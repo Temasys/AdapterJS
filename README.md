@@ -17,19 +17,19 @@ AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around t
 
 ## Helper functions
 
-### `attachMediaStream(videoelement, stream)`
+#### `attachMediaStream(videoelement, stream)`
 
 universally adds a stream object to a video element
 
-### `reattachMediaStream(videoelement, videoelement)`
+#### `reattachMediaStream(videoelement, videoelement)`
 
 universally copies a stream object from one video element to another
 
-### `createIceServer(url, username, password)`
+#### `createIceServer(url, username, password)`
 
 creates a valid iceServer from one url, username and password
 
-### `createIceServers(urls, username, password)`
+#### `createIceServers(urls, username, password)`
 
 creates a valid iceServers array for the specific browser and version.
 
@@ -52,15 +52,15 @@ creates a valid iceServers array for the specific browser and version.
 
 ## Folders
 
-### publish
+#### publish
 
 The debug version of the library and a minified copy of it
 
-### source
+#### source
 
 The adapter.js library development file
 
-### tests
+#### tests
 
 Tape tests
 
