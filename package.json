@@ -1,0 +1,75 @@
+{
+    "name": "adapterjs",
+    "description": "Creating a common API for WebRTC in the browser",
+    "version": "0.0.1",
+    "homepage": "https://temasys.github.io/",
+    "author": {
+        "name": "Temasys Communications Pte. Ltd.",
+        "email": "info@temasys.com.sg"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:Temasys/AdapterJS.git"
+    },
+    "licenses": [{
+        "type": "Apache",
+        "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }],
+    "scripts": {
+        "test": "./test.sh;",
+        "prestart": "./start.sh;"
+    },
+    "devDependencies": {
+        "connect": "2.14.3",
+        "express": "~3.4",
+        "grunt": "0.4.1",
+        "grunt-contrib-clean": "0.4.0",
+        "grunt-contrib-concat": "0.3.0",
+        "grunt-contrib-jshint": "0.3.0",
+        "grunt-contrib-uglify": "^0.5.0",
+        "grunt-replace": "0.4.4",
+        "grunt-tape": "0.0.2",
+        "tape": "2.12.0"
+    },
+    "testling": {
+        "files": "tests/*.js",
+        "browsers": [
+            "ie/9",
+            "chrome/23.0",
+            "chrome/24.0",
+            "chrome/25.0",
+            "chrome/26.0",
+            "chrome/27.0",
+            "chrome/28.0",
+            "chrome/29.0",
+            "chrome/30.0",
+            "chrome/31.0",
+            "chrome/32.0",
+            "chrome/canary",
+            "firefox/18.0",
+            "firefox/19.0",
+            "firefox/20.0",
+            "firefox/21.0",
+            "firefox/22.0",
+            "firefox/23.0",
+            "firefox/24.0",
+            "firefox/25.0",
+            "firefox/26.0",
+            "firefox/27.0",
+            "firefox/nightly",
+            "opera/18.0",
+            "opera/19.0",
+            "opera/next",
+            "safari/latest",
+            "iphone/latest",
+            "ipad/latest",
+            "android-browser/latest"
+        ]
+    },
+    "engines": {
+        "node": "0.10.26",
+        "npm": "1.4.6",
+        "grunt": "0.4.1a"
+    },
+    "keywords": []
+}
