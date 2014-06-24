@@ -7,7 +7,7 @@
 [![browser support](https://ci.testling.com/Temasys/AdapterJS.png)
 ](https://ci.testling.com/Temasys/AdapterJS)
 
-AdapterJS provides Shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
+AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
 
 ## Shims
@@ -17,10 +17,21 @@ AdapterJS provides Shims and cross-browser helpers for WebRTC. It wraps around t
 
 ## Helper functions
 
-- `attachMediaStream(videoelement, stream)` universally adds a stream object to a video element
-- `reattachMediaStream(videoelement, videoelement)` universally copies a stream object from one video element to another
-- `createIceServer(url, username, password)` creates a valid iceServer from one url, username and password
-- `createIceServers(urls, username, password)` creates a valid iceServers array for the specific browser and version.
+### `attachMediaStream(videoelement, stream)`
+
+universally adds a stream object to a video element
+
+### `reattachMediaStream(videoelement, videoelement)`
+
+universally copies a stream object from one video element to another
+
+### `createIceServer(url, username, password)`
+
+creates a valid iceServer from one url, username and password
+
+### `createIceServers(urls, username, password)`
+
+creates a valid iceServers array for the specific browser and version.
 
 
 ## Setup this project
@@ -43,7 +54,7 @@ AdapterJS provides Shims and cross-browser helpers for WebRTC. It wraps around t
 
 ### publish
 
-The production version of the library and a minified copy of it
+The debug version of the library and a minified copy of it
 
 ### source
 
@@ -52,3 +63,8 @@ The adapter.js library development file
 ### tests
 
 Tape tests
+
+
+## License
+
+APACHE 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
