@@ -1,9 +1,9 @@
-# SkywayJS
+# AdapterJS
 
-> WebRTC real-time video conversation library
+> Creating a common API for WebRTC in the browser
 
-[![browser support](https://ci.testling.com/TemasysCommunications/SkywayJS.png)
-](https://ci.testling.com/TemasysCommunications/SkywayJS)
+[![browser support](https://ci.testling.com/Temasys/AdapterJS.png)
+](https://ci.testling.com/Temasys/AdapterJS)
 
 ## Setup
 
@@ -17,17 +17,9 @@
 
 - Run `npm test` to execute jshint and run the tests in your local Chrome (Mac). You can configure this in the `test.sh` file.
 - Run `grunt jshint` to run jshint on its own.
-- Run `grunt publish` to create production version in `publish` folder and generate the documentation in `doc` folder
+- Run `grunt publish` to create production version in `publish` folder
 
 ## Folders
-
-### demo
-
-Some demos to help with the development
-
-### doc
-
-YUI Documentation for the Skyway object and its events
 
 ### publish
 
@@ -35,7 +27,7 @@ The production version of the library and a minified copy of it
 
 ### source
 
-The skyway.js library development files
+The adapter.js library development file
 
 ### tests
 
