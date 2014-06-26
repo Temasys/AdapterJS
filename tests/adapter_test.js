@@ -1,5 +1,5 @@
 var test = require('tape'),
-	adapter = require('./../source/adapter.js');
+	adapter = require('./../publish/adapter.min.js');
 
 
 test('RTCPeerConnection is defined', function (t) {
