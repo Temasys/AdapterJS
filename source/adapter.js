@@ -175,6 +175,7 @@ getBrowserVersion = function () {
   return agent;
 };
 webrtcDetectedBrowser = getBrowserVersion();
+
 /**
  * Note:
  *  use this whenever you want to call the plugin
