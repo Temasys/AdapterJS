@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.1 - 2014-06-24 */
+/*! adapterjs - v0.0.1 - 2014-07-07 */
 
 RTCPeerConnection = null;
 /**
@@ -171,6 +171,7 @@ getBrowserVersion = function () {
   return agent;
 };
 webrtcDetectedBrowser = getBrowserVersion();
+
 /**
  * Note:
  *  use this whenever you want to call the plugin
