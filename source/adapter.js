@@ -67,6 +67,13 @@ pluginNeededButNotInstalledCb = null;
 webrtcDetectedBrowser = {};
 /**
  * Note:
+ *  The Object to check the number of times the ConnectionState is called
+ * [attribute] ICEConnectionStatus
+ * [type] JSON
+ */
+ICEConnectionStatus = {};
+/**
+ * Note:
  *  The Object to store the list of DataChannels
  * [attribute] RTCDataChannels
  * [type] JSON
@@ -245,6 +252,45 @@ maybeFixConfiguration = function (pcConfig) {
     }
   }
 };
+/**
+ * Note:
+ *   Handles the differences for all Browsers
+ *
+ * @method checkICEConnectionState
+ * @param {RTCPeerConnection} pc
+ * @param {Boolean} returnStateAlways
+ * @protected
+ */
+checkICEConnectionState = function (pc, returnStateAlways) {
+  var iceConnectionState = pc.iceConnectionState;
+  var fireICEConnectionState = false;
+
+  if (iceConnectionState === 'connected') {
+    if (!ICEConnectionStatus.connected) {
+      fireICEConnectionState = true;
+    } else {
+      iceConnectionState = 'completed';
+    }
+  } else if (iceConnectionState === 'completed') {
+    if (!ICEConnectionStatus.completed) {
+      iceConnectionState = 'connected';
+      fireICEConnectionState = true;
+    } else {
+      iceConnectionState = 'completed';
+    }
+  }
+  console.info('iceConnectionState : ' + iceConnectionState);
+  if (fireICEConnectionState) {
+    pc.iceConnectionState = iceConnectionState;
+  }
+  if (!ICEConnectionStatus[iceConnectionState] || returnStateAlways) {
+    if (!ICEConnectionStatus[iceConnectionState]) {
+      ICEConnectionStatus[iceConnectionState] = true;
+    }
+    return iceConnectionState;
+  }
+  return;
+};
 /*******************************************************************
  Check for browser types and react accordingly
 *******************************************************************/
@@ -400,7 +446,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     return iceServer;
   };
 
-  /**
+   /**
    * Note:
    *   Creates iceServers from the urls for Chrome M34 and above.
    *  - .urls is supported since Chrome M34.
@@ -496,7 +542,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
   TemRTCPlugin = document.createElement('object');
   TemRTCPlugin.id = temPluginInfo.pluginId;
   TemRTCPlugin.style.visibility = 'hidden';
-  TemRTCPlugin.type = temPluginInfxo.type;
+  TemRTCPlugin.type = temPluginInfo.type;
   TemRTCPlugin.innerHTML = '<param name="onload" value="' +
     temPluginInfo.onload + '">' +
     '<param name="pluginId" value="' +
