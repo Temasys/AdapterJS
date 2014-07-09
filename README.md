@@ -33,9 +33,9 @@ creates a valid iceServer from one url, username and password
 
 creates a valid iceServers array for the specific browser and version.
 
-#### `checkICEConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
+#### `checkIceConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
 
-handles all the iceConnectionState differences cross-browsers. Return values are 'checking' > 'connected' > 'completed'.
+handles all the iceConnectionState differences cross-browsers. Order of return values are 'checking' > 'connected' > 'completed'.
 
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {

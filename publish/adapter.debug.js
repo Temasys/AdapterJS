@@ -264,12 +264,12 @@ maybeFixConfiguration = function (pcConfig) {
  * Note:
  *   Handles the differences for all Browsers
  *
- * @method checkICEConnectionState
+ * @method checkIceConnectionState
  * @param {RTCPeerConnection} pc
  * @param {Boolean} returnStateAlways
  * @protected
  */
-checkICEConnectionState = function (peerID, iceConnectionState, callback, returnStateAlways) {
+checkIceConnectionState = function (peerID, iceConnectionState, callback, returnStateAlways) {
   if (typeof callback !== 'function') {
     return;
   }
