@@ -40,9 +40,7 @@ handles all the iceConnectionState differences cross-browsers. Order of return v
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
   checkICEConnectionState(peerID, peerConnection.iceConnectionState, function (iceConnectionState) {
-    if (iceConnectionState) {
-      // do Something every time there's a new state ['checking', 'connected', 'completed']
-    }
+    // do Something every time there's a new state ['checking', 'connected', 'completed']
   });
 };
 ```
