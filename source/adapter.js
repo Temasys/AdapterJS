@@ -72,14 +72,14 @@ webrtcDetectedBrowser = {};
  * @type JSON
  */
 ICEConnectionState = {
-  starting     : 'starting',
-  checking     : 'checking',
-  connected    : 'connected',
-  completed    : 'connected',
-  done         : 'completed'
+  starting : 'starting',
+  checking : 'checking',
+  connected : 'connected',
+  completed : 'connected',
+  done : 'completed',
   disconnected : 'disconnected',
-  failed       : 'failed',
-  closed       : 'closed'
+  failed : 'failed',
+  closed : 'closed'
 };
 /**
  * Note:
@@ -285,7 +285,7 @@ checkIceConnectionState = function (peerID, iceConnectionState, callback, return
   var returnState = false, err = null;
   console.log('ICECONNECTIONSTATE: ' + iceConnectionState);
 
-  if (!ICEConnectionFiredStates[peerID] || 
+  if (!ICEConnectionFiredStates[peerID] ||
     iceConnectionState === ICEConnectionState.disconnected ||
     iceConnectionState === ICEConnectionState.failed ||
     iceConnectionState === ICEConnectionState.closed) {

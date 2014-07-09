@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.1 - 2014-07-09 */
+/*! adapterjs - v0.0.3 - 2014-07-09 */
 
 RTCPeerConnection = null;
 /**
@@ -68,10 +68,14 @@ webrtcDetectedBrowser = {};
  * @type JSON
  */
 ICEConnectionState = {
-  checking  : 'checking',
+  starting : 'starting',
+  checking : 'checking',
   connected : 'connected',
   completed : 'connected',
-  done      : 'completed'
+  done : 'completed',
+  disconnected : 'disconnected',
+  failed : 'failed',
+  closed : 'closed'
 };
 /**
  * Note:
@@ -274,15 +278,16 @@ checkIceConnectionState = function (peerID, iceConnectionState, callback, return
     return;
   }
   peerID = (peerID) ? peerID : 'peer';
-  var returnState = false;
+  var returnState = false, err = null;
   console.log('ICECONNECTIONSTATE: ' + iceConnectionState);
 
-  if (!ICEConnectionFiredStates[peerID]) {
+  if (!ICEConnectionFiredStates[peerID] ||
+    iceConnectionState === ICEConnectionState.disconnected ||
+    iceConnectionState === ICEConnectionState.failed ||
+    iceConnectionState === ICEConnectionState.closed) {
     ICEConnectionFiredStates[peerID] = [];
   }
-  if (ICEConnectionState[iceConnectionState]) {
-    iceConnectionState = ICEConnectionState[iceConnectionState];
-  }
+  iceConnectionState = ICEConnectionState[iceConnectionState];
   if (ICEConnectionFiredStates[peerID].indexOf(iceConnectionState) === -1) {
     ICEConnectionFiredStates[peerID].push(iceConnectionState);
     if (iceConnectionState === ICEConnectionState.connected) {
