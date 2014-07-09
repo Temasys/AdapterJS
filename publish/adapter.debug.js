@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.3 - 2014-07-09 */
+/*! adapterjs - v0.0.3 - 2014-07-10 */
 
 RTCPeerConnection = null;
 /**
@@ -269,7 +269,9 @@ maybeFixConfiguration = function (pcConfig) {
  *   Handles the differences for all Browsers
  *
  * @method checkIceConnectionState
- * @param {RTCPeerConnection} pc
+ * @param {String} peerID
+ * @param {String} iceConnectionState
+ * @param {Function} callback
  * @param {Boolean} returnStateAlways
  * @protected
  */
@@ -302,6 +304,73 @@ checkIceConnectionState = function (peerID, iceConnectionState, callback, return
     callback(iceConnectionState);
   }
   return;
+};
+/**
+ * Note:
+ *   Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
+ *   This is only for SCTP based support browsers
+ *
+ * @method checkDataChannelSettings
+ * @param {Boolean} isOffer
+ * @param {String} peerBrowserAgent
+ * @param {Function} callback
+ * @param {JSON} constraints
+ * @protected
+ */
+checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, constraints) {
+  if (typeof callback !== 'function') {
+    return;
+  }
+  var resendEnter = false;
+  // Resends an updated version of constraints for MozDataChannel to work
+  // If other userAgent is firefox and user is firefox, remove MozDataChannel
+  if (isOffer) {
+    console.log('IsOffer');
+    if (webrtcDetectedBrowser.mozWebRTC) {
+      if (peerBrowserAgent === 'Firefox') {
+        try {
+          delete constraints.mandatory.MozDontOfferDataChannel;
+        } catch (err) {
+          console.error('Failed deleting MozDontOfferDataChannel');
+          console.exception(err);
+        }
+      } else {
+        // MozDontOfferDataChannel is required for Video and Audio interopability
+        constraints.mandatory.MozDontOfferDataChannel = true;
+      }
+    }
+    console.log(constraints);
+  } else {
+    if (!webrtcDetectedBrowser.mozWebRTC && peerBrowserAgent === 'Firefox') {
+      if (!constraints) {
+        console.log('No constraints');
+        // Tells user to resend an 'enter' again
+        resendEnter = true;
+      } else {
+        // Tells user to restart ICE connection for peer again
+        constraints.mandatory.IceRestart = true;
+      }
+    }
+  }
+  if (constraints) {
+    if (webrtcDetectedBrowser.webkitWebRTC || webrtcDetectedBrowser.pluginWebRTC) {
+      // temporary measure to remove Moz* constraints in Chrome
+      for (var prop in constraints.mandatory) {
+        if (constraints.mandatory.hasOwnProperty(prop)) {
+          if (prop.indexOf('Moz') !== -1) {
+            delete constraints.mandatory[prop];
+          }
+        }
+      }
+    }
+    console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
+    console.info(constraints);
+    callback(constraints);
+  } else {
+    console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
+    console.info('Resend Enter ? : ' + resendEnter);
+    callback(resendEnter);
+  }
 };
 /*******************************************************************
  Check for browser types and react accordingly
