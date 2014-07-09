@@ -10,7 +10,7 @@
 AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
 
-## Shims
+## Polyfills
 
 `RTCPeerConnection`, `RTCDataChannel` and `navigator.getUserMedia`
 
@@ -33,6 +33,19 @@ creates a valid iceServer from one url, username and password
 
 creates a valid iceServers array for the specific browser and version.
 
+#### `checkICEConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
+
+handles all the iceConnectionState differences cross-browsers. Return values are 'checking' > 'connected' > 'completed'.
+
+```javascript
+peerConnection.oniceconnectionstatechange = function () {
+  checkICEConnectionState(peerID, peerConnection.iceConnectionState, function (iceConnectionState) {
+    if (iceConnectionState) {
+      // do Something every time there's a new state ['checking', 'connected', 'completed']
+    }
+  });
+};
+```
 
 ## Setup this project
 

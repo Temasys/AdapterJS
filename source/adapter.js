@@ -67,11 +67,23 @@ pluginNeededButNotInstalledCb = null;
 webrtcDetectedBrowser = {};
 /**
  * Note:
- *  The Object to check the number of times the ConnectionState is called
- * [attribute] ICEConnectionStatus
- * [type] JSON
+ *   The results of each states returns
+ * @attribute ICEConnectionState
+ * @type JSON
  */
-ICEConnectionStatus = {};
+ICEConnectionState = {
+  checking  : 'checking',
+  connected : 'connected',
+  completed : 'connected',
+  done      : 'completed'
+};
+/**
+ * Note:
+ *   The states of each Peer
+ * @attribute ICEConnectionFiredStates
+ * @type JSON
+ */
+ICEConnectionFiredStates = {};
 /**
  * Note:
  *  The Object to store the list of DataChannels
@@ -261,33 +273,32 @@ maybeFixConfiguration = function (pcConfig) {
  * @param {Boolean} returnStateAlways
  * @protected
  */
-checkICEConnectionState = function (pc, returnStateAlways) {
-  var iceConnectionState = pc.iceConnectionState;
-  var fireICEConnectionState = false;
+checkICEConnectionState = function (peerID, iceConnectionState, callback, returnStateAlways) {
+  if (typeof callback !== 'function') {
+    return;
+  }
+  peerID = (peerID) ? peerID : 'peer';
+  var returnState = false;
+  console.log('ICECONNECTIONSTATE: ' + iceConnectionState);
 
-  if (iceConnectionState === 'connected') {
-    if (!ICEConnectionStatus.connected) {
-      fireICEConnectionState = true;
-    } else {
-      iceConnectionState = 'completed';
-    }
-  } else if (iceConnectionState === 'completed') {
-    if (!ICEConnectionStatus.completed) {
-      iceConnectionState = 'connected';
-      fireICEConnectionState = true;
-    } else {
-      iceConnectionState = 'completed';
-    }
+  if (!ICEConnectionFiredStates[peerID]) {
+    ICEConnectionFiredStates[peerID] = [];
   }
-  console.info('iceConnectionState : ' + iceConnectionState);
-  if (fireICEConnectionState) {
-    pc.iceConnectionState = iceConnectionState;
+  if (ICEConnectionState[iceConnectionState]) {
+    iceConnectionState = ICEConnectionState[iceConnectionState];
   }
-  if (!ICEConnectionStatus[iceConnectionState] || returnStateAlways) {
-    if (!ICEConnectionStatus[iceConnectionState]) {
-      ICEConnectionStatus[iceConnectionState] = true;
+  if (ICEConnectionFiredStates[peerID].indexOf(iceConnectionState) === -1) {
+    ICEConnectionFiredStates[peerID].push(iceConnectionState);
+    if (iceConnectionState === ICEConnectionState.connected) {
+      setTimeout(function () {
+        ICEConnectionFiredStates[peerID].push(ICEConnectionState.done);
+        callback(ICEConnectionState.done);
+      }, 1000);
     }
-    return iceConnectionState;
+    returnState = true;
+  }
+  if (returnStateAlways || returnState) {
+    callback(iceConnectionState);
   }
   return;
 };
