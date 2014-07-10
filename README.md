@@ -87,18 +87,17 @@ displays all the browser information and the webrtc type of support
 
 ## Setup this project
 
-- Install or update to the latest version of node and npm
+- Install or update to at lest version 0.10.26 of node and version 1.4.6 of npm
 - Install `grunt-cli` (See: http://gruntjs.com/getting-started)
 - Run `npm install` to install dev dependencies.
 - Run `npm install -g browserify` and `npm install -g testling` (might require sudo) to install the necessary tools to test locally
-- Run `npm start` to start a local webserver to be able access the demo and doc folders (WebRTC won't work from your local file-system). This will popup Chrome (Mac). You can configure a different browsers in the `start.sh` file.
 
 
 ## Development
 
 - Run `npm test` to execute jshint and run the tests in your local Chrome (Mac). You can configure this in the `test.sh` file.
 - Run `grunt jshint` to run jshint on its own.
-- Run `grunt publish` to create production version in `publish` folder
+- Run `grunt publish` to create production debug and minified copies of adapter.js in `publish` folder
 
 
 ## Folders
