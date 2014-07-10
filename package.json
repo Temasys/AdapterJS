@@ -16,8 +16,7 @@
         "url": "http://www.apache.org/licenses/LICENSE-2.0"
     }],
     "scripts": {
-        "test": "./test.sh;",
-        "prestart": "./start.sh;"
+        "test": "./test.sh;"
     },
     "dependencies": {},
     "devDependencies": {
