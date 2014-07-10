@@ -325,40 +325,39 @@ checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, c
   if (typeof callback !== 'function') {
     return;
   }
-  var resendEnter = false;
+  var peerBrowserVersion, resendEnter = false;
+
+  console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
+
+  if (peerBrowserAgent.indexOf('|') > -1) {
+    peerBrowser = peerBrowserAgent.split('|');
+    peerBrowserAgent = peerBrowser[0];
+    peerBrowserVersion = parseInt(peerBrowser[1], 10);
+    console.info('Peer Browser version: ' + peerBrowserVersion);
+  }
+  var isLocalFirefox = webrtcDetectedBrowser.mozWebRTC;
+  // Nightly version does not require MozDontOfferDataChannel for interop
+  var isLocalFirefoxInterop = webrtcDetectedBrowser.mozWebRTC &&
+    webrtcDetectedBrowser.version > 30;
+  var isPeerFirefox = peerBrowserAgent === 'Firefox';
+  var isPeerFirefoxInterop = peerBrowserAgent === 'Firefox' &&
+    ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
+
   // Resends an updated version of constraints for MozDataChannel to work
   // If other userAgent is firefox and user is firefox, remove MozDataChannel
   if (isOffer) {
-    console.log('IsOffer');
-    if (webrtcDetectedBrowser.mozWebRTC) {
-      if (peerBrowserAgent === 'Firefox') {
-        try {
-          delete constraints.mandatory.MozDontOfferDataChannel;
-        } catch (err) {
-          console.error('Failed deleting MozDontOfferDataChannel');
-          console.exception(err);
-        }
-      } else {
-        // MozDontOfferDataChannel is required for Video and Audio interopability
-        constraints.mandatory.MozDontOfferDataChannel = true;
+    if ((isLocalFirefox && isPeerFirefox) || (isLocalFirefoxInterop)) {
+      try {
+        delete constraints.mandatory.MozDontOfferDataChannel;
+      } catch (err) {
+        console.error('Failed deleting MozDontOfferDataChannel');
+        console.exception(err);
       }
+    } else if ((isLocalFirefox && !isPeerFirefox)) {
+      constraints.mandatory.MozDontOfferDataChannel = true;
     }
-    console.log(constraints);
-  } else {
-    if (!webrtcDetectedBrowser.mozWebRTC && peerBrowserAgent === 'Firefox') {
-      if (!constraints) {
-        console.log('No constraints');
-        // Tells user to resend an 'enter' again
-        resendEnter = true;
-      } else {
-        // Tells user to restart ICE connection for peer again
-        constraints.mandatory.IceRestart = true;
-      }
-    }
-  }
-  if (constraints) {
-    if (webrtcDetectedBrowser.webkitWebRTC || webrtcDetectedBrowser.pluginWebRTC) {
-      // temporary measure to remove Moz* constraints in Chrome
+    if (!isLocalFirefox) {
+      // temporary measure to remove Moz* constraints in non Firefox browsers
       for (var prop in constraints.mandatory) {
         if (constraints.mandatory.hasOwnProperty(prop)) {
           if (prop.indexOf('Moz') !== -1) {
@@ -367,12 +366,17 @@ checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, c
         }
       }
     }
-    console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
-    console.info(constraints);
+    console.log('Set Offer constraints for DataChannel and MediaStream interopability');
+    console.dir(constraints);
     callback(constraints);
   } else {
-    console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
-    console.info('Resend Enter ? : ' + resendEnter);
+    // Tells user to resend an 'enter' again
+    // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
+    // interopability of the media stream
+    if (!isLocalFirefox && isPeerFirefox && !isPeerFirefoxInterop) {
+      resendEnter = true;
+    }
+    console.info('Resend Enter: ' + resendEnter);
     callback(resendEnter);
   }
 };
