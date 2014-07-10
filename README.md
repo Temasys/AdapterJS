@@ -10,7 +10,7 @@
 AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
 
-## Shims
+## Polyfills
 
 `RTCPeerConnection`, `RTCDataChannel` and `navigator.getUserMedia`
 
@@ -33,6 +33,57 @@ creates a valid iceServer from one url, username and password
 
 creates a valid iceServers array for the specific browser and version.
 
+#### `checkIceConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
+
+handles all the iceConnectionState differences cross-browsers. Order of return values are 'checking' > 'connected' > 'completed'.
+
+```javascript
+peerConnection.oniceconnectionstatechange = function () {
+  checkICEConnectionState(peerID, peerConnection.iceConnectionState, function (iceConnectionState) {
+    // do Something every time there's a new state ['checking', 'connected', 'completed']
+  });
+};
+```
+
+#### `checkMediaDataChannelSettings(isOffer, peerBrowserAgent, callback, constraints)`
+
+handles all MediaStream and DataChannel differences for interopability cross-browsers.
+method has to be called before sending the acknowledge to create the offer and before creating the offer 
+
+```javascript
+// Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
+// the other peer
+var isOffer = false;
+// You may use "webrtcDetectedBrowser" Helper function to get the peer to send browser information
+var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
+checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
+  if (beOfferer) {
+    // be the one who does the offer
+  } else {
+    // your peer does the offer
+  }
+});
+```
+
+```javascript
+// We are going to do the offer so we need to check the constraints first.
+var isOffer = true;
+// You may use "webrtcDetectedBrowser" Helper variable to get the peer to send browser information
+var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion; 
+checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstraints) {
+  peerConnection.createOffer(function (offer) {
+    // success
+  }, function (error) {
+    // failure
+  }, offerConstraints);
+}, constraints);
+```
+
+## Helper variables
+
+#### `webrtcDetectedBrowser`
+
+displays all the browser information and the webrtc type of support
 
 ## Setup this project
 
