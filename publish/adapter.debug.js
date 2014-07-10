@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.3 - 2014-07-10 */
+/*! adapterjs - v0.0.2 - 2014-07-10 */
 
 RTCPeerConnection = null;
 /**

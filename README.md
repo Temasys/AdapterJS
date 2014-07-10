@@ -2,9 +2,15 @@
 
 > Creating a common API for WebRTC in the browser
 
+Find the most recent version hosted on our CDN. SSL versions are in the works.
+
+- Minified version: `http://cdn.temasys.com.sg/adapterjs/latest/adapter.min.js`
+- Debug version `http://cdn.temasys.com.sg/adapterjs/latest/adapter.debug.js`
+
+
 ## Compatibility
 
-AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
+AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
 
 ## Functionality
