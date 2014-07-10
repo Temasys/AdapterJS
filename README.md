@@ -79,6 +79,12 @@ checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstrai
 }, constraints);
 ```
 
+## Helper variables
+
+#### `webrtcDetectedBrowser`
+
+displays all the browser information and the webrtc type of support
+
 ## Setup this project
 
 - Install or update to the latest version of node and npm
