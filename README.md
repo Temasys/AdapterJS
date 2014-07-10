@@ -4,36 +4,35 @@
 
 ## Compatibility
 
-[![browser support](https://ci.testling.com/Temasys/AdapterJS.png)
-](https://ci.testling.com/Temasys/AdapterJS)
-
-AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
+AdapterJS provides shims and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
 
-## Polyfills
+## Functionality
+
+#### Polyfills
 
 `RTCPeerConnection`, `RTCDataChannel` and `navigator.getUserMedia`
 
 
-## Helper functions
+#### Helper functions
 
-#### `attachMediaStream(videoelement, stream)`
+##### `attachMediaStream(videoelement, stream)`
 
 universally adds a stream object to a video element
 
-#### `reattachMediaStream(videoelement, videoelement)`
+##### `reattachMediaStream(videoelement, videoelement)`
 
 universally copies a stream object from one video element to another
 
-#### `createIceServer(url, username, password)`
+##### `createIceServer(url, username, password)`
 
 creates a valid iceServer from one url, username and password
 
-#### `createIceServers(urls, username, password)`
+##### `createIceServers(urls, username, password)`
 
 creates a valid iceServers array for the specific browser and version.
 
-#### `checkIceConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
+##### `checkIceConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
 
 handles all the iceConnectionState differences cross-browsers. Order of return values are 'checking' > 'connected' > 'completed'.
 
@@ -45,10 +44,10 @@ peerConnection.oniceconnectionstatechange = function () {
 };
 ```
 
-#### `checkMediaDataChannelSettings(isOffer, peerBrowserAgent, callback, constraints)`
+##### `checkMediaDataChannelSettings(isOffer, peerBrowserAgent, callback, constraints)`
 
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
-method has to be called before sending the acknowledge to create the offer and before creating the offer 
+method has to be called before sending the acknowledge to create the offer and before creating the offer
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
@@ -69,7 +68,7 @@ checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
 // We are going to do the offer so we need to check the constraints first.
 var isOffer = true;
 // You may use "webrtcDetectedBrowser" Helper variable to get the peer to send browser information
-var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion; 
+var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
 checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstraints) {
   peerConnection.createOffer(function (offer) {
     // success
@@ -79,11 +78,12 @@ checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstrai
 }, constraints);
 ```
 
-## Helper variables
+### Helper variables
 
-#### `webrtcDetectedBrowser`
+##### `webrtcDetectedBrowser`
 
 displays all the browser information and the webrtc type of support
+
 
 ## Setup this project
 
@@ -103,15 +103,15 @@ displays all the browser information and the webrtc type of support
 
 ## Folders
 
-#### publish
+##### publish
 
 The debug version of the library and a minified copy of it
 
-#### source
+##### source
 
 The adapter.js library development file
 
-#### tests
+##### tests
 
 Tape tests
 
