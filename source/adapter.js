@@ -189,7 +189,7 @@ getBrowserVersion = function () {
     }
   }
   agent.os = navigator.platform;
-  agent.isSCTPDCSupported = agent.mozWebRTC || 
+  agent.isSCTPDCSupported = agent.mozWebRTC ||
     (agent.browser === 'Chrome' && agent.version > 30) ||
     (agent.browser === 'Opera' && agent.version > 19);
   agent.isRTPDCSupported = agent.browser === 'Chrome' && agent.version < 30 && agent.version > 24;
@@ -312,7 +312,7 @@ checkIceConnectionState = function (peerID, iceConnectionState, callback, return
  *   Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
  *   This is only for SCTP based support browsers
  *
- * @method checkDataChannelSettings
+ * @method checkMediaDataChannelSettings
  * @param {Boolean} isOffer
  * @param {String} peerBrowserAgent
  * @param {Function} callback
@@ -323,7 +323,7 @@ checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, c
   if (typeof callback !== 'function') {
     return;
   }
-  var peerBrowserVersion, resendEnter = false;
+  var peerBrowserVersion, beOfferer = false;
 
   console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
 
@@ -372,10 +372,10 @@ checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, c
     // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
     // interopability of the media stream
     if (!isLocalFirefox && isPeerFirefox && !isPeerFirefoxInterop) {
-      resendEnter = true;
+      beOfferer = true;
     }
-    console.info('Resend Enter: ' + resendEnter);
-    callback(resendEnter);
+    console.info('Resend Enter: ' + beOfferer);
+    callback(beOfferer);
   }
 };
 /*******************************************************************

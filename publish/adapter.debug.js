@@ -124,8 +124,8 @@ TemPageId = Math.random().toString(36).slice(2);
  * 2nd Step: Check browser DataChannels Support
  * 3rd Step: Check browser WebRTC Support type
  * 4th Step: Get browser version
- * [Credits]: Get version of Browser. Code provided by kennebec@stackoverflow.com
- * [Credits]: IsSCTP/isRTPD Supported. Code provided by DetectRTC by Muaz Khan
+ * @author Get version of Browser. Code provided by kennebec@stackoverflow.com
+ * @author IsSCTP/isRTPD Supported. Code provided by DetectRTC by Muaz Khan
  *
  * @method getBrowserVersion
  * @protected
@@ -137,13 +137,6 @@ getBrowserVersion = function () {
   tem;
   var M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
 
-  agent.os = navigator.platform;
-  agent.isSCTPDCSupported = agent.mozWebRTC || (agent.browser === 'Chrome' && agent.version >= 25);
-  agent.isRTPDCSupported = agent.browser === 'Chrome' && agent.version >= 31;
-  if (!agent.isSCTPDCSupported && !agent.isRTPDCSupported) {
-    // Plugin magic here
-    agent.isPluginSupported = true;
-  }
   if (na.mozGetUserMedia) {
     agent.mozWebRTC = true;
   } else if (na.webkitGetUserMedia) {
@@ -191,10 +184,15 @@ getBrowserVersion = function () {
       agent.version = 0;
     }
   }
+  agent.os = navigator.platform;
+  agent.isSCTPDCSupported = agent.mozWebRTC ||
+    (agent.browser === 'Chrome' && agent.version > 30) ||
+    (agent.browser === 'Opera' && agent.version > 19);
+  agent.isRTPDCSupported = agent.browser === 'Chrome' && agent.version < 30 && agent.version > 24;
+  agent.isPluginSupported = !agent.isSCTPDCSupported && !agent.isRTPDCSupported;
   return agent;
 };
 webrtcDetectedBrowser = getBrowserVersion();
-
 /**
  * Note:
  *  use this whenever you want to call the plugin
@@ -310,7 +308,7 @@ checkIceConnectionState = function (peerID, iceConnectionState, callback, return
  *   Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
  *   This is only for SCTP based support browsers
  *
- * @method checkDataChannelSettings
+ * @method checkMediaDataChannelSettings
  * @param {Boolean} isOffer
  * @param {String} peerBrowserAgent
  * @param {Function} callback
@@ -321,7 +319,7 @@ checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, c
   if (typeof callback !== 'function') {
     return;
   }
-  var peerBrowserVersion, resendEnter = false;
+  var peerBrowserVersion, beOfferer = false;
 
   console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
 
@@ -370,10 +368,10 @@ checkMediaDataChannelSettings = function (isOffer, peerBrowserAgent, callback, c
     // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
     // interopability of the media stream
     if (!isLocalFirefox && isPeerFirefox && !isPeerFirefoxInterop) {
-      resendEnter = true;
+      beOfferer = true;
     }
-    console.info('Resend Enter: ' + resendEnter);
-    callback(resendEnter);
+    console.info('Resend Enter: ' + beOfferer);
+    callback(beOfferer);
   }
 };
 /*******************************************************************

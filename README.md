@@ -45,6 +45,40 @@ peerConnection.oniceconnectionstatechange = function () {
 };
 ```
 
+#### `checkMediaDataChannelSettings(isOffer, peerBrowserAgent, callback, constraints)`
+
+handles all MediaStream and DataChannel differences for interopability cross-browsers.
+method has to be called before sending the acknowledge to create the offer and before creating the offer 
+
+```javascript
+// Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
+// the other peer
+var isOffer = false;
+// You may use "webrtcDetectedBrowser" Helper function to get the peer to send browser information
+var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
+checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
+  if (beOfferer) {
+    // be the one who does the offer
+  } else {
+    // your peer does the offer
+  }
+});
+```
+
+```javascript
+// We are going to do the offer so we need to check the constraints first.
+var isOffer = true;
+// You may use "webrtcDetectedBrowser" Helper function to get the peer to send browser information
+var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion; 
+checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstraints) {
+  peerConnection.createOffer(function (offer) {
+    // success
+  }, function (error) {
+    // failure
+  }, offerConstraints);
+}, constraints);
+```
+
 ## Setup this project
 
 - Install or update to the latest version of node and npm
