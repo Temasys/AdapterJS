@@ -68,7 +68,7 @@ checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
 ```javascript
 // We are going to do the offer so we need to check the constraints first.
 var isOffer = true;
-// You may use "webrtcDetectedBrowser" Helper function to get the peer to send browser information
+// You may use "webrtcDetectedBrowser" Helper variable to get the peer to send browser information
 var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion; 
 checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstraints) {
   peerConnection.createOffer(function (offer) {
