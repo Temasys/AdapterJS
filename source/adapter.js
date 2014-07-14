@@ -90,13 +90,6 @@ ICEConnectionState = {
 ICEConnectionFiredStates = {};
 /**
  * Note:
- *  The Object to store the list of DataChannels
- * [attribute] RTCDataChannels
- * [type] JSON
- */
-RTCDataChannels = {};
-/**
- * Note:
  *  The Object to store Plugin information
  * [attribute] temPluginInfo
  * [type] JSON

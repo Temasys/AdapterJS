@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.2 - 2014-07-10 */
+/*! adapterjs - v0.0.2 - 2014-07-14 */
 
 RTCPeerConnection = null;
 /**
@@ -84,13 +84,6 @@ ICEConnectionState = {
  * @type JSON
  */
 ICEConnectionFiredStates = {};
-/**
- * Note:
- *  The Object to store the list of DataChannels
- * [attribute] RTCDataChannels
- * [type] JSON
- */
-RTCDataChannels = {};
 /**
  * Note:
  *  The Object to store Plugin information
