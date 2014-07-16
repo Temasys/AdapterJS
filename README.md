@@ -42,10 +42,12 @@ creates a valid iceServers array for the specific browser and version.
 
 handles all the iceConnectionState differences cross-browsers. Order of return values are 'checking' > 'connected' > 'completed'.
 tested outcomes in Firefox returns 'checking' > 'connected' for both offerer and answerer.
-tested outcomes in Chrome returns 'checking' > 'completed' > 'completed' (sometimes repeated twice) for the offerer and
-'checking' > 'connected' for the answerer. 
-to make sure that all iceConnectionState returns the same outcome and is connected based on different browser results, use
-this helper function to handle all differences and return the same result.
+
+__Tested outcomes__
+- __Chrome (offerer)__   : 'checking' > 'completed' > 'completed'
+- __Chrome (answerer)__  : 'checking' > 'connected'
+- __Firefox (offerer)__  : 'checking' > 'connected'
+- __Firefox (answerer)__ : 'checking' > 'connected'
 
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
@@ -60,10 +62,12 @@ peerConnection.oniceconnectionstatechange = function () {
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
 method has to be called before sending the acknowledge to create the offer and before creating the offer.
 
-for Firefox (not 30+) and Chrome interopability, MozDontOfferDataChannel has to be used, which destroys the
-ability of it establishing a DataChannel connection, hence Chrome or other browser has to be the one creating
-the offer in-order for a Firefox to Chrome interopability.
-use this helper function to manage all interopability for Chrome to Firefox MediaStream and DataChannel connection
+__Check which Peer creates the Offer__
+
+For Firefox (not 30+) and Chrome MediaStream interopability, _``MozDontOfferDataChannel``_ has to be used, and hence 
+Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection.
+To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one 
+creating the offer. 
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
@@ -78,9 +82,9 @@ checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
   }
 });
 ```
+__Check Offer constraints__
 
-this is needed to check and make sure that MozDontOfferDataChannel is removed if it's a Firefox to Firefox connection.
-if it's a Firefox to Chrome or other browsers connection, make sure MozDontOfferDataChannel is true.
+For Firefox to Firefox MediaStream and DataChannel connection interopability, _``MozDontOfferDataChannel``_ has to be removed.
 
 ```javascript
 // We are going to do the offer so we need to check the constraints first.
