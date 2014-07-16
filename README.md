@@ -41,6 +41,11 @@ creates a valid iceServers array for the specific browser and version.
 ##### `checkIceConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
 
 handles all the iceConnectionState differences cross-browsers. Order of return values are 'checking' > 'connected' > 'completed'.
+tested outcomes in Firefox returns 'checking' > 'connected' for both offerer and answerer.
+tested outcomes in Chrome returns 'checking' > 'completed' > 'completed' (sometimes repeated twice) for the offerer and
+'checking' > 'connected' for the answerer. 
+to make sure that all iceConnectionState returns the same outcome and is connected based on different browser results, use
+this helper function to handle all differences and return the same result.
 
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
@@ -53,12 +58,16 @@ peerConnection.oniceconnectionstatechange = function () {
 ##### `checkMediaDataChannelSettings(isOffer, peerBrowserAgent, callback, constraints)`
 
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
-method has to be called before sending the acknowledge to create the offer and before creating the offer
+method has to be called before sending the acknowledge to create the offer and before creating the offer.
+
+for Firefox (not 30+) and Chrome interopability, MozDontOfferDataChannel has to be used, which destroys the
+ability of it establishing a DataChannel connection, hence Chrome or other browser has to be the one creating
+the offer in-order for a Firefox to Chrome interopability.
+use this helper function to manage all interopability for Chrome to Firefox MediaStream and DataChannel connection
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
 // the other peer
-var isOffer = false;
 // You may use "webrtcDetectedBrowser" Helper function to get the peer to send browser information
 var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
 checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
@@ -70,12 +79,14 @@ checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
 });
 ```
 
+this is needed to check and make sure that MozDontOfferDataChannel is removed if it's a Firefox to Firefox connection.
+if it's a Firefox to Chrome or other browsers connection, make sure MozDontOfferDataChannel is true.
+
 ```javascript
 // We are going to do the offer so we need to check the constraints first.
-var isOffer = true;
 // You may use "webrtcDetectedBrowser" Helper variable to get the peer to send browser information
 var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
-checkMediaDataChannelSettings(isOffer, peerAgentBrowser, function (offerConstraints) {
+checkMediaDataChannelSettings(true, peerAgentBrowser, function (offerConstraints) {
   peerConnection.createOffer(function (offer) {
     // success
   }, function (error) {
