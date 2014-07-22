@@ -8,7 +8,18 @@
    * @class AdapterJS
    * @constructor
   */
-  function AdapterJS () {
+  function IAdapterJS () {
+    /**
+     * Note:
+     *   The results of each states returns
+     * @attribute _ICECONNECTION_STATE
+     * @type JSON
+     * @protected
+     */
+    this.PLUGIN_READY_STATE = {
+      INIT : 0,
+      READY : 1
+    };
     /**
      * Note:
      *   The results of each states returns
@@ -35,12 +46,21 @@
     /**
      * Note:
      *  The WebRTC Detected type information
-     * @attribute webrtcDetectedBrowser
+     * @attribute browser
      * @type JSON
      */
-    this.webrtcDetectedBrowser = {};
+    this.browser = {};
+    /**
+     * State of Plugin ready [Rel: AdapterJS.PLUGIN_READY_STATE]
+     *
+     * @attribute pluginReadyState
+     * @type String
+     * - INIT: Plugin is loading.
+     * - READY: Plugin has been loaded and is ready to use
+     */
+    this.pluginReadyState = this.PLUGIN_READY_STATE.INIT;
   }
-  this.AdapterJS = AdapterJS;
+  this.IAdapterJS = IAdapterJS;
 
   /**
    * Note:
@@ -53,7 +73,7 @@
    * @param {Boolean} returnStateAlways
    * @protected
    */
-  AdapterJS.prototype.checkIceConnectionState =
+  IAdapterJS.prototype.checkIceConnectionState =
     function (peerID, iceConnectionState, callback, returnStateAlways) {
     if (typeof callback !== 'function') {
       return;
@@ -86,7 +106,6 @@
   };
 
   /**
-   * Note:
    * - Latest Opera supports Webkit WebRTC
    * - IE is detected as Safari
    * - Older Firefox and Chrome does not support WebRTC
@@ -102,11 +121,10 @@
    * 4th Step: Get browser version
    * @author Get version of Browser. Code provided by kennebec@stackoverflow.com
    * @author IsSCTP/isRTPD Supported. Code provided by DetectRTC by Muaz Khan
-   *
-   * @method getBrowserVersion
-   * @protected
+   * @method _getBrowser
+   * @private
    */
-  AdapterJS.prototype.getBrowserVersion = function () {
+  IAdapterJS.prototype._getBrowser = function () {
     var agent = {},
     na = navigator,
     ua = na.userAgent,
@@ -170,9 +188,8 @@
   };
 
   /**
-   * Note:
-   *   Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
-   *   This is only for SCTP based support browsers
+   * Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
+   * This is only for SCTP based support browsers
    *
    * @method checkMediaDataChannelSettings
    * @param {Boolean} isOffer
@@ -181,14 +198,14 @@
    * @param {JSON} constraints
    * @protected
    */
-  AdapterJS.prototype.checkMediaDataChannelSettings =
+  IAdapterJS.prototype.checkMediaDataChannelSettings =
     function (isOffer, peerBrowserAgent, callback, constraints) {
     if (typeof callback !== 'function') {
       return;
     }
     var peerBrowserVersion, beOfferer = false;
 
-    console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
+    console.log('Self: ' + this.browser.browser + ' | Peer: ' + peerBrowserAgent);
 
     if (peerBrowserAgent.indexOf('|') > -1) {
       peerBrowser = peerBrowserAgent.split('|');
@@ -196,10 +213,9 @@
       peerBrowserVersion = parseInt(peerBrowser[1], 10);
       console.info('Peer Browser version: ' + peerBrowserVersion);
     }
-    var isLocalFirefox = webrtcDetectedBrowser.mozWebRTC;
+    var isLocalFirefox = this.browser.mozWebRTC;
     // Nightly version does not require MozDontOfferDataChannel for interop
-    var isLocalFirefoxInterop = webrtcDetectedBrowser.mozWebRTC &&
-      webrtcDetectedBrowser.version > 30;
+    var isLocalFirefoxInterop = this.browser.mozWebRTC && this.browser.version > 30;
     var isPeerFirefox = peerBrowserAgent === 'Firefox';
     var isPeerFirefoxInterop = peerBrowserAgent === 'Firefox' &&
       ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
@@ -251,7 +267,7 @@
    * @param {JSON} constraints
    * @protected
    */
-  AdapterJS.prototype.checkMediaDataChannel = function (stream, constraints) {
+  IAdapterJS.prototype.checkMediaDataChannel = function (stream, constraints) {
     var testedOptions = {
       audio : false,
       video : false,
@@ -278,6 +294,5 @@
     return testedOptions;
   };
 }).call(this);
-// Call adapter
-adapter = new AdapterJS();
-webrtcDetectedBrowser = adapter.getBrowserVersion();
+AdapterJS = new IAdapterJS();
+AdapterJS.browser = AdapterJS._getBrowser();

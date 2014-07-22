@@ -24,8 +24,8 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 #### Starting out
 
 ```javascript
-var adapter = new AdapterJS();
-adapter.helper_function();
+AdapterJS.variable;
+AdapterJS.function();
 ```
 
 #### Helper functions

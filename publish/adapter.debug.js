@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.2 - 2014-07-21 */
+/*! adapterjs - v0.0.2 - 2014-07-22 */
 
 /**
  * Add-on classes to help interopability that is not from the original AdapterJS specification
@@ -10,7 +10,18 @@
    * @class AdapterJS
    * @constructor
   */
-  function AdapterJS () {
+  function IAdapterJS () {
+    /**
+     * Note:
+     *   The results of each states returns
+     * @attribute _ICECONNECTION_STATE
+     * @type JSON
+     * @protected
+     */
+    this.PLUGIN_READY_STATE = {
+      INIT : 0,
+      READY : 1
+    };
     /**
      * Note:
      *   The results of each states returns
@@ -37,12 +48,21 @@
     /**
      * Note:
      *  The WebRTC Detected type information
-     * @attribute webrtcDetectedBrowser
+     * @attribute browser
      * @type JSON
      */
-    this.webrtcDetectedBrowser = {};
+    this.browser = {};
+    /**
+     * State of Plugin ready [Rel: AdapterJS.PLUGIN_READY_STATE]
+     *
+     * @attribute pluginReadyState
+     * @type String
+     * - INIT: Plugin is loading.
+     * - READY: Plugin has been loaded and is ready to use
+     */
+    this.pluginReadyState = this.PLUGIN_READY_STATE.INIT;
   }
-  this.AdapterJS = AdapterJS;
+  this.IAdapterJS = IAdapterJS;
 
   /**
    * Note:
@@ -55,7 +75,7 @@
    * @param {Boolean} returnStateAlways
    * @protected
    */
-  AdapterJS.prototype.checkIceConnectionState =
+  IAdapterJS.prototype.checkIceConnectionState =
     function (peerID, iceConnectionState, callback, returnStateAlways) {
     if (typeof callback !== 'function') {
       return;
@@ -88,7 +108,6 @@
   };
 
   /**
-   * Note:
    * - Latest Opera supports Webkit WebRTC
    * - IE is detected as Safari
    * - Older Firefox and Chrome does not support WebRTC
@@ -104,11 +123,10 @@
    * 4th Step: Get browser version
    * @author Get version of Browser. Code provided by kennebec@stackoverflow.com
    * @author IsSCTP/isRTPD Supported. Code provided by DetectRTC by Muaz Khan
-   *
-   * @method getBrowserVersion
-   * @protected
+   * @method _getBrowser
+   * @private
    */
-  AdapterJS.prototype.getBrowserVersion = function () {
+  IAdapterJS.prototype._getBrowser = function () {
     var agent = {},
     na = navigator,
     ua = na.userAgent,
@@ -172,9 +190,8 @@
   };
 
   /**
-   * Note:
-   *   Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
-   *   This is only for SCTP based support browsers
+   * Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
+   * This is only for SCTP based support browsers
    *
    * @method checkMediaDataChannelSettings
    * @param {Boolean} isOffer
@@ -183,14 +200,14 @@
    * @param {JSON} constraints
    * @protected
    */
-  AdapterJS.prototype.checkMediaDataChannelSettings =
+  IAdapterJS.prototype.checkMediaDataChannelSettings =
     function (isOffer, peerBrowserAgent, callback, constraints) {
     if (typeof callback !== 'function') {
       return;
     }
     var peerBrowserVersion, beOfferer = false;
 
-    console.log('Self: ' + webrtcDetectedBrowser.browser + ' | Peer: ' + peerBrowserAgent);
+    console.log('Self: ' + this.browser.browser + ' | Peer: ' + peerBrowserAgent);
 
     if (peerBrowserAgent.indexOf('|') > -1) {
       peerBrowser = peerBrowserAgent.split('|');
@@ -198,10 +215,9 @@
       peerBrowserVersion = parseInt(peerBrowser[1], 10);
       console.info('Peer Browser version: ' + peerBrowserVersion);
     }
-    var isLocalFirefox = webrtcDetectedBrowser.mozWebRTC;
+    var isLocalFirefox = this.browser.mozWebRTC;
     // Nightly version does not require MozDontOfferDataChannel for interop
-    var isLocalFirefoxInterop = webrtcDetectedBrowser.mozWebRTC &&
-      webrtcDetectedBrowser.version > 30;
+    var isLocalFirefoxInterop = this.browser.mozWebRTC && this.browser.version > 30;
     var isPeerFirefox = peerBrowserAgent === 'Firefox';
     var isPeerFirefoxInterop = peerBrowserAgent === 'Firefox' &&
       ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
@@ -253,7 +269,7 @@
    * @param {JSON} constraints
    * @protected
    */
-  AdapterJS.prototype.checkMediaDataChannel = function (stream, constraints) {
+  IAdapterJS.prototype.checkMediaDataChannel = function (stream, constraints) {
     var testedOptions = {
       audio : false,
       video : false,
@@ -280,9 +296,159 @@
     return testedOptions;
   };
 }).call(this);
-// Call adapter
-adapter = new AdapterJS();
-webrtcDetectedBrowser = adapter.getBrowserVersion();
+AdapterJS = new IAdapterJS();
+AdapterJS.browser = AdapterJS._getBrowser();
+//-----------------------------------------------------------
+// Temasys Implemented functions
+//-----------------------------------------------------------
+/**
+ * Temasys reserved namespace
+ *
+ * @namespace Temasys
+ * @type JSON
+ * @requires Temasys Plugin. Please download it from
+ *   https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins
+ */
+var Temasys = Temasys || {};
+/**
+ * Temasys WebRTC plugin reserved namespace
+ *
+ * @attribute WebRTCPlugin
+ * @type JSON
+ */
+Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
+/**
+ * This function detects whether or not a plugin is installed
+ * - Com name : the company name,
+ * - plugName : the plugin name
+ * - installedCb : callback if the plugin is detected (no argument)
+ * - notInstalledCb : callback if the plugin is not detected (no argument)
+ *
+ * @method isPluginInstalled
+ * @protected
+ */
+Temasys.WebRTCPlugin.isPluginInstalled = null;
+/**
+ * Defines webrtc's JS interface according to the plugin's implementation
+ *
+ * @attribute defineWebRTCInterface
+ * @type Function
+ */
+Temasys.WebRTCPlugin.defineWebRTCInterface = null;
+/**
+ * This function will be called if the plugin is needed
+ * (browser different from Chrome or Firefox),
+ * but the plugin is not installed
+ * Override it according to your application logic.
+ *
+ * @method pluginNeededButNotInstalledCb
+ * @protected
+ */
+Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
+/**
+ * The Object to store Plugin information
+ *
+ * @attribute temPluginInfo
+ * @type JSON
+ */
+Temasys.WebRTCPlugin.temPluginInfo = {
+  pluginId : 'plugin0',
+  type : 'application/x-temwebrtcplugin',
+  onload : '__TemWebRTCReady0'
+};
+/**
+ * Unique identifier of each opened page
+ *
+ * @attribute TemPageId
+ * @type String
+ */
+Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
+/**
+ * Use this whenever you want to call the plugin
+ *
+ * @attribute plugin
+ * @type DOM Object
+ * @protected
+ */
+Temasys.WebRTCPlugin.TemRTCPlugin = null;
+/**
+ * WebRTC ready Cb, should only be called once.
+ * Need to prevent Chrome + plugin form calling WebRTCReadyCb twice
+ * --------------------------------------------------------------------------
+ * WebRTCReadyCb is callback function called when the browser is webrtc ready
+ * this can be because of the browser or because of the plugin
+ * Override WebRTCReadyCb and use it to do whatever you need to do when the
+ * page is ready
+ *
+ * @method TemPrivateWebRTCReadyCb
+ * @private
+ * @beta
+ */
+/*Temasys.WebRTCPlugin.TemPrivateWebRTCReadyCb = function () {
+   arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
+   if (arguments.callee.StaticWasInit === 1) {
+     if (typeof WebRTCReadyCb === 'function') {
+       WebRTCReadyCb();
+     }
+   }
+   arguments.callee.StaticWasInit++;
+ };
+*/
+/**
+ * !!! DO NOT OVERRIDE THIS FUNCTION !!!
+ * This function will be called when plugin is ready
+ * it sends necessary details to the plugin.
+ * If you need to do something once the page/plugin is ready, override
+ * WebRTCReadyCb instead.
+ * This function is not in the IE/Safari condition brackets so that
+ * TemPluginLoaded function might be called on Chrome/Firefox
+ *
+ * @method TemInitPlugin0
+ * @protected
+ */
+__TemWebRTCReady0 = function () {
+  arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
+  if (arguments.callee.StaticWasInit === 1) {
+    Temasys.isPluginReady = true;
+    if (typeof WebRTCReadyCb === 'function') {
+      WebRTCReadyCb();
+    }
+  }
+  arguments.callee.StaticWasInit++;
+};
+/**
+ * Called when Plugin is ready to use
+ *
+ * @method WebRTCReadyCb
+ * @protected
+ */
+WebRTCReadyCb = function () {
+  AdapterJS.pluginReadyState = AdapterJS.PLUGIN_READY_STATE.READY;
+};
+/**
+ * To Fix Configuration as some browsers,
+ * some browsers does not support the 'urls' attribute
+ * - .urls is not supported in FF yet.
+ *
+ * @attribute maybeFixConfiguration
+ * @type Function
+ * @param {JSON} pcConfig
+ * @private
+ */
+maybeFixConfiguration = function (pcConfig) {
+  if (pcConfig === null) {
+    return;
+  }
+  for (var i = 0; i < pcConfig.iceServers.length; i++) {
+    if (pcConfig.iceServers[i].hasOwnProperty('urls')) {
+      pcConfig.iceServers[i].url = pcConfig.iceServers[i].urls;
+      delete pcConfig.iceServers[i].urls;
+    }
+  }
+};
+//-----------------------------------------------------------
+// AdapterJS functions from original Google Code
+//-----------------------------------------------------------
 /**
  * Note:
  *  The RTCPeerConnection object.
@@ -315,125 +481,10 @@ attachMediaStream = null;
  * [type] Function
  */
 reattachMediaStream = null;
-/**
- * Note:
- *  This function detects whether or not a plugin is installed
- *  - Com name : the company name,
- *  - plugName : the plugin name
- *  - installedCb : callback if the plugin is detected (no argument)
- *  - notInstalledCb : callback if the plugin is not detected (no argument)
- * @method isPluginInstalled
- * @protected
- */
-isPluginInstalled = null;
-/**
- * Note:
- *  defines webrtc's JS interface according to the plugin's implementation
- * [attribute] defineWebRTCInterface
- * [type] Function
- */
-defineWebRTCInterface = null;
-/**
- * Note:
- *  This function will be called if the plugin is needed
- *  (browser different from Chrome or Firefox),
- *  but the plugin is not installed
- *  Override it according to your application logic.
- * [attribute] pluginNeededButNotInstalledCb
- * [type] Function
- */
-pluginNeededButNotInstalledCb = null;
-/**
- * Note:
- *  The Object to store Plugin information
- * [attribute] temPluginInfo
- * [type] JSON
- */
-temPluginInfo = {
-  pluginId : 'plugin0',
-  type : 'application/x-temwebrtcplugin',
-  onload : 'TemInitPlugin0'
-};
-/**
- * Note:
- * Unique identifier of each opened page
- * [attribute] TemPageId
- * [type] String
- */
-TemPageId = Math.random().toString(36).slice(2);
-/**
- * Note:
- *  use this whenever you want to call the plugin
- * [attribute] plugin
- * [type DOM] {Object}
- * [protected]
- */
-TemRTCPlugin = null;
-/**
- * Note:
- *  webRTC readu Cb, should only be called once.
- *  Need to prevent Chrome + plugin form calling WebRTCReadyCb twice
- *  --------------------------------------------------------------------------
- *  WebRTCReadyCb is callback function called when the browser is webrtc ready
- *  this can be because of the browser or because of the plugin
- *  Override WebRTCReadyCb and use it to do whatever you need to do when the
- *  page is ready
- * [attribute] TemPrivateWebRTCReadyCb
- * [type] Function
- * [private]
- */
-TemPrivateWebRTCReadyCb = function () {
-  arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
-  if (arguments.callee.StaticWasInit === 1) {
-    if (typeof WebRTCReadyCb === 'function') {
-      WebRTCReadyCb();
-    }
-  }
-  arguments.callee.StaticWasInit++;
-};
-/**
- * Note:
- *  !!! DO NOT OVERRIDE THIS FUNCTION !!!
- *  This function will be called when plugin is ready
- *  it sends necessary details to the plugin.
- *  If you need to do something once the page/plugin is ready, override
- *  TemPrivateWebRTCReadyCb instead.
- *  This function is not in the IE/Safari condition brackets so that
- *  TemPluginLoaded function might be called on Chrome/Firefox
- * [attribute] TemInitPlugin0
- * [type] Function
- * [protected]
- */
-TemInitPlugin0 = function () {
-  TemRTCPlugin.setPluginId(TemPageId, temPluginInfo.pluginId);
-  TemRTCPlugin.setLogFunction(console);
-  TemPrivateWebRTCReadyCb();
-};
-/**
- * Note:
- *  To Fix Configuration as some browsers,
- *  some browsers does not support the 'urls' attribute
- * - .urls is not supported in FF yet.
- * [attribute] maybeFixConfiguration
- * [type] Function
- * _ [param] {JSON} pcConfig
- * [private]
- */
-maybeFixConfiguration = function (pcConfig) {
-  if (pcConfig === null) {
-    return;
-  }
-  for (var i = 0; i < pcConfig.iceServers.length; i++) {
-    if (pcConfig.iceServers[i].hasOwnProperty('urls')) {
-      pcConfig.iceServers[i].url = pcConfig.iceServers[i].urls;
-      delete pcConfig.iceServers[i].urls;
-    }
-  }
-};
 /*******************************************************************
  Check for browser types and react accordingly
 *******************************************************************/
-if (webrtcDetectedBrowser.mozWebRTC) {
+if (AdapterJS.browser.mozWebRTC) {
   /**
    * Note:
    *  Creates a RTCPeerConnection object for moz
@@ -473,7 +524,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     if (url_parts[0].indexOf('stun') === 0) {
       iceServer = { 'url' : url };
     } else if (url_parts[0].indexOf('turn') === 0) {
-      if (webrtcDetectedBrowser.version < 27) {
+      if (AdapterJS.browser.version < 27) {
         var turn_url_parts = url.split('?');
         if (turn_url_parts.length === 1 || turn_url_parts[1].indexOf('transport=udp') === 0) {
           iceServer = {
@@ -557,8 +608,8 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       return [];
     };
   }
-  TemPrivateWebRTCReadyCb();
-} else if (webrtcDetectedBrowser.webkitWebRTC) {
+  __TemWebRTCReady0();
+} else if (AdapterJS.browser.webkitWebRTC) {
   /**
    * Note:
    *  Creates iceServer from the url for Chrome M33 and earlier.
@@ -598,7 +649,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
    */
   createIceServers = function (urls, username, password) {
     var iceServers = [];
-    if (webrtcDetectedBrowser.version >= 34) {
+    if (AdapterJS.browser.version >= 34) {
       iceServers = {
         'urls' : urls,
         'credential' : password,
@@ -625,7 +676,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
    * [param] {String} password
    */
   RTCPeerConnection = function (pcConfig, pcConstraints) {
-    if (webrtcDetectedBrowser.version < 34) {
+    if (AdapterJS.browser.version < 34) {
       maybeFixConfiguration(pcConfig);
     }
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
@@ -667,33 +718,45 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     to.src = from.src;
     return to;
   };
-  TemPrivateWebRTCReadyCb();
-} else if (webrtcDetectedBrowser.pluginWebRTC) {
-  // var isOpera = webrtcDetectedBrowser.browser === 'Opera'; // Might not be used.
-  var isFirefox = webrtcDetectedBrowser.browser === 'Firefox';
-  var isSafari = webrtcDetectedBrowser.browser === 'Safari';
-  var isChrome = webrtcDetectedBrowser.browser === 'Chrome';
-  var isIE = webrtcDetectedBrowser.browser === 'IE';
+  __TemWebRTCReady0();
+} else if (AdapterJS.browser.pluginWebRTC) {
+  // var isOpera = AdapterJS.browser.browser === 'Opera'; // Might not be used.
+  var isFirefox = AdapterJS.browser.browser === 'Firefox';
+  var isSafari = AdapterJS.browser.browser === 'Safari';
+  var isChrome = AdapterJS.browser.browser === 'Chrome';
+  var isIE = AdapterJS.browser.browser === 'IE';
 
   /********************************************************************************
     Load Plugin
   ********************************************************************************/
-  TemRTCPlugin = document.createElement('object');
-  TemRTCPlugin.id = temPluginInfo.pluginId;
-  TemRTCPlugin.style.visibility = 'hidden';
-  TemRTCPlugin.type = temPluginInfo.type;
-  TemRTCPlugin.innerHTML = '<param name="onload" value="' +
-    temPluginInfo.onload + '">' +
+  Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('object');
+  Temasys.WebRTCPlugin.TemRTCPlugin.id = Temasys.WebRTCPlugin.temPluginInfo.pluginId;
+  // IE will only start the plugin if it's ACTUALLY visible
+  if (isIE) {
+    Temasys.WebRTCPlugin.TemRTCPlugin.width = '1px';
+    Temasys.WebRTCPlugin.TemRTCPlugin.height = '1px';
+  } else {
+    Temasys.WebRTCPlugin.TemRTCPlugin.style.visibility = 'hidden';
+    Temasys.WebRTCPlugin.TemRTCPlugin.width = '1px';
+    Temasys.WebRTCPlugin.TemRTCPlugin.height = '1px';
+    Temasys.WebRTCPlugin.TemRTCPlugin.type = Temasys.WebRTCPlugin.temPluginInfo.type;
+    Temasys.WebRTCPlugin.TemRTCPlugin.innerHTML = '<param name="onload" value="' +
+    Temasys.WebRTCPlugin.temPluginInfo.onload + '">' +
     '<param name="pluginId" value="' +
-    temPluginInfo.pluginId + '">' +
-    '<param name="pageId" value="' + TemPageId + '">';
-  document.getElementsByTagName('body')[0].appendChild(TemRTCPlugin);
-  TemRTCPlugin.onreadystatechange = function (state) {
+    Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
+    '<param name="windowless" value="false" /> ' +
+    '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
+    document.getElementsByTagName('body')[0].appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
+  }
+
+  // FIXEM: dead code?
+  Temasys.WebRTCPlugin.TemRTCPlugin.onreadystatechange = function (state) {
     console.log('Plugin: Ready State : ' + state);
     if (state === 4) {
       console.log('Plugin has been loaded');
     }
   };
+
   /**
    * Note:
    *   Checks if the Plugin is installed
@@ -707,7 +770,8 @@ if (webrtcDetectedBrowser.mozWebRTC) {
    * [param] {Function} installedCb
    * [param] {Function} notInstalledCb
    */
-  isPluginInstalled = function (comName, plugName, installedCb, notInstalledCb) {
+  Temasys.WebRTCPlugin.isPluginInstalled =
+    function (comName, plugName, installedCb, notInstalledCb) {
     if (isChrome || isSafari || isFirefox) {
       var pluginArray = navigator.plugins;
       for (var i = 0; i < pluginArray.length; i++) {
@@ -736,7 +800,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
    *
    * [method] defineWebRTCInterface
    */
-  defineWebRTCInterface = function () {
+  Temasys.WebRTCPlugin.defineWebRTCInterface = function () {
     /**
     * Note:
     *   Check if WebRTC Interface is Defined
@@ -745,7 +809,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     * [method] isDefined
     * [param] {String} variable
     */
-    isDefined = function (variable) {
+    Temasys.WebRTCPlugin.isDefined = function (variable) {
       return variable !== null && variable !== undefined;
     };
 
@@ -810,7 +874,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     * [param] {String} password
     */
     RTCSessionDescription = function (info) {
-      return TemRTCPlugin.ConstructSessionDescription(info.type, info.sdp);
+      return Temasys.WebRTCPlugin.TemRTCPlugin.ConstructSessionDescription(info.type, info.sdp);
     };
 
     /**
@@ -830,18 +894,19 @@ if (webrtcDetectedBrowser.mozWebRTC) {
           if (iceServers[i].urls && !iceServers[i].url) {
             iceServers[i].url = iceServers[i].urls;
           }
-          iceServers[i].hasCredentials = isDefined(iceServers[i].username) &&
-          isDefined(iceServers[i].credential);
+          iceServers[i].hasCredentials = Temasys.WebRTCPlugin.isDefined(iceServers[i].username) &&
+          Temasys.WebRTCPlugin.isDefined(iceServers[i].credential);
         }
       }
       var mandatory = (constraints && constraints.mandatory) ? constraints.mandatory : null;
       var optional = (constraints && constraints.optional) ? constraints.optional : null;
-      return TemRTCPlugin.PeerConnection(TemPageId, iceServers, mandatory, optional);
+      return Temasys.WebRTCPlugin.TemRTCPlugin.PeerConnection(Temasys.WebRTCPlugin.TemPageId,
+        iceServers, mandatory, optional);
     };
 
     MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
-      TemRTCPlugin.GetSources(callback);
+      Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback);
     };
 
     /*******************************************************
@@ -851,7 +916,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       if (!constraints.audio) {
         constraints.audio = false;
       }
-      TemRTCPlugin.getUserMedia(constraints, successCallback, failureCallback);
+      Temasys.WebRTCPlugin.TemRTCPlugin.getUserMedia(constraints, successCallback, failureCallback);
     };
     navigator.getUserMedia = getUserMedia;
 
@@ -876,7 +941,8 @@ if (webrtcDetectedBrowser.mozWebRTC) {
           temp.innerHTML = '<object id="' + elementId + '" ' + classHTML +
             'type="application/x-temwebrtcplugin">' +
             '<param name="pluginId" value="' + elementId + '" /> ' +
-            '<param name="pageId" value="' + TemPageId + '" /> ' +
+            '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '" /> ' +
+            '<param name="windowless" value="true" /> ' +
             '<param name="streamId" value="' + stream.id + '" /> ' +
             '</object>';
           while (temp.firstChild) {
@@ -925,7 +991,8 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       var children = from.children;
       for (var i = 0; i !== children.length; ++i) {
         if (children[i].name === 'streamId') {
-          stream = TemRTCPlugin.getStreamWithId(TemPageId, children[i].value);
+          stream = Temasys.WebRTCPlugin.TemRTCPlugin
+            .getStreamWithId(Temasys.WebRTCPlugin.TemPageId, children[i].value);
           break;
         }
       }
@@ -948,17 +1015,19 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       if (!candidate.sdpMid) {
         candidate.sdpMid = '';
       }
-      return TemRTCPlugin.ConstructIceCandidate(
+      return Temasys.WebRTCPlugin.TemRTCPlugin.ConstructIceCandidate(
         candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate
       );
     };
   };
 
-  pluginNeededButNotInstalledCb = function () {
+  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function () {
     alert('Your browser is not webrtc ready and Temasys plugin is not installed');
   };
   // Try to detect the plugin and act accordingly
-  isPluginInstalled('Tem', 'TemWebRTCPlugin', defineWebRTCInterface, pluginNeededButNotInstalledCb);
+  Temasys.WebRTCPlugin.isPluginInstalled('Tem', 'TemWebRTCPlugin',
+    Temasys.WebRTCPlugin.defineWebRTCInterface,
+    Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb);
 } else {
   console.log('Browser does not appear to be WebRTC-capable');
 }
