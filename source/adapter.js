@@ -1,33 +1,33 @@
 /**
  * Note:
  *  The RTCPeerConnection object.
- * [attribute] RTCPeerConnection
- * [type] Function
+ * @attribute RTCPeerConnection
+ * @type Function
  */
 RTCPeerConnection = null;
 /**
  * Note:
  *  Get UserMedia (only difference is the prefix).
- * [Credits] Code from Adam Barth.
+ * @author Code from Adam Barth.
  *
- * [attribute] RTCIceCandidate
- * [type] Function
+ * @attribute RTCIceCandidate
+ * @type Function
  */
 getUserMedia = null;
 /**
  * Note:
  *  Attach a media stream to an element.
  *
- * [attribute] attachMediaStream
- * [type] Function
+ * @attribute attachMediaStream
+ * @type Function
  */
 attachMediaStream = null;
 /**
  * Note:
  *  Re-attach a media stream to an element.
  *
- * [attribute] reattachMediaStream
- * [type] Function
+ * @attribute reattachMediaStream
+ * @type Function
  */
 reattachMediaStream = null;
 /**
@@ -44,8 +44,8 @@ isPluginInstalled = null;
 /**
  * Note:
  *  defines webrtc's JS interface according to the plugin's implementation
- * [attribute] defineWebRTCInterface
- * [type] Function
+ * @attribute defineWebRTCInterface
+ * @type Function
  */
 defineWebRTCInterface = null;
 /**
@@ -54,15 +54,15 @@ defineWebRTCInterface = null;
  *  (browser different from Chrome or Firefox),
  *  but the plugin is not installed
  *  Override it according to your application logic.
- * [attribute] pluginNeededButNotInstalledCb
- * [type] Function
+ * @attribute pluginNeededButNotInstalledCb
+ * type Function
  */
 pluginNeededButNotInstalledCb = null;
 /**
  * Note:
  *  The Object to store Plugin information
- * [attribute] temPluginInfo
- * [type] JSON
+ * @attribute] temPluginInfo
+ * @type JSON
  */
 temPluginInfo = {
   pluginId : 'plugin0',

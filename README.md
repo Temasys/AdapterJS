@@ -19,6 +19,14 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 `RTCPeerConnection`, `RTCDataChannel` and `navigator.getUserMedia`
 
+## Using AdapterJS 
+
+#### Starting out
+
+```javascript
+var adapter = new AdapterJS();
+adapter.helper_function();
+```
 
 #### Helper functions
 
@@ -99,7 +107,7 @@ checkMediaDataChannelSettings(true, peerAgentBrowser, function (offerConstraints
 }, constraints);
 ```
 
-### Helper variables
+#### Helper variables
 
 ##### `webrtcDetectedBrowser`
 
