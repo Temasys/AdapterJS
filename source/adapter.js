@@ -789,9 +789,9 @@ if (AdapterJS.browser.mozWebRTC) {
       w.document.body.removeChild(i);
     });
     setTimeout(function() {
-      if(typeof i.style.transition === 'string') {
+      if(typeof i.style.webkitTransform === 'string') {
         i.style.webkitTransform = 'translateY(40px)';
-      } else if(typeof i.style.transition === 'string') {
+      } else if(typeof i.style.transform === 'string') {
         i.style.transform = 'translateY(40px)';
       } else {
         i.style.top = '0px';
