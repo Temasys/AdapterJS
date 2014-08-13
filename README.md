@@ -19,14 +19,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 `RTCPeerConnection`, `RTCDataChannel` and `navigator.getUserMedia`
 
-## Using AdapterJS 
-
-#### Starting out
-
-```javascript
-AdapterJS.variable;
-AdapterJS.function();
-```
+## Using AdapterJS
 
 #### Helper functions
 
@@ -71,11 +64,11 @@ handles all MediaStream and DataChannel differences for interopability cross-bro
 method has to be called before sending the acknowledge to create the offer and before creating the offer.
 
 > __Check which Peer creates the Offer__
-> 
-> For Firefox (not 30+) and Chrome MediaStream interopability, _``MozDontOfferDataChannel``_ has to be used, and hence 
+>
+> For Firefox (not 30+) and Chrome MediaStream interopability, _``MozDontOfferDataChannel``_ has to be used, and hence
 > Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection.
-> To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one 
-> creating the offer. 
+> To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one
+> creating the offer.
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
@@ -91,7 +84,7 @@ checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
 });
 ```
 > __Check Offer constraints__
-> 
+>
 > For Firefox to Firefox MediaStream and DataChannel connection interopability, _``MozDontOfferDataChannel``_ has to be removed.
 
 ```javascript
