@@ -16,7 +16,7 @@ var Temasys = Temasys || {};
  * @attribute WebRTCPlugin
  * @type JSON
  */
-Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
+Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
 /**
  * This function detects whether or not a plugin is installed
  * - Com name : the company name,
@@ -446,7 +446,7 @@ if (AdapterJS.browser.mozWebRTC) {
     Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
     '<param name="windowless" value="false" /> ' +
     '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
-    document.getElementsByTagName('body')[0].appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
+    document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
   }
 
   // FIXEM: dead code?
@@ -699,7 +699,7 @@ if (AdapterJS.browser.mozWebRTC) {
       if (stream !== null) {
         return attachMediaStream(to, stream);
       } else {
-        alert('Could not find the stream associated with this element');
+        console.log('Could not find the stream associated with this element');
       }
     };
 
@@ -721,8 +721,78 @@ if (AdapterJS.browser.mozWebRTC) {
     };
   };
 
+  Temasys.WebRTCPlugin.getWebsiteLink = function() {
+    return 'http://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins';
+  }
+
+  Temasys.WebRTCPlugin.getDownloadLink = function() {
+    if(!!navigator.platform.match(/^Mac/i)) {
+      return 'http://bit.ly/1n77hco';
+    }
+    else if(!!navigator.platform.match(/^Win/i)) {
+      return 'http://bit.ly/1kkS4FN';
+    }
+    return null;
+  };
+
   Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function () {
-    alert('Your browser is not webrtc ready and Temasys plugin is not installed');
+    var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
+    if(downloadLink) {
+      Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="'+Temasys.WebRTCPlugin.getWebsiteLink()+'" target="_blank">Temasys WebRTC Plugin</a> to upgrade your browser.', 'Install Now', downloadLink);
+    }
+    else {
+      Temasys.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
+    }
+  };
+
+  Temasys.WebRTCPlugin.pluginNeedsUpgrade = function (downloadLink) {
+    Temasys.WebRTCPlugin.renderNotificationBar('There is a new version of the <a href="'+Temasys.WebRTCPlugin.getWebsiteLink()+'" target="_blank">Temasys WebRTC Plugin</a> available.', 'Update Now', downloadLink||Temasys.WebRTCPlugin.getDownloadLink());
+  };
+
+  Temasys.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
+    var w = window;
+    var i = document.createElement('iframe');
+    i.style.position = 'fixed';
+    i.style.left = 0;
+    i.style.right = 0;
+    i.style.width = '100%';
+    i.style.height = '40px';
+    i.style.backgroundColor = '#ffffe1';
+    i.style.border = 'none';
+    i.style.borderBottom = '1px solid #888888';
+    i.style.zIndex = '9999999';
+    try {
+      i.style.webkitTransition = 'all .5s ease-out';
+      i.style.top = '-41px';
+    } catch(e) {
+      i.style.top = 0;
+    }
+    document.body.appendChild(i);
+    c = (i.contentWindow) ? i.contentWindow : (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
+    c.document.open();
+    c.document.write('<span style="font-family: Helvetica, Arial, sans-serif; font-size: .9rem; padding: 7px; vertical-align: middle; cursor: default;">'+text+'</span>');
+    if(buttonText && buttonLink) {
+      c.document.write('<button id="okay">'+buttonText+'</button><button>Cancel</button>');
+      c.document.close();
+      c.document.getElementById('okay').addEventListener('click', function(e) {
+        window.open(buttonLink, '_top');
+        e.preventDefault();
+        try {
+          event.cancelBubble = true;
+        } catch(e) {}
+      })
+    }
+    else {
+      c.document.close();
+    }
+    c.document.addEventListener('click', function() {
+      w.document.body.removeChild(i);
+    });
+    setTimeout(function() {
+      try {
+        i.style.webkitTransform = 'translateY(40px)';
+      } catch(e) {}
+    }, 300);
   };
   // Try to detect the plugin and act accordingly
   Temasys.WebRTCPlugin.isPluginInstalled('Tem', 'TemWebRTCPlugin',
