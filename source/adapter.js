@@ -113,7 +113,6 @@ Temasys.WebRTCPlugin.TemRTCPlugin = null;
  * This function is not in the IE/Safari condition brackets so that
  * TemPluginLoaded function might be called on Chrome/Firefox
  * @method __TemWebRTCReady0
- * @for Temasys
  * @private
  */
 __TemWebRTCReady0 = function () {
@@ -175,20 +174,14 @@ Temasys.ICEConnectionFiredStates = {};
  */
 Temasys.pluginReadyState = Temasys.PLUGIN_READY_STATE.INIT;
 /**
- * Detected browser information
- * @attribute Temasys.browser
- * @type JSON
- */
-Temasys.browser = null;
-/**
  * To Fix Configuration as some browsers,
  * some browsers does not support the 'urls' attribute
  * - .urls is not supported in FF yet.
- * @attribute Temasys.maybeFixConfiguration
+ * @attribute maybeFixConfiguration
  * @type Function
  * @param {JSON} pcConfig
  */
-Temasys.maybeFixConfiguration = function (pcConfig) {
+maybeFixConfiguration = function (pcConfig) {
   if (pcConfig === null) {
     return;
   }
@@ -218,90 +211,89 @@ Temasys.maybeFixConfiguration = function (pcConfig) {
  * @author Get version of Browser. Code provided by kennebec@stackoverflow.com
  * @author IsSCTP/isRTPD Supported. Code provided by DetectRTC by Muaz Khan
  * @method Temasys.getDetectedBrowser
- * @return {JSON} Browser information
- * @private
+ * @return {JSON} Browser information object
  */
-Temasys._getDetectedBrowser = function () {
-  var browser = {};
+getDetectedBrowser = function () {
+  var agent = {};
   var hasMatch;
   var checkMatch = navigator.userAgent.match(
     /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
   if (navigator.mozGetUserMedia) {
-    browser.mozWebRTC = true;
+    agent.mozWebRTC = true;
   } else if (na.webkitGetUserMedia) {
-    browser.webkitWebRTC = true;
+    agent.webkitWebRTC = true;
   } else {
-    if (navigator.userAgent.indexOf('Safari')) {
+    if (agent.userAgent.indexOf('Safari')) {
       if (typeof InstallTrigger !== 'undefined') {
-        browser.browser = 'Firefox';
+        agent.browser = 'Firefox';
       } else if (/*@cc_on!@*/
         false || !!document.documentMode) {
-        browser.browser = 'IE';
+        agent.browser = 'IE';
       } else if (
         Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
-        browser.browser = 'Safari';
+        agent.browser = 'Safari';
       } else if (!!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
-        browser.browser = 'Opera';
+        agent.browser = 'Opera';
       } else if (!!window.chrome) {
-        browser.browser = 'Chrome';
+        agent.browser = 'Chrome';
       }
-      browser.pluginWebRTC = true;
+      agent.pluginWebRTC = true;
     }
   }
   if (/trident/i.test(checkMatch[1])) {
     hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
-    browser.browser = 'IE';
-    browser.version = parseInt(hasMatch[1] || '0', 10);
+    agent.browser = 'IE';
+    agent.version = parseInt(hasMatch[1] || '0', 10);
   } else if (checkMatch[1] === 'Chrome') {
     hasMatch = navigator.userAgent.match(/\bOPR\/(\d+)/);
     if (hasMatch !== null) {
-      browser.browser = 'Opera';
-      browser.version = parseInt(hasMatch[1], 10);
+      agent.browser = 'Opera';
+      agent.version = parseInt(hasMatch[1], 10);
     }
   }
-  if (!browser.browser) {
-    browser.browser = checkMatch[1];
+  if (!agent.browser) {
+    agent.browser = checkMatch[1];
   }
-  if (!browser.version) {
+  if (!agent.version) {
     try {
       checkMatch = (checkMatch[2]) ? [checkMatch[1], checkMatch[2]] :
         [navigator.appName, navigator.appVersion, '-?'];
       if ((hasMatch = navigator.userAgent.match(/version\/(\d+)/i)) !== null) {
         checkMatch.splice(1, 1, hasMatch[1]);
       }
-      browser.version = parseInt(checkMatch[1], 10);
+      agent.version = parseInt(checkMatch[1], 10);
     } catch (error) {
-      browser.version = 0;
+      agent.version = 0;
       console.error('Unable to retrieve Navigator version. Reason was:');
       console.error(error);
     }
   }
-  browser.os = navigator.platform;
-  browser.isSCTPDCSupported = browser.mozWebRTC ||
-    (browser.browser === 'Chrome' && browser.version > 30) ||
-    (browser.browser === 'Opera' && browser.version > 19);
-  browser.isRTPDCSupported = browser.browser === 'Chrome' &&
-    browser.version < 30 && browser.version > 24;
-  browser.isPluginSupported = !browser.isSCTPDCSupported && !browser.isRTPDCSupported;
-  return browser;
+  agent.os = navigator.platform;
+  agent.isSCTPDCSupported = agent.mozWebRTC ||
+    (agent.browser === 'Chrome' && agent.version > 30) ||
+    (agent.browser === 'Opera' && agent.version > 19);
+  agent.isRTPDCSupported = agent.browser === 'Chrome' &&
+    agent.version < 30 && agent.version > 24;
+  agent.isPluginSupported = !agent.isSCTPDCSupported && !agent.isRTPDCSupported;
+  return agent;
 };
 /**
  * Set the settings for creating DataChannels, MediaStream for Cross-browser compability.
  * This is only for SCTP based support browsers
- * @method Temasys.checkMediaDataChannelSettings
+ * @method checkMediaDataChannelSettings
  * @param {Boolean} isOffer
  * @param {String} peerBrowserAgent
  * @param {Function} callback
  * @param {JSON} constraints
  */
-Temasys.checkMediaDataChannelSettings = function
+checkMediaDataChannelSettings = function
   (isOffer, peerBrowserAgent, callback, constraints) {
   if (typeof callback !== 'function') {
     return;
   }
   var peerBrowserVersion, beOfferer = false;
 
-  console.log('Self: ' + Temasys.browser.browser + ' | Peer: ' + peerBrowserAgent);
+  console.log('Self: ' + navigator.browser + ' | Peer: ' + peerBrowserAgent);
 
   if (peerBrowserAgent.indexOf('|') > -1) {
     peerBrowser = peerBrowserAgent.split('|');
@@ -309,9 +301,9 @@ Temasys.checkMediaDataChannelSettings = function
     peerBrowserVersion = parseInt(peerBrowser[1], 10);
     console.info('Peer Browser version: ' + peerBrowserVersion);
   }
-  var isLocalFirefox = Temasys.browser.mozWebRTC;
+  var isLocalFirefox = navigator.mozWebRTC;
   // Nightly version does not require MozDontOfferDataChannel for interop
-  var isLocalFirefoxInterop = Temasys.browser.mozWebRTC && Temasys.browser.version > 30;
+  var isLocalFirefoxInterop = navigator.mozWebRTC && navigator.version > 30;
   var isPeerFirefox = peerBrowserAgent === 'Firefox';
   var isPeerFirefoxInterop = peerBrowserAgent === 'Firefox' &&
     ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
@@ -355,14 +347,14 @@ Temasys.checkMediaDataChannelSettings = function
 };
 /**
  * Handles the differences for all Browsers
- * @method Temasys.checkIceConnectionState
+ * @method checkIceConnectionState
  * @param {String} peerID
  * @param {String} iceConnectionState
  * @param {Function} callback
  * @param {Boolean} returnStateAlways
  * @protected
  */
-Temasys.checkIceConnectionState = function
+checkIceConnectionState = function
   (peerID, iceConnectionState, callback, returnStateAlways) {
   if (typeof callback !== 'function') {
     return;
@@ -396,11 +388,11 @@ Temasys.checkIceConnectionState = function
 /**
  * Check the availability of the MediaStream and DataChannel.
  * Method to be called after getUserMedia
- * @method Temasys.checkMediaDataChannel
+ * @method checkMediaDataChannel
  * @param {MediaStream} stream
  * @param {JSON} constraints
  */
-Temasys.checkMediaDataChannel = function (stream, constraints) {
+checkMediaDataChannel = function (stream, constraints) {
   var testedOptions = {
     audio : false,
     video : false,
@@ -526,12 +518,45 @@ createIceServer = null;
  * @return {Array} List of Ice Servers Configuration
  */
 createIceServers = null;
-// Instantiate browser information
-Temasys.browser = Temasys._getDetectedBrowser();
+/**
+ * Firefox:
+ * - Creates IceServers for Firefox
+ *   - Use .url for FireFox.
+ *   - Multiple Urls support
+ * Chrome:
+ * - Creates iceServers from the urls for Chrome M34 and above.
+ *   - .urls is supported since Chrome M34.
+ *   - Multiple Urls support
+ * Plugin:
+ * - Creates Ice Servers for Plugin Browsers
+ *   - Multiple Urls support
+ *   - This is a WebRTC Function
+ * @method createIceServers
+ * @param {Array} urls
+ * @param {String} username
+ * @param {String} password
+ * @return {Array} List of Ice Servers Configuration
+ */
+createIceServers = null;
+/**
+ * The browser information
+ * @attribute webrtcDetectedBrowser
+ * @type JSON
+ * @param {String} browser The browser name
+ * @param {Integer} version The browser version
+ * @param {Boolean} webkitWebRTC The browser uses webkit implementation of WebRTC
+ * @param {Boolean} mozWebRTC The browser uses moz implementation of WebRTC
+ * @param {Boolean} pluginWebRTC The browser uses the plugin implementation of WebRTC
+ * @param {String} os The browser Operating System/Platform
+ * @param {Boolean} isSCTPDCSupported If browser supports SCTP DataChannels
+ * @param {Boolean} isRTPDCSupported If browser supports RTP DataChannels
+ * @param {Boolean} isPluginSupported If browser is using the Plugin DataChannels
+ */
+webrtcDetectedBrowser = getDetectedBrowser();
 // Check for browser types and react accordingly
-if (Temasys.browser.mozWebRTC) {
+if (webrtcDetectedBrowser.mozWebRTC) {
   RTCPeerConnection = function (pcConfig, pcConstraints) {
-    Temasys.maybeFixConfiguration(pcConfig);
+    maybeFixConfiguration(pcConfig);
     return new mozRTCPeerConnection(pcConfig, pcConstraints);
   };
 
@@ -546,7 +571,7 @@ if (Temasys.browser.mozWebRTC) {
     if (url_parts[0].indexOf('stun') === 0) {
       iceServer = { 'url' : url };
     } else if (url_parts[0].indexOf('turn') === 0) {
-      if (Temasys.browser.version < 27) {
+      if (webrtcDetectedBrowser.version < 27) {
         var turn_url_parts = url.split('?');
         if (turn_url_parts.length === 1 || turn_url_parts[1].indexOf('transport=udp') === 0) {
           iceServer = {
@@ -603,7 +628,7 @@ if (Temasys.browser.mozWebRTC) {
     };
   }
   __TemWebRTCReady0();
-} else if (Temasys.browser.webkitWebRTC) {
+} else if (webrtcDetectedBrowser.webkitWebRTC) {
   createIceServer = function (url, username, password) {
     var iceServer = null;
     var url_parts = url.split(':');
@@ -621,7 +646,7 @@ if (Temasys.browser.mozWebRTC) {
 
   createIceServers = function (urls, username, password) {
     var iceServers = [];
-    if (Temasys.browser.version >= 34) {
+    if (webrtcDetectedBrowser.version >= 34) {
       iceServers = {
         'urls' : urls,
         'credential' : password,
@@ -639,8 +664,8 @@ if (Temasys.browser.mozWebRTC) {
   };
 
   RTCPeerConnection = function (pcConfig, pcConstraints) {
-    if (Temasys.browser.version < 34) {
-      Temasys.maybeFixConfiguration(pcConfig);
+    if (webrtcDetectedBrowser.version < 34) {
+      maybeFixConfiguration(pcConfig);
     }
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
   };
@@ -666,12 +691,12 @@ if (Temasys.browser.mozWebRTC) {
     return to;
   };
   __TemWebRTCReady0();
-} else if (Temasys.browser.pluginWebRTC) {
-  // var isOpera = Temasys.browser.browser === 'Opera'; // Might not be used.
-  var isFirefox = Temasys.browser.browser === 'Firefox';
-  var isSafari = Temasys.browser.browser === 'Safari';
-  var isChrome = Temasys.browser.browser === 'Chrome';
-  var isIE = Temasys.browser.browser === 'IE';
+} else if (webrtcDetectedBrowser.pluginWebRTC) {
+  // var isOpera = webrtcDetectedBrowser.browser === 'Opera'; // Might not be used.
+  var isFirefox = webrtcDetectedBrowser.browser === 'Firefox';
+  var isSafari = webrtcDetectedBrowser.browser === 'Safari';
+  var isChrome = webrtcDetectedBrowser.browser === 'Chrome';
+  var isIE = webrtcDetectedBrowser.browser === 'IE';
 
   // Load Plugin
   Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('object');
@@ -885,10 +910,9 @@ if (Temasys.browser.mozWebRTC) {
   Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function () {
     var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
     if(downloadLink) {
-      Temasys.WebRTCPlugin.renderNotificationBar(
-        'This website needs to install the <a href="'+Temasys.WebRTCPlugin.getWebsiteLink() + '"' +
-        'target="_blank">Temasys WebRTC Plugin</a> to upgrade your browser.',
-        'Install Now', downloadLink);
+      Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="' +
+        Temasys.WebRTCPlugin.getWebsiteLink() + '" target="_blank">Temasys WebRTC Plugin</a>' +
+        ' to upgrade your browser.', 'Install Now', downloadLink);
     }
     else {
       Temasys.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
@@ -897,8 +921,8 @@ if (Temasys.browser.mozWebRTC) {
 
   Temasys.WebRTCPlugin.pluginNeedsUpgrade = function (downloadLink) {
     Temasys.WebRTCPlugin.renderNotificationBar('There is a new version of the <a href="' +
-      Temasys.WebRTCPlugin.getWebsiteLink() +
-      '" target="_blank">Temasys WebRTC Plugin</a> available.',
+      Temasys.WebRTCPlugin.getWebsiteLink() + '" target="_blank">' +
+      'Temasys WebRTC Plugin</a> available.',
       'Update Now', downloadLink||Temasys.WebRTCPlugin.getDownloadLink());
   };
 
@@ -924,11 +948,11 @@ if (Temasys.browser.mozWebRTC) {
     c = (i.contentWindow) ? i.contentWindow :
       (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
     c.document.open();
-    c.document.write('<span style="font-family: ' +
-      'Helvetica, Arial, sans-serif; font-size: .9rem; padding: 7px;' +
-      'vertical-align: middle; cursor: default;">'+text+'</span>');
+    c.document.write('<span style="font-family: Helvetica, Arial,' +
+      'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
+      'middle; cursor: default;">' + text + '</span>');
     if(buttonText && buttonLink) {
-      c.document.write('<button id="okay">'+buttonText+'</button><button>Cancel</button>');
+      c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
       c.document.close();
       c.document.getElementById('okay').addEventListener('click', function(e) {
         window.open(buttonLink, '_top');
