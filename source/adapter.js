@@ -753,6 +753,7 @@ if (AdapterJS.browser.mozWebRTC) {
     var w = window;
     var i = document.createElement('iframe');
     i.style.position = 'fixed';
+    i.style.top = '-41px';
     i.style.left = 0;
     i.style.right = 0;
     i.style.width = '100%';
@@ -761,11 +762,10 @@ if (AdapterJS.browser.mozWebRTC) {
     i.style.border = 'none';
     i.style.borderBottom = '1px solid #888888';
     i.style.zIndex = '9999999';
-    try {
+    if(typeof i.style.webkitTransition === 'string') {
       i.style.webkitTransition = 'all .5s ease-out';
-      i.style.top = '-41px';
-    } catch(e) {
-      i.style.top = 0;
+    } else if(typeof i.style.transition === 'string') {
+      i.style.transition = 'all .5s ease-out';
     }
     document.body.appendChild(i);
     c = (i.contentWindow) ? i.contentWindow : (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
@@ -789,9 +789,13 @@ if (AdapterJS.browser.mozWebRTC) {
       w.document.body.removeChild(i);
     });
     setTimeout(function() {
-      try {
+      if(typeof i.style.transition === 'string') {
         i.style.webkitTransform = 'translateY(40px)';
-      } catch(e) {}
+      } else if(typeof i.style.transition === 'string') {
+        i.style.transform = 'translateY(40px)';
+      } else {
+        i.style.top = '0px';
+      }
     }, 300);
   };
   // Try to detect the plugin and act accordingly
