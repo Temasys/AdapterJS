@@ -1,4 +1,4 @@
-/*! adapterjs - v0.0.2 - 2014-08-14 */
+/*! adapterjs - v0.1.0 - 2014-08-14 */
 
 // Temasys Implemented functions
 /**
