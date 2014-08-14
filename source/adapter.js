@@ -220,7 +220,7 @@ getDetectedBrowser = function () {
     /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
   if (navigator.mozGetUserMedia) {
     agent.mozWebRTC = true;
-  } else if (na.webkitGetUserMedia) {
+  } else if (navigator.webkitGetUserMedia) {
     agent.webkitWebRTC = true;
   } else {
     if (agent.userAgent.indexOf('Safari')) {
@@ -314,9 +314,9 @@ checkMediaDataChannelSettings = function
     if ((isLocalFirefox && isPeerFirefox) || (isLocalFirefoxInterop)) {
       try {
         delete constraints.mandatory.MozDontOfferDataChannel;
-      } catch (err) {
+      } catch (error) {
         console.error('Failed deleting MozDontOfferDataChannel');
-        console.exception(err);
+        console.error(error);
       }
     } else if ((isLocalFirefox && !isPeerFirefox)) {
       constraints.mandatory.MozDontOfferDataChannel = true;
@@ -412,9 +412,9 @@ checkMediaDataChannel = function (stream, constraints) {
     if (dc) {
       testedOptions.data = true;
     }
-  } catch (err) {
+  } catch (error) {
     console.error('Failed creating DataChannel');
-    console.error(err);
+    console.error(error);
   }
   return testedOptions;
 };
@@ -959,10 +959,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
         e.preventDefault();
         try {
           event.cancelBubble = true;
-        } catch(error) {
-          console.error('Exception occurred:');
-          console.error(error);
-        }
+        } catch(error) { }
       });
     }
     else {
