@@ -1,4 +1,4 @@
-/*! adapterjs - v0.1.0 - 2014-08-14 */
+/*! adapterjs - v0.9.0 - 2014-08-25 */
 
 // Temasys Implemented functions
 /**
@@ -948,13 +948,6 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     else {
       Temasys.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
     }
-  };
-
-  Temasys.WebRTCPlugin.pluginNeedsUpgrade = function (downloadLink) {
-    Temasys.WebRTCPlugin.renderNotificationBar('There is a new version of the <a href="' +
-      Temasys.WebRTCPlugin.getWebsiteLink() + '" target="_blank">' +
-      'Temasys WebRTC Plugin</a> available.',
-      'Update Now', downloadLink||Temasys.WebRTCPlugin.getDownloadLink());
   };
 
   Temasys.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
