@@ -948,13 +948,6 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     }
   };
 
-  Temasys.WebRTCPlugin.pluginNeedsUpgrade = function (downloadLink) {
-    Temasys.WebRTCPlugin.renderNotificationBar('There is a new version of the <a href="' +
-      Temasys.WebRTCPlugin.getWebsiteLink() + '" target="_blank">' +
-      'Temasys WebRTC Plugin</a> available.',
-      'Update Now', downloadLink||Temasys.WebRTCPlugin.getDownloadLink());
-  };
-
   Temasys.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
     var w = window;
     var i = document.createElement('iframe');
