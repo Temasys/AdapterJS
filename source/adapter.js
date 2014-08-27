@@ -55,12 +55,6 @@ Temasys.WebRTCPlugin.isDefined = null;
  */
 Temasys.WebRTCPlugin.injectPlugin = null;
 /**
- * Check if Plugin is ready
- * @method Temasys.WebRTCPlugin.checkIfReady
- * @type Function
- */
-Temasys.WebRTCPlugin.checkIfReady = null;
-/**
  * This function will be called if the plugin is needed
  * (browser different from Chrome or Firefox),
  * but the plugin is not installed
@@ -96,30 +90,22 @@ Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
 Temasys.WebRTCPlugin.TemRTCPlugin = null;
 /**
  * WebRTC ready Cb, should only be called once.
- * Need to prevent Chrome + plugin form calling WebRTCReadyCb twice
+ * Need to prevent Chrome + plugin form calling window.onwebrtcready twice
  * --------------------------------------------------------------------------
- * WebRTCReadyCb is callback function called when the browser is webrtc ready
+ * window.onwebrtcready is callback function called when the browser is webrtc ready
  * this can be because of the browser or because of the plugin
- * Override WebRTCReadyCb and use it to do whatever you need to do when the
+ * Override window.onwebrtcready and use it to do whatever you need to do when the
  * page is ready
- * @method Temasys.TemPrivateWebRTCReadyCb
+ * @method Temasys.TemPrivatewindow.onwebrtcready
  * @private
  * @deprecated
  */
-/*Temasys.WebRTCPlugin.TemPrivateWebRTCReadyCb = function () {
-   arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
-   if (arguments.callee.StaticWasInit === 1) {
-     Temasys.pluginReadyState = Temasys.PLUGIN_READY_STATE.READY;
-   }
-   arguments.callee.StaticWasInit++;
- };
-*/
 /**
  * !!! DO NOT OVERRIDE THIS FUNCTION !!!
  * This function will be called when plugin is ready
  * it sends necessary details to the plugin.
  * If you need to do something once the page/plugin is ready, override
- * WebRTCReadyCb instead.
+ * window.onwebrtcready instead.
  * This function is not in the IE/Safari condition brackets so that
  * TemPluginLoaded function might be called on Chrome/Firefox
  * @method __TemWebRTCReady0
@@ -128,8 +114,16 @@ Temasys.WebRTCPlugin.TemRTCPlugin = null;
 __TemWebRTCReady0 = function () {
   arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
   if (arguments.callee.StaticWasInit === 1) {
-    Temasys.isPluginReady = true;
-    Temasys.pluginReadyState = Temasys.PLUGIN_READY_STATE.READY;
+    Temasys.WebRTCPlugin.documentReadyInterval = setInterval(function () {
+      if (document.readyState === 'complete') { // TODO: update comments, we wait for the document to be ready
+        clearInterval(Temasys.WebRTCPlugin.documentReadyInterval);
+        if (typeof window.onwebrtcready === 'function') {
+          Temasys.isPluginReady = true;
+          Temasys.pluginReadyState = Temasys.PLUGIN_READY_STATE.READY;
+          window.onwebrtcready();
+        }
+      }
+    }, 100);
   }
   arguments.callee.StaticWasInit++;
 };
@@ -720,15 +714,14 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       '<param name="windowless" value="false" /> ' +
       '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
     document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
-  };
-  Temasys.WebRTCPlugin.injectPlugin();
 
-  // FIXEM: dead code?
-  Temasys.WebRTCPlugin.TemRTCPlugin.onreadystatechange = function (state) {
-    console.log('Plugin: Ready State : ' + state);
-    if (state === 4) {
-      console.log('Plugin has been loaded');
-    }
+    // FIXEM: dead code?
+    Temasys.WebRTCPlugin.TemRTCPlugin.onreadystatechange = function (state) {
+      console.log('Plugin: Ready State : ' + state);
+      if (state === 4) {
+        console.log('Plugin has been loaded');
+      }
+    };
   };
 
   Temasys.WebRTCPlugin.isPluginInstalled =
@@ -760,15 +753,6 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       return variable !== null && variable !== undefined;
     };
 
-    Temasys.WebRTCPlugin.checkIfReady = function (callback) {
-      var checkPluginReadyState = setInterval(function () {
-        if (Temasys.pluginReadyState === Temasys.PLUGIN_READY_STATE.READY) {
-          clearInterval(checkPluginReadyState);
-          callback();
-        }
-      }, 100);
-    };
-
     createIceServer = function (url, username, password) {
       var iceServer = null;
       var url_parts = url.split(':');
@@ -797,51 +781,43 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     };
 
     RTCSessionDescription = function (info) {
-      Temasys.WebRTCPlugin.checkIfReady(function() {
-        return Temasys.WebRTCPlugin.TemRTCPlugin.
-          ConstructSessionDescription(info.type, info.sdp);
-      });
+      return Temasys.WebRTCPlugin.TemRTCPlugin.
+        ConstructSessionDescription(info.type, info.sdp);
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      Temasys.WebRTCPlugin.checkIfReady(function() {
-        var iceServers = null;
-        if (servers) {
-          iceServers = servers.iceServers;
-          for (var i = 0; i < iceServers.length; i++) {
-            if (iceServers[i].urls && !iceServers[i].url) {
-              iceServers[i].url = iceServers[i].urls;
-            }
-            iceServers[i].hasCredentials = Temasys.WebRTCPlugin.
-              isDefined(iceServers[i].username) &&
-              Temasys.WebRTCPlugin.isDefined(iceServers[i].credential);
+      var iceServers = null;
+      if (servers) {
+        iceServers = servers.iceServers;
+        for (var i = 0; i < iceServers.length; i++) {
+          if (iceServers[i].urls && !iceServers[i].url) {
+            iceServers[i].url = iceServers[i].urls;
           }
+          iceServers[i].hasCredentials = Temasys.WebRTCPlugin.
+            isDefined(iceServers[i].username) &&
+            Temasys.WebRTCPlugin.isDefined(iceServers[i].credential);
         }
-        var mandatory = (constraints && constraints.mandatory) ?
-          constraints.mandatory : null;
-        var optional = (constraints && constraints.optional) ?
-          constraints.optional : null;
-        return Temasys.WebRTCPlugin.TemRTCPlugin.
-          PeerConnection(Temasys.WebRTCPlugin.TemPageId,
-          iceServers, mandatory, optional);
-      });
+      }
+      var mandatory = (constraints && constraints.mandatory) ?
+        constraints.mandatory : null;
+      var optional = (constraints && constraints.optional) ?
+        constraints.optional : null;
+      return Temasys.WebRTCPlugin.TemRTCPlugin.
+        PeerConnection(Temasys.WebRTCPlugin.TemPageId,
+        iceServers, mandatory, optional); 
     };
 
     MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
-      Temasys.WebRTCPlugin.checkIfReady(function() {
-        Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback);
-      });
+      Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback); 
     };
 
     getUserMedia = function (constraints, successCallback, failureCallback) {
-      Temasys.WebRTCPlugin.checkIfReady(function() {
-        if (!constraints.audio) {
-          constraints.audio = false;
-        }
-        Temasys.WebRTCPlugin.TemRTCPlugin.
-          getUserMedia(constraints, successCallback, failureCallback);
-      });
+      if (!constraints.audio) {
+        constraints.audio = false;
+      }
+      Temasys.WebRTCPlugin.TemRTCPlugin.
+        getUserMedia(constraints, successCallback, failureCallback);
     };
     navigator.getUserMedia = getUserMedia;
 
@@ -880,6 +856,9 @@ if (webrtcDetectedBrowser.mozWebRTC) {
           element.setStreamId(stream.id);
         }
         var newElement = document.getElementById(elementId);
+        newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
+        if (isIE) // on IE the event needs to be plugged manually
+          newElement.attachEvent("onplaying", newElement.onplaying);
         newElement.onclick = (element.onclick) ? element.onclick : function (arg) {};
         newElement._TemOnClick = function (id) {
           var arg = {
@@ -911,14 +890,12 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     };
 
     RTCIceCandidate = function (candidate) {
-      Temasys.WebRTCPlugin.checkIfReady(function () {
-        if (!candidate.sdpMid) {
-          candidate.sdpMid = '';
-        }
-        return Temasys.WebRTCPlugin.TemRTCPlugin.ConstructIceCandidate(
-          candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate
-        );
-      });
+      if (!candidate.sdpMid) {
+        candidate.sdpMid = '';
+      }
+      return Temasys.WebRTCPlugin.TemRTCPlugin.ConstructIceCandidate(
+        candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate
+      );
     };
   };
 
@@ -1004,6 +981,8 @@ if (webrtcDetectedBrowser.mozWebRTC) {
   Temasys.WebRTCPlugin.isPluginInstalled('Tem', 'TemWebRTCPlugin',
     Temasys.WebRTCPlugin.defineWebRTCInterface,
     Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb);
+
+  Temasys.WebRTCPlugin.injectPlugin();
 } else {
   console.log('Browser does not appear to be WebRTC-capable');
 }
