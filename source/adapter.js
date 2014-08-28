@@ -55,6 +55,11 @@ Temasys.WebRTCPlugin.isDefined = null;
  */
 Temasys.WebRTCPlugin.injectPlugin = null;
 /**
+
+
+*/
+Temasys.WebRTCPlugin.WaitForPluginReady = null;
+/**
  * This function will be called if the plugin is needed
  * (browser different from Chrome or Firefox),
  * but the plugin is not installed
@@ -88,6 +93,8 @@ Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
  * @protected
  */
 Temasys.WebRTCPlugin.TemRTCPlugin = null;
+
+Temasys.WebRTCPlugin.isPluginReady = false;
 /**
  * WebRTC ready Cb, should only be called once.
  * Need to prevent Chrome + plugin form calling window.onwebrtcready twice
@@ -117,11 +124,11 @@ __TemWebRTCReady0 = function () {
     Temasys.WebRTCPlugin.documentReadyInterval = setInterval(function () {
       if (document.readyState === 'complete') { // TODO: update comments, we wait for the document to be ready
         clearInterval(Temasys.WebRTCPlugin.documentReadyInterval);
-        if (typeof window.onwebrtcready === 'function') {
-          Temasys.isPluginReady = true;
-          Temasys.pluginReadyState = Temasys.PLUGIN_READY_STATE.READY;
-          window.onwebrtcready();
-        }
+        // if (typeof window.onwebrtcready === 'function') {
+          Temasys.WebRTCPlugin.isPluginReady = true;
+          Temasys.WebRTCPlugin.pluginReadyState = Temasys.PLUGIN_READY_STATE.READY;
+          // window.onwebrtcready();
+        // }
       }
     }, 100);
   }
@@ -167,7 +174,7 @@ Temasys.ICEConnectionFiredStates = {};
  * @attribute Temasys.pluginReadyState
  * @type String
  */
-Temasys.pluginReadyState = Temasys.PLUGIN_READY_STATE.INIT;
+Temasys.WebRTCPlugin.pluginReadyState = Temasys.PLUGIN_READY_STATE.INIT;
 /**
  * To Fix Configuration as some browsers,
  * some browsers does not support the 'urls' attribute
@@ -430,7 +437,7 @@ RTCPeerConnection = null;
  * @param {JSON} info
  * @return {Object} The RTCSessionDescription object
  */
-RTCSessionDescription = (typeof RTCSessionDescription === 'object') ?
+RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
   RTCSessionDescription : null;
 /**
  * Plugin:
@@ -440,8 +447,8 @@ RTCSessionDescription = (typeof RTCSessionDescription === 'object') ?
  * @param {Object} candidate
  * @return {Object} The RTCIceCandidate object
  */
-RTCIceCandidate = (typeof RTCIceCandidate === 'object') ?
-  RTCSessionDescription : null;
+RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
+  RTCIceCandidate : null;
 /**
  * Original Google Code. Get UserMedia (only difference is the prefix).
  * @function getUserMedia
@@ -549,9 +556,16 @@ createIceServers = null;
  * @param {Boolean} isRTPDCSupported If browser supports RTP DataChannels
  * @param {Boolean} isPluginSupported If browser is using the Plugin DataChannels
  */
-webrtcDetectedBrowser = getDetectedBrowser();
+webrtcDetectedBrowser = null;
+
+webrtcDetectedVersion = null;
+
 // Check for browser types and react accordingly
-if (webrtcDetectedBrowser.mozWebRTC) {
+if (navigator.mozGetUserMedia) {
+  webrtcDetectedBrowser = "firefox";
+  webrtcDetectedVersion =
+  parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1], 10);
+
   RTCPeerConnection = function (pcConfig, pcConstraints) {
     maybeFixConfiguration(pcConfig);
     return new mozRTCPeerConnection(pcConfig, pcConstraints);
@@ -568,7 +582,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     if (url_parts[0].indexOf('stun') === 0) {
       iceServer = { 'url' : url };
     } else if (url_parts[0].indexOf('turn') === 0) {
-      if (webrtcDetectedBrowser.version < 27) {
+      if (webrtcDetectedVersion < 27) {
         var turn_url_parts = url.split('?');
         if (turn_url_parts.length === 1 || turn_url_parts[1].indexOf('transport=udp') === 0) {
           iceServer = {
@@ -625,7 +639,12 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     };
   }
   __TemWebRTCReady0();
-} else if (webrtcDetectedBrowser.webkitWebRTC) {
+} else if (navigator.webkitGetUserMedia) {
+
+  webrtcDetectedBrowser = "chrome";
+  webrtcDetectedVersion =
+  parseInt(navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./)[2], 10);
+
   createIceServer = function (url, username, password) {
     var iceServer = null;
     var url_parts = url.split(':');
@@ -643,7 +662,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
 
   createIceServers = function (urls, username, password) {
     var iceServers = [];
-    if (webrtcDetectedBrowser.version >= 34) {
+    if (webrtcDetectedVersion >= 34) {
       iceServers = {
         'urls' : urls,
         'credential' : password,
@@ -661,7 +680,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
   };
 
   RTCPeerConnection = function (pcConfig, pcConstraints) {
-    if (webrtcDetectedBrowser.version < 34) {
+    if (webrtcDetectedVersion < 34) {
       maybeFixConfiguration(pcConfig);
     }
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
@@ -688,12 +707,23 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     return to;
   };
   __TemWebRTCReady0();
-} else if (webrtcDetectedBrowser.pluginWebRTC) {
+} else {
   // var isOpera = webrtcDetectedBrowser.browser === 'Opera'; // Might not be used.
-  var isFirefox = webrtcDetectedBrowser.browser === 'Firefox';
-  var isSafari = webrtcDetectedBrowser.browser === 'Safari';
-  var isChrome = webrtcDetectedBrowser.browser === 'Chrome';
-  var isIE = webrtcDetectedBrowser.browser === 'IE';
+  webrtcDetectedBrowser =  getDetectedBrowser().browser;
+  isIE = webrtcDetectedBrowser === 'IE';
+
+  Temasys.WebRTCPlugin.WaitForPluginReady = function() {
+    while (!Temasys.WebRTCPlugin.isPluginReady) { };
+  }
+
+  Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
+    var checkPluginReadyState = setInterval(function () {
+      if (Temasys.WebRTCPlugin.isPluginReady) {
+        clearInterval(checkPluginReadyState);
+        callback();
+      }
+    }, 100);
+  };
 
   Temasys.WebRTCPlugin.injectPlugin = function () {
     // Load Plugin
@@ -713,20 +743,13 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
       '<param name="windowless" value="false" /> ' +
       '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
+      // '<param name="forceGetAllCams" value="True" />'
     document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
-
-    // FIXEM: dead code?
-    Temasys.WebRTCPlugin.TemRTCPlugin.onreadystatechange = function (state) {
-      console.log('Plugin: Ready State : ' + state);
-      if (state === 4) {
-        console.log('Plugin has been loaded');
-      }
-    };
   };
 
   Temasys.WebRTCPlugin.isPluginInstalled =
     function (comName, plugName, installedCb, notInstalledCb) {
-    if (isChrome || isSafari || isFirefox) {
+    if (!isIE) {
       var pluginArray = navigator.plugins;
       for (var i = 0; i < pluginArray.length; i++) {
         if (pluginArray[i].name.indexOf(plugName) >= 0) {
@@ -735,7 +758,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
         }
       }
       notInstalledCb();
-    } else if (isIE) {
+    } else {
       try {
         var axo = new ActiveXObject(comName + '.' + plugName);
       } catch (e) {
@@ -743,9 +766,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
         return;
       }
       installedCb();
-    } else {
-      return;
-    }
+    } 
   };
 
   Temasys.WebRTCPlugin.defineWebRTCInterface = function () {
@@ -781,6 +802,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
     };
 
     RTCSessionDescription = function (info) {
+      Temasys.WebRTCPlugin.WaitForPluginReady();
       return Temasys.WebRTCPlugin.TemRTCPlugin.
         ConstructSessionDescription(info.type, info.sdp);
     };
@@ -802,6 +824,8 @@ if (webrtcDetectedBrowser.mozWebRTC) {
         constraints.mandatory : null;
       var optional = (constraints && constraints.optional) ?
         constraints.optional : null;
+
+      Temasys.WebRTCPlugin.WaitForPluginReady();
       return Temasys.WebRTCPlugin.TemRTCPlugin.
         PeerConnection(Temasys.WebRTCPlugin.TemPageId,
         iceServers, mandatory, optional); 
@@ -809,15 +833,20 @@ if (webrtcDetectedBrowser.mozWebRTC) {
 
     MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
-      Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback); 
+      Temasys.WebRTCPlugin.callWhenPluginReady(function() {
+        Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback); 
+      });
     };
 
     getUserMedia = function (constraints, successCallback, failureCallback) {
       if (!constraints.audio) {
         constraints.audio = false;
       }
-      Temasys.WebRTCPlugin.TemRTCPlugin.
-        getUserMedia(constraints, successCallback, failureCallback);
+
+      Temasys.WebRTCPlugin.callWhenPluginReady(function() {
+        Temasys.WebRTCPlugin.TemRTCPlugin.
+          getUserMedia(constraints, successCallback, failureCallback);
+      });
     };
     navigator.getUserMedia = getUserMedia;
 
@@ -877,6 +906,7 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       var children = from.children;
       for (var i = 0; i !== children.length; ++i) {
         if (children[i].name === 'streamId') {
+          Temasys.WebRTCPlugin.WaitForPluginReady();
           stream = Temasys.WebRTCPlugin.TemRTCPlugin
             .getStreamWithId(Temasys.WebRTCPlugin.TemPageId, children[i].value);
           break;
@@ -893,10 +923,14 @@ if (webrtcDetectedBrowser.mozWebRTC) {
       if (!candidate.sdpMid) {
         candidate.sdpMid = '';
       }
+
+      Temasys.WebRTCPlugin.WaitForPluginReady();
       return Temasys.WebRTCPlugin.TemRTCPlugin.ConstructIceCandidate(
         candidate.sdpMid, candidate.sdpMLineIndex, candidate.candidate
       );
     };
+
+    Temasys.WebRTCPlugin.injectPlugin();
   };
 
   Temasys.WebRTCPlugin.getWebsiteLink = function() {
@@ -981,8 +1015,4 @@ if (webrtcDetectedBrowser.mozWebRTC) {
   Temasys.WebRTCPlugin.isPluginInstalled('Tem', 'TemWebRTCPlugin',
     Temasys.WebRTCPlugin.defineWebRTCInterface,
     Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb);
-
-  Temasys.WebRTCPlugin.injectPlugin();
-} else {
-  console.log('Browser does not appear to be WebRTC-capable');
-}
+} 
