@@ -635,7 +635,6 @@ if (navigator.mozGetUserMedia) {
       return [];
     };
   }
-  __TemWebRTCReady0();
 } else if (navigator.webkitGetUserMedia) {
 
   webrtcDetectedBrowser = "chrome";
@@ -703,7 +702,6 @@ if (navigator.mozGetUserMedia) {
     to.src = from.src;
     return to;
   };
-  __TemWebRTCReady0();
 } else {
   // var isOpera = webrtcDetectedBrowser.browser === 'Opera'; // Might not be used.
   webrtcDetectedBrowser =  getDetectedBrowser().browser;
