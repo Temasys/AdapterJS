@@ -124,11 +124,8 @@ __TemWebRTCReady0 = function () {
     Temasys.WebRTCPlugin.documentReadyInterval = setInterval(function () {
       if (document.readyState === 'complete') { // TODO: update comments, we wait for the document to be ready
         clearInterval(Temasys.WebRTCPlugin.documentReadyInterval);
-        // if (typeof window.onwebrtcready === 'function') {
           Temasys.WebRTCPlugin.isPluginReady = true;
           Temasys.WebRTCPlugin.pluginReadyState = Temasys.PLUGIN_READY_STATE.READY;
-          // window.onwebrtcready();
-        // }
       }
     }, 100);
   }
