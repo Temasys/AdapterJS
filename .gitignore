@@ -88,3 +88,4 @@ staging
 _site
 source/config/local.json
 node_modules/
+demo/
