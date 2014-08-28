@@ -89,3 +89,5 @@ _site
 source/config/local.json
 node_modules/
 demo/
+doc/
+doc-style/
