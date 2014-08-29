@@ -161,7 +161,7 @@ Temasys.parseWebrtcDetectedBrowser = function () {
     /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
   if (/trident/i.test(checkMatch[1])) {
     hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
-    webrtcDetectedBrowser = 'ie';
+    webrtcDetectedBrowser = 'IE';
     webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
   } else if (checkMatch[1] === 'Chrome') {
     hasMatch = navigator.userAgent.match(/\bOPR\/(\d+)/);
@@ -174,7 +174,7 @@ Temasys.parseWebrtcDetectedBrowser = function () {
     if (typeof InstallTrigger !== 'undefined') {
       webrtcDetectedBrowser = 'firefox';
     } else if (/*@cc_on!@*/ false || !!document.documentMode) {
-      webrtcDetectedBrowser = 'ie';
+      webrtcDetectedBrowser = 'IE';
     } else if (
       Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
       webrtcDetectedBrowser = 'safari';
@@ -239,7 +239,7 @@ checkMediaDataChannelSettings = function
   console.info('Peer Browser version: ' + peerBrowserVersion);
 
   var beOfferer = false;
-  var isLocalFirefox = navigator.mozWebRTC;
+  var isLocalFirefox = webrtcDetectedBrowser === 'firefox';
   // Nightly version does not require MozDontOfferDataChannel for interop
   var isLocalFirefoxInterop = webrtcDetectedType === 'moz' && webrtcDetectedVersion > 30;
   var isPeerFirefox = peerBrowserAgent === 'Firefox';
