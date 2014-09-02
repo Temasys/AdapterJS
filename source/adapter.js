@@ -645,16 +645,22 @@ if (navigator.mozGetUserMedia) {
     to.src = from.src;
     return to;
   };
-} else {
+} else { // TRY TO USE PLUGIN
+  // IE 9 is not offering an implementation of console.log until you open a console
+  if (typeof console !== 'object' || typeof console.log !== 'function') {
+    var console = console || {};
+    console.log = function (arg) {
+        // You may override this function
+    }
+  }
+
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
   Temasys.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
   Temasys.WebRTCPlugin.WaitForPluginReady = function() {
-    /*while (!Temasys.WebRTCPlugin.isPluginReady) {
-      // commented out to pass jshint
-    };*/
+    while (!Temasys.WebRTCPlugin.isPluginReady) {};
   };
 
   Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
@@ -666,26 +672,53 @@ if (navigator.mozGetUserMedia) {
     }, 100);
   };
 
+function isIE () {
+  var myNav = navigator.userAgent.toLowerCase();
+  return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+}
+
   Temasys.WebRTCPlugin.injectPlugin = function () {
-    // Load Plugin
-    Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('object');
-    Temasys.WebRTCPlugin.TemRTCPlugin.id = Temasys.WebRTCPlugin.temPluginInfo.pluginId;
-    // IE will only start the plugin if it's ACTUALLY visible
-    if (isIE) {
+    if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 9) {
+      var frag = document.createDocumentFragment();
+      Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('div');
+      Temasys.WebRTCPlugin.TemRTCPlugin.innerHTML = '<object id="' + Temasys.WebRTCPlugin.temPluginInfo.pluginId + '" type="' + Temasys.WebRTCPlugin.temPluginInfo.type + '" ' + 
+                                            'width="1" height="1">' + 
+        '<param name="pluginId" value="' + Temasys.WebRTCPlugin.temPluginInfo.pluginId + '" /> ' + 
+        '<param name="windowless" value="false" /> ' + 
+        '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '" /> ' + 
+        '<param name="onload" value="' + Temasys.WebRTCPlugin.temPluginInfo.onload + '" />' + 
+        // '<param name="forceGetAllCams" value="True" />' +  // uncomment to be able to use virtual cams
+      '</object>';
+      while (Temasys.WebRTCPlugin.TemRTCPlugin.firstChild) {
+        frag.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin.firstChild);
+      }
+      document.body.appendChild(frag);
+
+      // Need to re-fetch the plugin
+      Temasys.WebRTCPlugin.TemRTCPlugin = document.getElementById(Temasys.WebRTCPlugin.temPluginInfo.pluginId);
+
+    } else {
+      // Load Plugin
+      Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('object');
+      Temasys.WebRTCPlugin.TemRTCPlugin.id = Temasys.WebRTCPlugin.temPluginInfo.pluginId;
+      // IE will only start the plugin if it's ACTUALLY visible
+      if (isIE) {
+        Temasys.WebRTCPlugin.TemRTCPlugin.width = '1px';
+        Temasys.WebRTCPlugin.TemRTCPlugin.height = '1px';
+      }
       Temasys.WebRTCPlugin.TemRTCPlugin.width = '1px';
       Temasys.WebRTCPlugin.TemRTCPlugin.height = '1px';
+      Temasys.WebRTCPlugin.TemRTCPlugin.type = Temasys.WebRTCPlugin.temPluginInfo.type;
+      Temasys.WebRTCPlugin.TemRTCPlugin.innerHTML = '<param name="onload" value="' +
+        Temasys.WebRTCPlugin.temPluginInfo.onload + '">' +
+        '<param name="pluginId" value="' +
+        Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
+        '<param name="windowless" value="false" /> ' +
+        // '<param name="forceGetAllCams" value="True" />' + // uncomment to be able to use virtual cams
+        '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
+        
+      document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
     }
-    Temasys.WebRTCPlugin.TemRTCPlugin.width = '1px';
-    Temasys.WebRTCPlugin.TemRTCPlugin.height = '1px';
-    Temasys.WebRTCPlugin.TemRTCPlugin.type = Temasys.WebRTCPlugin.temPluginInfo.type;
-    Temasys.WebRTCPlugin.TemRTCPlugin.innerHTML = '<param name="onload" value="' +
-      Temasys.WebRTCPlugin.temPluginInfo.onload + '">' +
-      '<param name="pluginId" value="' +
-      Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
-      '<param name="windowless" value="false" /> ' +
-      '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
-      // '<param name="forceGetAllCams" value="True" />'
-    document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
   };
 
   Temasys.WebRTCPlugin.isPluginInstalled =
