@@ -95,7 +95,7 @@ module.exports = function (grunt) {
 					themedir: 'doc-style'
 				}
 			}
-		},
+		}
 	});
 
 	grunt.registerTask('publish', [

@@ -52,7 +52,7 @@ tested outcomes in Firefox returns 'checking' > 'connected' for both offerer and
 
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
-  checkICEConnectionState(peerID, peerConnection.iceConnectionState, function (iceConnectionState) {
+  checkICEConnectionState(peerId, peerConnection.iceConnectionState, function (updatedIceConnectionState) {
     // do Something every time there's a new state ['checking', 'connected', 'completed']
   });
 };
@@ -73,9 +73,8 @@ method has to be called before sending the acknowledge to create the offer and b
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
 // the other peer
-// You may use "webrtcDetectedBrowser" Helper function to get the peer to send browser information
-var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
-checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
+checkMediaDataChannelSettings(false, peerAgentBrowser, peerAgentVersion,
+  function (beOfferer) {
   if (beOfferer) {
     // be the one who does the offer
   } else {
@@ -89,22 +88,25 @@ checkMediaDataChannelSettings(false, peerAgentBrowser, function (beOfferer) {
 
 ```javascript
 // We are going to do the offer so we need to check the constraints first.
-// You may use "webrtcDetectedBrowser" Helper variable to get the peer to send browser information
-var peerAgentBrowser = peerBrowserName + '|' + peerBrowserVersion;
-checkMediaDataChannelSettings(true, peerAgentBrowser, function (offerConstraints) {
+checkMediaDataChannelSettings(true, peerAgentBrowser, peerAgentVersion,
+  function (unifiedOfferConstraints) {
   peerConnection.createOffer(function (offer) {
     // success
   }, function (error) {
     // failure
-  }, offerConstraints);
-}, constraints);
+  }, unifiedOfferConstraints);
+}, inputConstraints);
 ```
 
 #### Helper variables
 
-##### `webrtcDetectedBrowser`
+##### `webrtcDetectedType`
 
-displays all the browser information and the webrtc type of support
+displays the browser webrtc implementation type.
+
+##### `webrtcDetectedDCSupport`
+
+displays the browser webrtc datachannel support type.
 
 
 ## Setup this project
