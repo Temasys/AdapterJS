@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.0 - 2014-09-03 */
+/*! adapterjs - v0.9.0 - 2014-09-04 */
 
 /**
  * Temasys reserved namespace.
@@ -24,7 +24,7 @@ Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
  * @extends Temasys
  */
 Temasys.AdapterJS = {
-  VERSION: "0.9.0"
+  VERSION: '0.9.0'
 };
 /**
  * This function detects whether or not a plugin is installed.
@@ -71,7 +71,6 @@ Temasys.WebRTCPlugin.callWhenPluginReady = null;
 /**
  * This function will be called if the plugin is needed (browser different
  * from Chrome or Firefox), but the plugin is not installed.
->>>>>>> 76ef4248559cdedb1439dfcec1619d8cf656cdde
  * Override it according to your application logic.
  * @method pluginNeededButNotInstalledCb
  * @for Temasys.WebRTCPlugin
