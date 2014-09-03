@@ -15,6 +15,14 @@ var Temasys = Temasys || {};
  */
 Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
 /**
+ * Adapter's interface.
+ * @class Temasys.AdapterJS
+ * @extends Temasys
+ */
+Temasys.AdapterJS = {
+  VERSION: "@@version"
+};
+/**
  * This function detects whether or not a plugin is installed.
  * @method isPluginInstalled
  * @param {String} comName The company name.
@@ -51,10 +59,15 @@ Temasys.WebRTCPlugin.isDefined = null;
  */
 Temasys.WebRTCPlugin.injectPlugin = null;
 /**
-
-
+ * This functions will block until the plugin is ready to be used.
+ * @for Temasys.WebRTCPlugin
 */
 Temasys.WebRTCPlugin.WaitForPluginReady = null;
+/**
+  * This methid will use an interval to wait for the plugin to be ready.
+  * @for Temasys.WebRTCPlugin
+*/
+Temasys.WebRTCPlugin.callWhenPluginReady = null;
 /**
  * This function will be called if the plugin is needed
  * (browser different from Chrome or Firefox),
@@ -89,6 +102,12 @@ Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
  * @protected
  */
 Temasys.WebRTCPlugin.TemRTCPlugin = null;
+/**
+ * Indicated whether or not the plugin is ready to be used
+ * @attribute Temasys.WebRTCPlugin.isPluginReady
+ * @type Boolean
+ * @protected
+ */
 Temasys.WebRTCPlugin.isPluginReady = false;
 /**
  * !!! DO NOT OVERRIDE THIS FUNCTION !!!
