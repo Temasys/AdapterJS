@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.0 - 2014-09-04 */
+/*! adapterjs - v0.9.0 - 2014-09-05 */
 
 /**
  * Temasys reserved namespace.
@@ -310,82 +310,61 @@ maybeFixConfiguration = function (pcConfig) {
  * @param {Function} callback The callback once it's done.
  * @param {JSON} constraints The offer constraints.
  * @example
- *   // Step 1: First, check who should do the createOffer first.
- *   checkMediaDataChannelSettings(false, peerAgentBrowser, peerAgentVersion,
- *     function (beOfferer) {
- *     if (beOfferer) {
- *       // be the one who does the offer
- *     } else {
- *       // your peer does the offer
- *     }
- *   });
- *
- *   // Step 2: Parse the offer constraints to remove unsupported variables for
- *   // interopability
- *   checkMediaDataChannelSettings(true, peerAgentBrowser, peerAgentVersion,
- *     function (unifiedOfferConstraints) {
- *       peerConnection.createOffer(function (offer) {
- *         // success
- *       }, function (error) {
- *         // failure
- *       }, unifiedOfferConstraints);
+ *   checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion,
+ *     function (beOfferer, unifiedOfferConstraints) {
+ *       if (beOfferer) {
+ *         peerConnection.createOffer(function (offer) {
+ *           // success
+ *         }, function (error) {
+ *           // failure
+ *         }, unifiedOfferConstraints);
+ *       } else {
+ *          // let someone else do the job
+ *       }
  *   }, inputConstraints);
  * @for Temasys
  */
-checkMediaDataChannelSettings = function
-  (isOffer, peerBrowserAgent, peerBrowserVersion, callback, constraints) {
+checkMediaDataChannelSettings =
+  function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
   if (typeof callback !== 'function') {
     return;
   }
-  console.info('User Browser: ' + webrtcDetectedBrowser);
-  console.info('User Browser version: ' + webrtcDetectedVersion);
-  console.info('Peer Browser: ' + peerBrowserAgent);
-  console.info('Peer Browser version: ' + peerBrowserVersion);
-
-  var beOfferer = false;
+  var beOfferer = true;
   var isLocalFirefox = webrtcDetectedBrowser === 'firefox';
   // Nightly version does not require MozDontOfferDataChannel for interop
   var isLocalFirefoxInterop = webrtcDetectedType === 'moz' && webrtcDetectedVersion > 30;
-  var isPeerFirefox = peerBrowserAgent === 'Firefox';
-  var isPeerFirefoxInterop = peerBrowserAgent === 'Firefox' &&
+  var isPeerFirefox = peerBrowserAgent === 'firefox';
+  var isPeerFirefoxInterop = peerBrowserAgent === 'firefox' &&
     ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
 
   // Resends an updated version of constraints for MozDataChannel to work
   // If other userAgent is firefox and user is firefox, remove MozDataChannel
-  if (isOffer) {
-    if ((isLocalFirefox && isPeerFirefox) || (isLocalFirefoxInterop)) {
-      try {
-        delete constraints.mandatory.MozDontOfferDataChannel;
-      } catch (error) {
-        console.error('Failed deleting MozDontOfferDataChannel');
-        console.error(error);
-      }
-    } else if ((isLocalFirefox && !isPeerFirefox)) {
-      constraints.mandatory.MozDontOfferDataChannel = true;
+  if ((isLocalFirefox && isPeerFirefox) || (isLocalFirefoxInterop)) {
+    try {
+      delete constraints.mandatory.MozDontOfferDataChannel;
+    } catch (error) {
+      console.error('Failed deleting MozDontOfferDataChannel');
+      console.error(error);
     }
-    if (!isLocalFirefox) {
-      // temporary measure to remove Moz* constraints in non Firefox browsers
-      for (var prop in constraints.mandatory) {
-        if (constraints.mandatory.hasOwnProperty(prop)) {
-          if (prop.indexOf('Moz') !== -1) {
-            delete constraints.mandatory[prop];
-          }
+  } else if ((isLocalFirefox && !isPeerFirefox)) {
+    constraints.mandatory.MozDontOfferDataChannel = true;
+  }
+  if (!isLocalFirefox) {
+    // temporary measure to remove Moz* constraints in non Firefox browsers
+    for (var prop in constraints.mandatory) {
+      if (constraints.mandatory.hasOwnProperty(prop)) {
+        if (prop.indexOf('Moz') !== -1) {
+          delete constraints.mandatory[prop];
         }
       }
     }
-    console.log('Set Offer constraints for DataChannel and MediaStream interopability');
-    console.dir(constraints);
-    callback(constraints);
-  } else {
-    // Tells user to resend an 'enter' again
-    // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
-    // interopability of the media stream
-    if (!isLocalFirefox && isPeerFirefox && !isPeerFirefoxInterop) {
-      beOfferer = true;
-    }
-    console.info('Resend Enter: ' + beOfferer);
-    callback(beOfferer);
   }
+  // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
+  // interopability of the media stream
+  if (isLocalFirefox && !isPeerFirefox && !isPeerFirefoxInterop) {
+    beOfferer = false;
+  }
+  callback(beOfferer, constraints);
 };
 /**
  * Handles the differences for all browsers ice connection state output.
