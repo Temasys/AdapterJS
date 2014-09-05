@@ -17,19 +17,11 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 #### Polyfills
 
-`RTCPeerConnection`, `RTCDataChannel` and `navigator.getUserMedia`
+`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`, `attachMediaStream`, `reattachMediaStream`
 
 ## Using AdapterJS
 
 #### Helper functions
-
-##### `attachMediaStream(videoelement, stream)`
-
-universally adds a stream object to a video element
-
-##### `reattachMediaStream(videoelement, videoelement)`
-
-universally copies a stream object from one video element to another
 
 ##### `createIceServer(url, username, password)`
 
@@ -39,16 +31,22 @@ creates a valid iceServer from one url, username and password
 
 creates a valid iceServers array for the specific browser and version.
 
-##### `checkIceConnectionState(peerID, iceConnectionState, callback, returnStateAlways)`
+##### `maybeFixConfiguration(pcConfig)`
 
-handles all the iceConnectionState differences cross-browsers. Order of return values are 'checking' > 'connected' > 'completed'.
-tested outcomes in Firefox returns 'checking' > 'connected' for both offerer and answerer.
+Fixes the incompability of `urls` attribute in some browsers.
 
-> __Tested outcomes__
-> - __Chrome (offerer)__   : 'checking' > 'completed' > 'completed'
-> - __Chrome (answerer)__  : 'checking' > 'connected'
-> - __Firefox (offerer)__  : 'checking' > 'connected'
-> - __Firefox (answerer)__ : 'checking' > 'connected'
+
+
+##### `checkIceConnectionState(peerId, iceConnectionState, callback)`
+
+handles all the iceConnectionState differences cross-browsers. Order of return values are `'checking' > 'connected' > 'completed'`.
+tested outcomes in Firefox returns `'checking' > 'connected'` for both offerer and answerer.
+
+Tested outcomes:
+- Chrome (offerer) : `'checking' > 'completed' > 'completed'`
+- Chrome (answerer) : `'checking' > 'connected'`
+- Firefox (offerer) : `'checking' > 'connected'`
+- Firefox (answerer) : `'checking' > 'connected'`
 
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
@@ -63,14 +61,10 @@ peerConnection.oniceconnectionstatechange = function () {
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
 
-> For Firefox (not 30+) and Chrome MediaStream interopability, _``MozDontOfferDataChannel``_ has to be used, and hence
-> Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection.
-> To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one
-> creating the offer.
+For some older (20+) versions of Firefox and Chrome MediaStream interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection. To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one creating the offer.
 
 ```javascript
-// Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
-// the other peer
+// Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of the other peer
 checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion,
   function (beOfferer, unifiedOfferConstraints) {
   if (beOfferer) {
