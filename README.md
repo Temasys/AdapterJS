@@ -65,7 +65,7 @@ For some older (20+) versions of Firefox and Chrome MediaStream interopability, 
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of the other peer
-checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion,
+checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion, callback, constraints) {
   function (beOfferer, unifiedOfferConstraints) {
   if (beOfferer) {
     peerConnection.createOffer(function (offer) {
