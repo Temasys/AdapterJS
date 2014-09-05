@@ -56,7 +56,7 @@ peerConnection.oniceconnectionstatechange = function () {
 };
 ```
 
-##### `checkMediaDataChannelSettings(peerBrowserAgent, callback, constraints)`
+##### `checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion, callback, constraints)`
 
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
