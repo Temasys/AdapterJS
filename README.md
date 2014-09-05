@@ -73,30 +73,18 @@ method has to be called before sending the acknowledge to create the offer and b
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of
 // the other peer
-checkMediaDataChannelSettings(false, peerAgentBrowser, peerAgentVersion,
-  function (beOfferer) {
+checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion,
+  function (beOfferer, unifiedOfferConstraints) {
   if (beOfferer) {
-    // be the one who does the offer
+    peerConnection.createOffer(function (offer) {
+      // success
+    }, function (error) {
+      // failure
+    }, unifiedOfferConstraints);
   } else {
-    // your peer does the offer
+    // let the other peer do the offer instead.
   }
-});
-```
-> __Check Offer constraints__
->
-> For Firefox to Firefox MediaStream and DataChannel connection interopability, _``MozDontOfferDataChannel``_ has to be removed.
-
-```javascript
-// We are going to do the offer so we need to check the constraints first.
-checkMediaDataChannelSettings(true, peerAgentBrowser, peerAgentVersion,
-  function (unifiedOfferConstraints) {
-  peerConnection.createOffer(function (offer) {
-    // success
-  }, function (error) {
-    // failure
-  }, unifiedOfferConstraints);
 }, inputConstraints);
-```
 
 #### Helper variables
 
