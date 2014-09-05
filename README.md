@@ -58,13 +58,11 @@ peerConnection.oniceconnectionstatechange = function () {
 };
 ```
 
-##### `checkMediaDataChannelSettings(isOffer, peerBrowserAgent, callback, constraints)`
+##### `checkMediaDataChannelSettings(peerBrowserAgent, callback, constraints)`
 
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
-method has to be called before sending the acknowledge to create the offer and before creating the offer.
+method has to be called before creating the offer to check if peer should create the offer.
 
-> __Check which Peer creates the Offer__
->
 > For Firefox (not 30+) and Chrome MediaStream interopability, _``MozDontOfferDataChannel``_ has to be used, and hence
 > Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection.
 > To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one
@@ -85,6 +83,7 @@ checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion,
     // let the other peer do the offer instead.
   }
 }, inputConstraints);
+```
 
 #### Helper variables
 
