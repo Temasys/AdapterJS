@@ -32,7 +32,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 taken over for compatibility with the original adapter.js from Google. Feeds a MediaStream object into video and audio tags.
 
 
-##### `reattachMediaStream(element, stream)`
+##### `reattachMediaStream(elementFrom, elementTo)`
 
 taken over for compatibility with adapter.js from Google. Feeds a MediaStream from one video or audio tag into another.
 
