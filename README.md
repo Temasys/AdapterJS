@@ -2,10 +2,10 @@
 
 > Creating a common API for WebRTC in the browser
 
-Find the most recent version hosted on our CDN. SSL versions are in the works.
+Find the most recent version hosted on our CDN.
 
-- Minified version: `http://cdn.temasys.com.sg/adapterjs/latest/adapter.min.js`
-- Debug version `http://cdn.temasys.com.sg/adapterjs/latest/adapter.debug.js`
+- Minified version: `//cdn.temasys.com.sg/adapterjs/latest/adapter.min.js`
+- Debug version `//cdn.temasys.com.sg/adapterjs/latest/adapter.debug.js`
 
 
 ## Compatibility
