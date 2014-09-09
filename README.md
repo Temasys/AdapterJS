@@ -20,19 +20,32 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 #### Polyfills
 
-`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`, `attachMediaStream`, `reattachMediaStream`
+`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`
+
 
 ## Using AdapterJS
 
 #### Helper functions
 
+##### `attachMediaStream(element, stream)`
+
+taken over for compatibility with the original adapter.js from Google. Feeds a MediaStream object into video and audio tags.
+
+
+##### `reattachMediaStream(element, stream)`
+
+taken over for compatibility with adapter.js from Google. Feeds a MediaStream from one video or audio tag into another.
+
+
 ##### `createIceServer(url, username, password)`
 
 creates a valid iceServer from one url, username and password
 
+
 ##### `createIceServers(urls, username, password)`
 
 creates a valid iceServers array for the specific browser and version.
+
 
 ##### `maybeFixConfiguration(pcConfig)`
 
