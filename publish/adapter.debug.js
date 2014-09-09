@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.0 - 2014-09-05 */
+/*! adapterjs - v0.9.0 - 2014-09-09 */
 
 /**
  * Temasys reserved namespace.
