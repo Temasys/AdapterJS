@@ -4,6 +4,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-replace');
 
 	grunt.initConfig({
 
@@ -21,8 +22,8 @@ module.exports = function (grunt) {
 
 		concat: {
 			options: {
-				separator: ';',
-				stripBanners: true,
+				separator: '\n',
+				stripBanners: false,
 				banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
 					'<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
 			},
@@ -46,6 +47,25 @@ module.exports = function (grunt) {
 				files: {
 					'<%= production %>/adapter.min.js': ['<%= production %>/adapter.debug.js']
 				}
+			}
+		},
+
+		replace: {
+			dist: {
+				options: {
+					variables: {
+						'version': '<%= pkg.version %>'
+					},
+					prefix: '@@'
+				},
+				files: [{
+					expand: true,
+					flatten: true,
+					src: [
+						'<%= production %>/*.js'
+					],
+					dest: '<%= production %>/'
+				}]
 			}
 		},
 
@@ -86,7 +106,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('publish', [
 		'clean:production',
 		'concat:production',
+		'replace:dist',
 		'uglify:production_min'
 	]);
-
 };
