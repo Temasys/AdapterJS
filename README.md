@@ -1,35 +1,51 @@
-# AdapterJS
+#![AdapterJS](http://temasys.github.io/resources/img/adapterjs.svg)
 
 > Creating a common API for WebRTC in the browser
 
-Find the most recent version hosted on our CDN. SSL versions are in the works.
+Find the most recent version hosted on our CDN.
 
-- Minified version: `http://cdn.temasys.com.sg/adapterjs/latest/adapter.min.js`
-- Debug version `http://cdn.temasys.com.sg/adapterjs/latest/adapter.debug.js`
+- Minified version: `//cdn.temasys.com.sg/adapterjs/latest/adapter.min.js`
+- Debug version `//cdn.temasys.com.sg/adapterjs/latest/adapter.debug.js`
 
 
 ## Compatibility
 
 AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
+![Plugin Install Bar in IE and Safari](http://temasys.github.io/resources/img/adapterheader.png)
+> In versions of IE and Safari that don't support WebRTC natively, AdapterJS will suggest to the user to install the [Temasys WebRTC plugin](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins) for Mac or Windows when you try to access getUserMedia or RTCPeerConnection.
+
 
 ## Functionality
 
 #### Polyfills
 
-`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`, `attachMediaStream`, `reattachMediaStream`
+`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`
+
 
 ## Using AdapterJS
 
 #### Helper functions
 
+##### `attachMediaStream(element, stream)`
+
+taken over for compatibility with the original adapter.js from Google. Feeds a MediaStream object into video and audio tags.
+
+
+##### `reattachMediaStream(elementFrom, elementTo)`
+
+taken over for compatibility with adapter.js from Google. Feeds a MediaStream from one video or audio tag into another.
+
+
 ##### `createIceServer(url, username, password)`
 
 creates a valid iceServer from one url, username and password
 
+
 ##### `createIceServers(urls, username, password)`
 
 creates a valid iceServers array for the specific browser and version.
+
 
 ##### `maybeFixConfiguration(pcConfig)`
 
