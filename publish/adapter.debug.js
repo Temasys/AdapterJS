@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.0 - 2014-09-09 */
+/*! adapterjs - v0.9.0 - 2014-09-10 */
 
 /**
  * Temasys reserved namespace.
@@ -771,10 +771,24 @@ if (navigator.mozGetUserMedia) {
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
-    var console = console || {};
-    console.log = function (arg) {
-      // You may override this function
-    };
+    console = console || {};
+    // Implemented based on console specs from MDN
+    // You may override these functions
+    console.log = function (arg) {};
+    console.info = function (arg) {};
+    console.error = function (arg) {};
+    console.dir = function (arg) {};
+    console.exception = function (arg) {};
+    console.trace = function (arg) {};
+    console.warn = function (arg) {};
+    console.count = function (arg) {};
+    console.debug = function (arg) {};
+    console.count = function (arg) {};
+    console.time = function (arg) {};
+    console.timeEnd = function (arg) {};
+    console.group = function (arg) {};
+    console.groupCollapsed = function (arg) {};
+    console.groupEnd = function (arg) {};
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
