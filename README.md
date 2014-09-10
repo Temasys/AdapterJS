@@ -41,28 +41,60 @@ taken over for compatibility with adapter.js from Google. Feeds a MediaStream fr
 
 creates a valid iceServer from one url, username and password
 
+expected parameters:
+
+- `url`: The iceServer url.
+- `username`: The username.
+- `password`: The password.
+
+expected return values:
+
+- `iceServer`: The iceServer object.
+   - `url`: The iceServer url.
+  - `username`: The username.
+  - `password`: The password.
 
 ##### `createIceServers(urls, username, password)`
 
 creates a valid iceServers array for the specific browser and version.
 
+expected parameters:
 
-##### `maybeFixConfiguration(pcConfig)`
+- `urls`: The array of iceServer urls.
+- `username`: The username.
+- `password`: The password.
 
-Fixes the incompability of `urls` attribute in some browsers.
+expected return values:
 
-
+- `iceServerList`: The array of iceServer objects. 
+  - `iceServer`: The iceServer object.
+     - `url`: The iceServer url.
+     - `username`: The username.
+     - `password`: The password.
 
 ##### `checkIceConnectionState(peerId, iceConnectionState, callback)`
 
-handles all the iceConnectionState differences cross-browsers. Order of return values are `'checking' > 'connected' > 'completed'`.
-tested outcomes in Firefox returns `'checking' > 'connected'` for both offerer and answerer.
+handles all the `iceConnectionState` return value differences cross-browsers when oniceconnectionstate is fired.
 
-Tested outcomes:
-- Chrome (offerer) : `'checking' > 'completed' > 'completed'`
-- Chrome (answerer) : `'checking' > 'connected'`
-- Firefox (offerer) : `'checking' > 'connected'`
-- Firefox (answerer) : `'checking' > 'connected'`
+- Expected outcome should be:  `checking` > `connected` > `completed`.
+
+- What was received in Chrome/Opera as offerer:  `checking` > `completed` > `completed`.
+
+- What was received in Chrome/Opera as answerer: `checking` > `connected`.
+
+- What was received in Firefox as offerer: `checking` > `connected`.
+
+- What was received in Firefox as answerer: `checking` > `connected`.
+
+expected parameters:
+
+- `peerId`: The unique identifier for the peer to store all fired states tied specifically to this peer.
+- `iceConnectionState`: The `iceConnectionState` received.
+- `callback`: The callback fired once the parsing is completed.
+
+expected return values:
+
+- `updatedIceConnectionState`: The `iceConnectionState` that user should be expecting.
 
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
@@ -77,7 +109,20 @@ peerConnection.oniceconnectionstatechange = function () {
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
 
-For some older (20+) versions of Firefox and Chrome MediaStream interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection. To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one creating the offer.
+- For some older (20+) versions of Firefox and Chrome MediaStream interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection. 
+- To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one creating the offer.
+
+expected parameters:
+
+- `peerAgentBrowser`: The browser agent or name. *E.g. Chrome*.
+- `peerAgentVersion`: The browser agent version. *E.g. 35*.
+- `callback`: The callback fired after the check has been made.
+- `constraints`: The offer constraints.
+
+expected return values:
+
+- `beOfferrer`: Returns a `true` or a `false`. If `true`, user should do the offer. If `false`, inform the other peer to do the offer.
+- `unifiedConstraints`: The updated constraints for interoperability.
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of the other peer
@@ -101,9 +146,22 @@ checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion
 
 displays the browser webrtc implementation type.
 
+expected values:
+
+- `na`: No webrtc implementation.
+- `webkit`: Webkit implementation of webrtc.
+- `moz`: Mozilla implementation of webrtc.
+- `plugin`: Temasys plugin implementation of webrtc.
+
 ##### `webrtcDetectedDCSupport`
 
 displays the browser webrtc datachannel support type.
+
+expected values:
+
+- `na`: No datachannel support.
+- `SCTP`: SCTP enabled datachannel.
+- `RTP`: RTP enabled datachannel.
 
 
 ## Setup this project
