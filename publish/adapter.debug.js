@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.0 - 2014-09-10 */
+/*! adapterjs - v0.9.1 - 2014-09-10 */
 
 /**
  * Temasys reserved namespace.
@@ -24,7 +24,7 @@ Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
  * @extends Temasys
  */
 Temasys.AdapterJS = {
-  VERSION: '0.9.0'
+  VERSION: '0.9.1'
 };
 /**
  * This function detects whether or not a plugin is installed.
