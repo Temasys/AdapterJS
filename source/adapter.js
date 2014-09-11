@@ -142,34 +142,11 @@ __TemWebRTCReady0 = function () {
         // TODO: update comments, we wait for the document to be ready
         clearInterval(Temasys.WebRTCPlugin.documentReadyInterval);
         Temasys.WebRTCPlugin.isPluginReady = true;
-        Temasys.WebRTCPlugin.pluginReadyState =
-          Temasys.WebRTCPlugin.pluginReadyStates.ready;
       }
     }, 100);
   }
   arguments.callee.StaticWasInit++;
 };
-/**
- * The results of each states returns.
- * @attribute pluginReadyStates
- * @type JSON
- * @param {Integer} init  Plugin is loading.
- * @param {Integer} ready Plugin has been loaded and is ready to use.
- * @readOnly
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.pluginReadyStates = {
-  init : 0,
-  ready : 1
-};
-/**
- * State of Plugin ready
- * @attribute pluginReadyState
- * @type String
- * @readyOnly
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.pluginReadyState = Temasys.WebRTCPlugin.pluginReadyStates.init;
 /**
  * The result of ice connection states.
  * @attribute _iceConnectionStates
