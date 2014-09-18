@@ -395,6 +395,14 @@ if (navigator.mozGetUserMedia) {
     return to;
   };
 
+  MediaStreamTrack.getSources = MediaStreamTrack.getSources || function (callback) {
+    if (!callback) {
+      throw new TypeError('Failed to execute \'getSources\' on \'MediaStreamTrack\'' +
+        ': 1 argument required, but only 0 present.');
+    }
+    return callback([]);
+  };
+
   // Fake get{Video,Audio}Tracks
   if (!MediaStream.prototype.getVideoTracks) {
     MediaStream.prototype.getVideoTracks = function () {
@@ -668,7 +676,6 @@ if (navigator.mozGetUserMedia) {
         iceServers, mandatory, optional);
     };
 
-    MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
       Temasys.WebRTCPlugin.callWhenPluginReady(function() {
         Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback);

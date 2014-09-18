@@ -397,6 +397,14 @@ if (navigator.mozGetUserMedia) {
     return to;
   };
 
+  MediaStreamTrack.getSources = MediaStreamTrack.getSources || function (callback) {
+    if (!callback) {
+      throw new TypeError('Failed to execute \'getSources\' on \'MediaStreamTrack\'' +
+        ': 1 argument required, but only 0 present.');
+    }
+    return callback([]);
+  };
+
   // Fake get{Video,Audio}Tracks
   if (!MediaStream.prototype.getVideoTracks) {
     MediaStream.prototype.getVideoTracks = function () {
@@ -494,10 +502,10 @@ if (navigator.mozGetUserMedia) {
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
+    /* jshint -W020 */
     console = console || {};
     // Implemented based on console specs from MDN
     // You may override these functions
-    /* jshint -W034 */
     console.log = function (arg) {};
     console.info = function (arg) {};
     console.error = function (arg) {};
@@ -513,19 +521,20 @@ if (navigator.mozGetUserMedia) {
     console.group = function (arg) {};
     console.groupCollapsed = function (arg) {};
     console.groupEnd = function (arg) {};
-    /* jshint +W034 */
+    /* jshint +W020 */
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
   parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
+  /* jshint -W035 */
   Temasys.WebRTCPlugin.WaitForPluginReady = function() {
-    /* jshint freeze:true */
     while (!Temasys.WebRTCPlugin.isPluginReady) {
       /* empty because it needs to prevent the function from running. */
-    };
+    }
   };
+  /* jshint +W035 */
 
   Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
     var checkPluginReadyState = setInterval(function () {
@@ -669,7 +678,6 @@ if (navigator.mozGetUserMedia) {
         iceServers, mandatory, optional);
     };
 
-    MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
       Temasys.WebRTCPlugin.callWhenPluginReady(function() {
         Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback);
