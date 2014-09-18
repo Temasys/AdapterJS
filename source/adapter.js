@@ -492,6 +492,7 @@ if (navigator.mozGetUserMedia) {
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
+    /* jshint -W020 */
     console = console || {};
     // Implemented based on console specs from MDN
     // You may override these functions
@@ -510,17 +511,20 @@ if (navigator.mozGetUserMedia) {
     console.group = function (arg) {};
     console.groupCollapsed = function (arg) {};
     console.groupEnd = function (arg) {};
+    /* jshint +W020 */
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
   parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
+  /* jshint -W035 */
   Temasys.WebRTCPlugin.WaitForPluginReady = function() {
     while (!Temasys.WebRTCPlugin.isPluginReady) {
       /* empty because it needs to prevent the function from running. */
     }
   };
+  /* jshint +W035 */
 
   Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
     var checkPluginReadyState = setInterval(function () {

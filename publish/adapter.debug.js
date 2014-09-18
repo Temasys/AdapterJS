@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.1 - 2014-09-17 */
+/*! adapterjs - v0.9.1 - 2014-09-18 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
@@ -497,6 +497,7 @@ if (navigator.mozGetUserMedia) {
     console = console || {};
     // Implemented based on console specs from MDN
     // You may override these functions
+    /* jshint -W034 */
     console.log = function (arg) {};
     console.info = function (arg) {};
     console.error = function (arg) {};
@@ -512,6 +513,7 @@ if (navigator.mozGetUserMedia) {
     console.group = function (arg) {};
     console.groupCollapsed = function (arg) {};
     console.groupEnd = function (arg) {};
+    /* jshint +W034 */
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
@@ -519,9 +521,10 @@ if (navigator.mozGetUserMedia) {
   isIE = webrtcDetectedBrowser === 'IE';
 
   Temasys.WebRTCPlugin.WaitForPluginReady = function() {
+    /* jshint freeze:true */
     while (!Temasys.WebRTCPlugin.isPluginReady) {
       /* empty because it needs to prevent the function from running. */
-    }
+    };
   };
 
   Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
