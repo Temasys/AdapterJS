@@ -187,7 +187,7 @@ test('attachMediaStream()', function (t) {
   }
 });
 
-test('reattachMediaStream is defined', function (t) {
+test('reattachMediaStream()', function (t) {
   t.plan(3);
   if (typeof window.reattachMediaStream === 'function') {
     t.pass('Is a function');
@@ -238,21 +238,16 @@ test('createIceServer()', function (t) {
       var turnCheck = window.createIceServer(turnUrl + turnUrlUdp, turnUsername, turnPassword);
       if ((Object.keys(turnCheck).length === 3 || (Object.keys(stunCheck).length === 4 &&
         stunCheck.hasCredentials === true))) {
-        if (navigator.mozGetUserMedia && window.webrtcDetectedVersion < 27) {
-          if (turnCheck.url === turnUrl) {
-            t.pass('Turn scenario pass (firefox 27 and below)');
-          } else {
-            t.fail('Turn scenario fail. Expected "' + turnUrl +
-              '". Returned "' + turnCheck.url + '"');
-          }
+        var isNoSupportFirefox = navigator.mozGetUserMedia && window.webrtcDetectedVersion < 27;
+        turnUrlCheck = turnUrl + ((!isNoSupportFirefox) ? turnUrlUdp : '');
+
+        if (turnCheck.url === turnUrlCheck && turnCheck.username === turnUsername &&
+          turnCheck.credential === turnPassword) {
+          t.pass('Turn scenario pass' + ((isNoSupportFirefox) ? ' (firefox 27 and below)': ''));
         } else {
-          if (turnCheck.url === (turnUrl + turnUrlUdp)) {
-            t.pass('Turn scenario pass');
-          } else {
-            t.fail('Turn scenario fail. Expected "' + turnUrl +
-              '",. Returned "' + turnCheck.url + turnUrlUdp + '"');
-            /** Check the username and password **/
-          }
+          t.fail('Turn scenario fail. Expected "' + turnUrl + '", "' + turnUsername + '" and "' +
+            turnPassword + '". Returned "' + turnCheck.url + '", "' +
+            turnCheck.username + '" and "' + turnCheck.credential + '"');
         }
       } else {
         t.fail('Turn scenario fail. Expected 1 key. Returned ' + Object.keys(stunCheck));
@@ -271,15 +266,47 @@ test('createIceServer()', function (t) {
 
 test('createIceServers()', function (t) {
   t.plan(3);
-  var urls = ['turn:turn.test.com', 'turn:turn.test2.com'];
-  var turnUsername = 'testUser@test.com';
-  var turnPassword = 'XXXX-XXXXX';
+  var urls = ['turn:turn.test.com', 'stun:turn.test2.com'];
+  var username = 'testUser@test.com';
+  var password = 'XXXX-XXXXX';
   if (typeof window.createIceServers === 'function') {
     t.pass('Is a function');
     if (window.createIceServers.length === 3) {
-      /** Check the urls and number list of array of url iceServer object **/
-      /** only chrome 34 and above supports the url **/
-      /** urls expects an array **/
+      t.pass('Expects 3 arguments');
+      var iceServers = window.createIceServers(urls, username, password);
+      if (iceServers instanceof Array) {
+        var passed = 0;
+        for (var i = 0; i < iceServers.length; i++) {
+          if (iceServers[i].url === urls[i] && iceServers[i].username === username &&
+            iceServers[i].credential === password) {
+            passed++;
+          } else {
+            t.fail('Ice server at ' + i + ' provided is incorrect. Expected "' + urls[i] +
+              '", "' + username + '" and "' + password + '". Returned "' + iceServers[i].url +
+              '", "' + iceServers[i].username + '" and "' + iceServers[i].credential + '"');
+            break;
+          }
+        }
+        if (passed === iceServers.length) {
+          t.pass('Ice servers are correct');
+        }
+      } else if (window.webrtcDetectedBrowser === 'chrome' && window.webrtcDetectedVersion >= 34 &&
+          typeof iceServers === 'object') { // Supports urls attribute
+        if (typeof iceServers === 'object') {
+          if (iceServers.urls === urls && iceServers.username === username &&
+            iceServers.credential === password) {
+            t.pass('Ice servers are correct. Test for (chrome 34 and above)');
+          }
+        } else {
+          t.fail('Ice servers are incorrect. Test for (chrome 34 and above). Expected [' +
+            urls.toString() + '], "' + username + '" and "' + password + '". Returned [' +
+            iceServers.urls.toString() + '], "' + iceServers.username + '" and "' +
+            iceServers.credential + '"');
+        }
+      } else {
+        t.fail('Parsed in a different typeof object. Expected an Array ' +
+          'or object (chrome 34 and above). Returned ' + (typeof iceServers));
+      }
     } else {
       t.fail('Expects 3 arguments. Returns ' + window.createIceServers.length);
     }
@@ -288,5 +315,144 @@ test('createIceServers()', function (t) {
       '. Expected a function');
     t.fail('Unable to execute function parameter check');
     t.fail('Unable to execute function ice servers check');
+  }
+});
+
+test('checkMediaDataChannelSettings()', function (t) {
+  t.plan(38);
+  var originalBrowser = window.webrtcDetectedBrowser;
+  var originalVersion = window.webrtcDetectedVersion;
+  var originalType = window.webrtcDetectedType;
+  var browsers = ['chrome|35|webkit', 'firefox|27|moz', 'firefox|32|moz',
+    'opera|22|webkit', 'safari|6|plugin', 'IE|11|plugin'];
+  if (typeof window.checkMediaDataChannelSettings === 'function') {
+    t.pass('Is a function');
+    if (window.checkMediaDataChannelSettings.length === 4) {
+      t.pass('Expects 4 arguments');
+      for (var i = 0; i < browsers.length; i++) {
+        window.webrtcDetectedBrowser = browsers[i].split('|')[0];
+        window.webrtcDetectedVersion = parseInt(browsers[i].split('|')[1], 10);
+        window.webrtcDetectedType = browsers[i].split('|')[2];
+        for (var j = 0; j < browsers.length; j++) {
+          var peerBrowser = browsers[j].split('|')[0];
+          var peerVersion = parseInt(browsers[j].split('|')[1], 10);
+          /* jshint -W083 */
+          window.checkMediaDataChannelSettings(peerBrowser, peerVersion,
+            function (beOfferer, constraints) {
+            if (window.webrtcDetectedType === 'moz' &&
+              window.webrtcDetectedVersion < 30 && (peerBrowser !== 'firefox')) {
+              if (beOfferer === false &&
+                constraints.mandatory.MozDontOfferDataChannel === true) {
+                t.pass(window.webrtcDetectedBrowser + ' ' +
+                  window.webrtcDetectedVersion + ' to ' +
+                  peerBrowser + ' ' + peerVersion);
+              } else {
+                t.fail(window.webrtcDetectedBrowser + ' ' +
+                  window.webrtcDetectedVersion + ' to ' + peerBrowser + ' ' +
+                  peerVersion + ' - Failed. Expected beOfferer ' +
+                  'false and constraints.mandatory.MozDontOfferDataChannel true. ' +
+                  'Received beOfferer ' + beOfferer + ' and constraints.mandatory.' +
+                  'MozDontOfferDataChannel ' +
+                  constraints.mandatory.MozDontOfferDataChannel);
+              }
+            } else if (window.webrtcDetectedType === 'moz' &&
+              peerBrowser === 'firefox') {
+              if (beOfferer === true &&
+                !constraints.mandatory.hasOwnProperty('MozDontOfferDataChannel')) {
+                t.pass(window.webrtcDetectedBrowser + ' ' +
+                  window.webrtcDetectedVersion + ' to ' +
+                  peerBrowser + ' ' + peerVersion);
+              } else {
+                t.fail(window.webrtcDetectedBrowser + ' ' +
+                  window.webrtcDetectedVersion + ' to ' +
+                  peerBrowser + ' ' + peerVersion + ' - Failed. ' +
+                  'Expected beOfferer true and constraints.mandatory has ' +
+                  'property MozDontOfferDataChannel false. ' +
+                  'Received beOfferer ' + beOfferer + ' and ' +
+                  'constraints.mandatory has property MozDontOfferDataChannel ' +
+                  constraints.mandatory.hasOwnProperty('MozDontOfferDataChannel'));
+              }
+            } else {
+              if (beOfferer === true &&
+                !constraints.mandatory.hasOwnProperty('MozDontOfferDatachannel')) {
+                t.pass(window.webrtcDetectedBrowser + ' ' +
+                  window.webrtcDetectedVersion + ' to ' +
+                  peerBrowser + ' ' + peerVersion);
+              } else {
+                t.fail(window.webrtcDetectedBrowser + ' ' +
+                  window.webrtcDetectedVersion + ' to ' + peerBrowser + ' ' +
+                  peerVersion + ' - Failed. Expected beOfferer true and ' +
+                  'constraints.mandatory has property MozDontOfferDataChannel false. ' +
+                  'Received beOfferer ' + beOfferer + ' and constraints.mandatory ' +
+                  'has property MozDontOfferDataChannel ' +
+                  constraints.mandatory.hasOwnProperty('MozDontOfferDataChannel'));
+              }
+              /** maybe check if constraints contains Moz properties? **/
+              /** for chrome don't contain moz properties **/
+              /** for nightly contain moz properties but not MozDontOfferDatachannel **/
+            }
+          }, {
+            optional: [],
+            mandatory: {
+              MozDontOfferDataChannel: true
+          }});
+          /* jshint +W083 */
+        }
+        window.webrtcDetectedBrowser = originalBrowser;
+        window.webrtcDetectedVersion = originalVersion;
+        window.webrtcDetectedType = originalType;
+      }
+    } else {
+      t.fail('Expects 4 arguments. Returned ' +
+        window.checkMediaDataChannelSettings.length);
+    }
+  } else {
+    t.fail('Is a ' + (typeof window.attachMediaStream) +
+      '. Expected a function');
+    t.fail('Unable to execute function parameter check');
+    t.fail('Failed to execute scenarios test');
+    t.end();
+  }
+});
+
+test('checkIceConnectionState()', function (t) {
+  t.plan(6);
+  var expected = ['checking', 'connected', 'completed'];
+  var scenario1 = ['checking', 'completed', 'completed'];
+  var scenario2 = ['checking', 'completed'];
+  var scenario3 = ['checking', 'connected', 'completed'];
+  var scenario4 = ['checking', 'connected'];
+  var checkICS = function (scenario, id) {
+    var checkArray = [];
+    /* jshint -W083 */
+    for (var i = 0; i < scenario.length; i++) {
+      window.checkIceConnectionState(id, scenario[i], function (icState) {
+        checkArray.push(icState);
+      });
+    }
+    /* jshint +W083 */
+    setTimeout(function () {
+      t.deepEqual(checkArray, expected, 'Scenario [' + scenario.toString() + ']');
+    }, 1000);
+  };
+  if (typeof window.createIceServers === 'function') {
+    t.pass('Is a function');
+    if (window.createIceServers.length === 3) {
+      t.pass('Expects 3 arguments');
+      checkICS(scenario1, 1);
+      checkICS(scenario2, 2);
+      checkICS(scenario3, 3);
+      checkICS(scenario4, 4);
+    } else {
+      t.fail('Expects 3 arguments. Returns ' + window.createIceServers.length);
+    }
+  } else {
+    t.fail('Is a ' + (typeof window.createIceServers) +
+      '. Expected a function');
+    t.fail('Unable to execute function parameter check');
+    t.fail('Unable to execute function ice connection state check for scenario 1');
+    t.fail('Unable to execute function ice connection state check for scenario 2');
+    t.fail('Unable to execute function ice connection state check for scenario 3');
+    t.fail('Unable to execute function ice connection state check for scenario 4');
   }
 });
