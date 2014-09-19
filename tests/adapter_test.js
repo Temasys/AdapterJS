@@ -1,5 +1,5 @@
 var test = require('tape'),
-  adapter = require('./../publish/adapter.min.js');
+  adapter = require('./../source/adapter.js');
 
 test('RTCPeerConnection', function (t) {
   t.plan(12);
@@ -315,6 +315,70 @@ test('createIceServers()', function (t) {
       '. Expected a function');
     t.fail('Unable to execute function parameter check');
     t.fail('Unable to execute function ice servers check');
+  }
+});
+
+test('webrtcDetectedBrowser', function (t) {
+  t.plan(2);
+  var test_array = ['chrome', 'firefox', 'safari', 'IE', 'opera'];
+  if (typeof window.webrtcDetectedBrowser === 'string') {
+    t.pass('Is a string');
+    if (test_array.indexOf(window.webrtcDetectedBrowser) > -1) {
+      t.pass('Is one of the supported browser "' +
+        window.webrtcDetectedBrowser + '"');
+    } else {
+      t.fail('Is not supported browser. Type given was "' +
+        window.webrtcDetectedBrowser + '"');
+    }
+  } else {
+    t.fail('Is a ' + (typeof window.webrtcDetectedBrowser) +
+      '. Expected a string');
+  }
+});
+
+test('webrtcDetectedVersion', function (t) {
+  t.plan(1);
+  if (typeof window.webrtcDetectedVersion === 'number') {
+    t.pass('Is a number');
+  } else {
+    t.fail('Is a ' + (typeof window.webrtcDetectedVersion) +
+      '. Expected a number');
+  }
+});
+
+test('webrtcDetectedType', function (t) {
+  t.plan(2);
+  var test_array = ['moz', 'webkit', 'plugin'];
+  if (typeof window.webrtcDetectedType === 'string') {
+    t.pass('Is a string');
+    if (test_array.indexOf(window.webrtcDetectedType) > -1) {
+      t.pass('Is one of the support type "' +
+        window.webrtcDetectedType + '"');
+    } else {
+      t.fail('Is not supported type. Type given was "' +
+        window.webrtcDetectedType + '"');
+    }
+  } else {
+    t.fail('Is a ' + (typeof window.webrtcDetectedType) +
+      '. Expected a string');
+  }
+});
+
+test('webrtcDetectedDCSupport', function (t) {
+  t.plan(2);
+  var test_array = ['SCTP', 'RTP'];
+  if (typeof window.webrtcDetectedDCSupport === 'string') {
+    t.pass('Is a string');
+    if (test_array.indexOf(window.webrtcDetectedDCSupport) > -1) {
+      t.pass('Is one of the support type "' +
+        window.webrtcDetectedDCSupport + '"');
+    } else {
+      t.fail('Is not supported type. Type given was "' +
+        window.webrtcDetectedDCSupport + '"');
+    }
+  } else {
+    t.fail('Is a ' + (typeof window.webrtcDetectedDCSupport) +
+      '. Expected a string');
   }
 });
 
