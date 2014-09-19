@@ -220,7 +220,7 @@ checkMediaDataChannelSettings =
   }
   // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
   // interopability of the media stream
-  if (isLocalFirefox && !isPeerFirefox && !isPeerFirefoxInterop) {
+  if (isLocalFirefox && !isPeerFirefox && !isLocalFirefoxInterop) {
     beOfferer = false;
   }
   callback(beOfferer, constraints);
