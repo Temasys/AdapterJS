@@ -35,6 +35,9 @@ Temasys.WebRTCPlugin.isPluginInstalled = null;
 // Check if WebRTC Interface is defined.
 Temasys.WebRTCPlugin.isDefined = null;
 
+ // Lets adapter.js wait until the the document is ready before injecting the plugin
+Temasys.WebRTCPlugin.pluginInjectionInterval = null;
+
 // Inject the HTML DOM object element into the page.
 Temasys.WebRTCPlugin.injectPlugin = null;
 
@@ -523,7 +526,7 @@ if (navigator.mozGetUserMedia) {
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
-  parseWebrtcDetectedBrowser();
+  Temasys.AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
   /* jshint -W035 */
@@ -676,6 +679,7 @@ if (navigator.mozGetUserMedia) {
         iceServers, mandatory, optional);
     };
 
+    MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
       Temasys.WebRTCPlugin.callWhenPluginReady(function() {
         Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback);
@@ -775,7 +779,14 @@ if (navigator.mozGetUserMedia) {
       );
     };
 
-    Temasys.WebRTCPlugin.injectPlugin();
+    // Inject plugin as soon as the document is fully loaded
+    Temasys.WebRTCPlugin.pluginInjectionInterval = setInterval(function () {
+      if (document.readyState === 'complete') {
+        clearInterval(Temasys.WebRTCPlugin.pluginInjectionInterval);
+        Temasys.WebRTCPlugin.injectPlugin();    
+      }
+    }, 100);
+    
   };
 
   Temasys.WebRTCPlugin.getWebsiteLink = function() {
