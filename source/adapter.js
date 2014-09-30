@@ -76,7 +76,7 @@ __TemWebRTCReady0 = function () {
 };
 
 // Temasys Adapter's interface.
-Temasys.AdapterJS = {};
+Temasys.AdapterJS={};
 
 // Temasys AdapterJS version
 Temasys.AdapterJS.VERSION = '@@version';
@@ -783,10 +783,10 @@ if (navigator.mozGetUserMedia) {
     Temasys.WebRTCPlugin.pluginInjectionInterval = setInterval(function () {
       if (document.readyState === 'complete') {
         clearInterval(Temasys.WebRTCPlugin.pluginInjectionInterval);
-        Temasys.WebRTCPlugin.injectPlugin();    
+        Temasys.WebRTCPlugin.injectPlugin();
       }
     }, 100);
-    
+
   };
 
   Temasys.WebRTCPlugin.getWebsiteLink = function() {

@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.1 - 2014-09-18 */
+/*! adapterjs - v0.9.1 - 2014-09-30 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
@@ -36,6 +36,9 @@ Temasys.WebRTCPlugin.isPluginInstalled = null;
 
 // Check if WebRTC Interface is defined.
 Temasys.WebRTCPlugin.isDefined = null;
+
+ // Lets adapter.js wait until the the document is ready before injecting the plugin
+Temasys.WebRTCPlugin.pluginInjectionInterval = null;
 
 // Inject the HTML DOM object element into the page.
 Temasys.WebRTCPlugin.injectPlugin = null;
@@ -75,7 +78,7 @@ __TemWebRTCReady0 = function () {
 };
 
 // Temasys Adapter's interface.
-Temasys.AdapterJS = {};
+Temasys.AdapterJS={};
 
 // Temasys AdapterJS version
 Temasys.AdapterJS.VERSION = '0.9.1';
@@ -222,7 +225,7 @@ checkMediaDataChannelSettings =
   }
   // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
   // interopability of the media stream
-  if (isLocalFirefox && !isPeerFirefox && !isPeerFirefoxInterop) {
+  if (isLocalFirefox && !isPeerFirefox && !isLocalFirefoxInterop) {
     beOfferer = false;
   }
   callback(beOfferer, constraints);
@@ -525,7 +528,7 @@ if (navigator.mozGetUserMedia) {
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
-  parseWebrtcDetectedBrowser();
+  Temasys.AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
   /* jshint -W035 */
@@ -678,6 +681,7 @@ if (navigator.mozGetUserMedia) {
         iceServers, mandatory, optional);
     };
 
+    MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
       Temasys.WebRTCPlugin.callWhenPluginReady(function() {
         Temasys.WebRTCPlugin.TemRTCPlugin.GetSources(callback);
@@ -777,7 +781,14 @@ if (navigator.mozGetUserMedia) {
       );
     };
 
-    Temasys.WebRTCPlugin.injectPlugin();
+    // Inject plugin as soon as the document is fully loaded
+    Temasys.WebRTCPlugin.pluginInjectionInterval = setInterval(function () {
+      if (document.readyState === 'complete') {
+        clearInterval(Temasys.WebRTCPlugin.pluginInjectionInterval);
+        Temasys.WebRTCPlugin.injectPlugin();
+      }
+    }, 100);
+
   };
 
   Temasys.WebRTCPlugin.getWebsiteLink = function() {
