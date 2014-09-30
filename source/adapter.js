@@ -417,7 +417,7 @@ if (navigator.mozGetUserMedia) {
       return [];
     };
   }
-} else if (navigator.webkitGetUserMedia) {
+} else if (false) { // (navigator.webkitGetUserMedia) {
   webrtcDetectedBrowser = 'chrome';
   webrtcDetectedType = 'webkit';
   webrtcDetectedVersion = parseInt(navigator
@@ -504,7 +504,7 @@ if (navigator.mozGetUserMedia) {
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
     /* jshint -W020 */
-    console = console || {};
+    console = {} || console;
     // Implemented based on console specs from MDN
     // You may override these functions
     console.log = function (arg) {};
@@ -779,13 +779,13 @@ if (navigator.mozGetUserMedia) {
       );
     };
 
-    // Inject plugin as soon as the document is fully loaded
-    Temasys.WebRTCPlugin.pluginInjectionInterval = setInterval(function () {
-      if (document.readyState === 'complete') {
-        clearInterval(Temasys.WebRTCPlugin.pluginInjectionInterval);
+    if (document.readyState == "complete" || document.readyState == "loaded") {
+      Temasys.WebRTCPlugin.injectPlugin();    
+    } else  { // TODO: what if the page is fully loaded between the if and the attach? is it even possible?
+      document.addEventListener("DOMContentLoaded", function(event) {
         Temasys.WebRTCPlugin.injectPlugin();    
-      }
-    }, 100);
+      });
+    }
     
   };
 
