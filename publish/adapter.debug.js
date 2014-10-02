@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.1 - 2014-09-30 */
+/*! adapterjs - v0.9.1 - 2014-10-02 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
@@ -22,9 +22,6 @@ Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
 // Use this whenever you want to call the plugin.
 Temasys.WebRTCPlugin.TemRTCPlugin = null;
 
-// Plugin ready status.
-Temasys.WebRTCPlugin.isPluginReady = false;
-
 // Defines webrtc's JS interface according to the plugin's implementation.
 // Define plugin Browsers as WebRTC Interface.
 Temasys.WebRTCPlugin.defineWebRTCInterface = null;
@@ -42,6 +39,18 @@ Temasys.WebRTCPlugin.pluginInjectionInterval = null;
 
 // Inject the HTML DOM object element into the page.
 Temasys.WebRTCPlugin.injectPlugin = null;
+
+Temasys.WebRTCPlugin.PLUGIN_STATES = {
+  NONE : 0,           // no plugin use
+  INITIALIZING : 1,   // Detected need for plugin
+  INJECTING : 2,      // Injecting plugin
+  INJECTED: 3,        // Plugin element injected but not usable yet
+  READY: 4            // Plugin ready to be used
+};
+
+// Current state of the plugin. You cannot use the plugin before this is
+// equal to Temasys.WebRTCPlugin.PLUGIN_STATES.READY
+Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.NONE;
 
 // Does a waiting check before proceeding to load the plugin.
 Temasys.WebRTCPlugin.WaitForPluginReady = null;
@@ -70,7 +79,7 @@ __TemWebRTCReady0 = function () {
       if (document.readyState === 'complete') {
         // TODO: update comments, we wait for the document to be ready
         clearInterval(Temasys.WebRTCPlugin.documentReadyInterval);
-        Temasys.WebRTCPlugin.isPluginReady = true;
+        Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.READY;
       }
     }, 100);
   }
@@ -506,7 +515,7 @@ if (navigator.mozGetUserMedia) {
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
     /* jshint -W020 */
-    console = console || {};
+    console = {} || console;
     // Implemented based on console specs from MDN
     // You may override these functions
     console.log = function (arg) {};
@@ -533,7 +542,7 @@ if (navigator.mozGetUserMedia) {
 
   /* jshint -W035 */
   Temasys.WebRTCPlugin.WaitForPluginReady = function() {
-    while (!Temasys.WebRTCPlugin.isPluginReady) {
+    while (Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.READY) {
       /* empty because it needs to prevent the function from running. */
     }
   };
@@ -541,7 +550,7 @@ if (navigator.mozGetUserMedia) {
 
   Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
     var checkPluginReadyState = setInterval(function () {
-      if (Temasys.WebRTCPlugin.isPluginReady) {
+      if (Temasys.WebRTCPlugin.pluginState === Temasys.WebRTCPlugin.PLUGIN_STATES.READY) {
         clearInterval(checkPluginReadyState);
         callback();
       }
@@ -549,6 +558,16 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.injectPlugin = function () {
+    // only inject once the page is ready
+    if (document.readyState !== 'complete')
+      return;
+
+    // Prevent multiple injections
+    if (Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.INITIALIZING)
+      return;
+
+    Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTING;
+
     if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 9) {
       var frag = document.createDocumentFragment();
       Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('div');
@@ -595,6 +614,9 @@ if (navigator.mozGetUserMedia) {
         '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
       document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
     }
+
+
+    Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTED;
   };
 
   Temasys.WebRTCPlugin.isPluginInstalled =
@@ -620,6 +642,8 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.defineWebRTCInterface = function () {
+    Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INITIALIZING;
+
     Temasys.WebRTCPlugin.isDefined = function (variable) {
       return variable !== null && variable !== undefined;
     };
@@ -781,14 +805,9 @@ if (navigator.mozGetUserMedia) {
       );
     };
 
-    // Inject plugin as soon as the document is fully loaded
-    Temasys.WebRTCPlugin.pluginInjectionInterval = setInterval(function () {
-      if (document.readyState === 'complete') {
-        clearInterval(Temasys.WebRTCPlugin.pluginInjectionInterval);
-        Temasys.WebRTCPlugin.injectPlugin();
-      }
-    }, 100);
-
+    // inject plugin
+    document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
+    Temasys.WebRTCPlugin.injectPlugin();
   };
 
   Temasys.WebRTCPlugin.getWebsiteLink = function() {
