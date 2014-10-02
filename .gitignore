@@ -83,7 +83,6 @@ appdirectory-build
 pids
 logs
 results
-publish
 staging
 _site
 source/config/local.json

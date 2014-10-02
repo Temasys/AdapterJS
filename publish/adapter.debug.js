@@ -1,141 +1,77 @@
-/*! adapterjs - v0.9.1 - 2014-09-10 */
+/*! adapterjs - v0.9.2 - 2014-10-02 */
 
-/**
- * Temasys reserved namespace.
- * - This are where all Temasys implemented functions are.
- * - Interface are called "classes" because yuidoc does not support interfaces.
- * - Functions and variables are not encapsulated except Temasys private
- *   functions and variables.
- * @class Temasys
- */
+// Temasys reserved namespace.
+// This are where all Temasys implemented functions are.
 var Temasys = Temasys || {};
-/**
- * Temasys plugin interface.
- * - <b><u>WARNING</u></b>: You may be required to [download our plugin](https:
- * /temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins) if you are using
- * Internet Explorer, Safari or older supported browsers (Chrome, Opera, Firefox).
- * @class Temasys.WebRTCPlugin
- * @for Temasys
- */
+
+// Temasys plugin interface.
+// Please download our plugin for Safari and IE users:
+// https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins
 Temasys.WebRTCPlugin = Temasys.WebRTCPlugin || {};
-/**
- * Adapter's interface.
- * @class Temasys.AdapterJS
- * @extends Temasys
- */
-Temasys.AdapterJS = {
-  VERSION: '0.9.1'
-};
-/**
- * This function detects whether or not a plugin is installed.
- * Checks if Not IE (firefox, for example), else if it's IE,
- * we're running IE and do something. If not it is not supported.
- * @method isPluginInstalled
- * @param {String} comName The company name.
- * @param {String} plugName The plugin name.
- * @param {Function} installedCb The callback fired if the plugin is detected
- * @param {Function} notInstalledCb The callback fired
- *   if the plugin is not detected (no argument).
- * @return {Boolean} Is plugin installed.
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.isPluginInstalled = null;
-/**
- * Check if WebRTC Interface is defined.
- * @method isDefined
- * @param {String} variable The variable to check.
- * @return {Boolean} If variable is defined.
- * @private
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.isDefined = null;
-/**
- * Inject the HTML DOM object element into the page.
- * @method injectPlugin
- * @for Temasys.WebRTCPlugin
- * @private
- */
-Temasys.WebRTCPlugin.injectPlugin = null;
-/**
- * Does a waiting check before proceeding to load the plugin.
- * @method WaitForPluginReady
- * @for Temasys.WebRTCPlugin
- * @private
- */
-Temasys.WebRTCPlugin.WaitForPluginReady = null;
-/**
-  * This methid will use an interval to wait for the plugin to be ready.
-  * @for Temasys.WebRTCPlugin
-*/
-Temasys.WebRTCPlugin.callWhenPluginReady = null;
-/**
- * This function will be called if the plugin is needed (browser different
- * from Chrome or Firefox), but the plugin is not installed.
- * Override it according to your application logic.
- * @method pluginNeededButNotInstalledCb
- * @for Temasys.WebRTCPlugin
- * @private
- */
-Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
-/**
- * The object to store plugin information
- * @attribute temPluginInfo
- * @type JSON
- * @readOnly
- * @required
- * @for Temasys.WebRTCPlugin
- */
+
+// The object to store plugin information
 Temasys.WebRTCPlugin.temPluginInfo = {
   pluginId : 'plugin0',
   type : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0'
 };
-/**
- * Unique identifier of each opened page
- * @attribute TemPageId
- * @type String
- * @readOnly
- * @required
- * @for Temasys.WebRTCPlugin
- */
+
+// Unique identifier of each opened page
 Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
-/**
- * Use this whenever you want to call the plugin.
- * @attribute TemRTCPlugin
- * @type <<DOM>>Object
- * @readOnly
- * @for Temasys.WebRTCPlugin
- */
+
+// Use this whenever you want to call the plugin.
 Temasys.WebRTCPlugin.TemRTCPlugin = null;
-/**
- * Plugin ready status.
- * @attribute isPluginReady
- * @type Boolean
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.isPluginReady = false;
-/**
- * Defines webrtc's JS interface according to the plugin's implementation.
- * - Define plugin Browsers as WebRTC Interface.
- * @method defineWebRTCInterface
- * @for Temasys.WebRTCPlugin
- * @private
- */
+
+// Defines webrtc's JS interface according to the plugin's implementation.
+// Define plugin Browsers as WebRTC Interface.
 Temasys.WebRTCPlugin.defineWebRTCInterface = null;
-/**
- * This function will be called when plugin is ready. It sends necessary
- * details to the plugin.
- * - <b><u>WARNING</u></b>: DO NOT OVERRIDE THIS FUNCTION.
- * - If you need to do something once the page/plugin is ready, override
- *   window.onwebrtcready instead.
- * - This function is not in the IE/Safari condition brackets so that
- *   TemPluginLoaded function might be called on Chrome/Firefox.
- * - This function is the only private function that is not encapsulated to
- *   allow the plugin method to be called.
- * @method __TemWebRTCReady0
- * @for Temasys
- * @private
- */
+
+// This function detects whether or not a plugin is installed.
+// Checks if Not IE (firefox, for example), else if it's IE,
+// we're running IE and do something. If not it is not supported.
+Temasys.WebRTCPlugin.isPluginInstalled = null;
+
+// Check if WebRTC Interface is defined.
+Temasys.WebRTCPlugin.isDefined = null;
+
+ // Lets adapter.js wait until the the document is ready before injecting the plugin
+Temasys.WebRTCPlugin.pluginInjectionInterval = null;
+
+// Inject the HTML DOM object element into the page.
+Temasys.WebRTCPlugin.injectPlugin = null;
+
+Temasys.WebRTCPlugin.PLUGIN_STATES = {
+  NONE : 0,           // no plugin use
+  INITIALIZING : 1,   // Detected need for plugin
+  INJECTING : 2,      // Injecting plugin
+  INJECTED: 3,        // Plugin element injected but not usable yet
+  READY: 4            // Plugin ready to be used
+};
+
+// Current state of the plugin. You cannot use the plugin before this is
+// equal to Temasys.WebRTCPlugin.PLUGIN_STATES.READY
+Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.NONE;
+
+// Does a waiting check before proceeding to load the plugin.
+Temasys.WebRTCPlugin.WaitForPluginReady = null;
+
+// This methid will use an interval to wait for the plugin to be ready.
+Temasys.WebRTCPlugin.callWhenPluginReady = null;
+
+// This function will be called if the plugin is needed (browser different
+// from Chrome or Firefox), but the plugin is not installed.
+// Override it according to your application logic.
+Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
+
+// !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
+// This function will be called when plugin is ready. It sends necessary
+// details to the plugin.
+// If you need to do something once the page/plugin is ready, override
+// window.onwebrtcready instead.
+// This function is not in the IE/Safari condition brackets so that
+// TemPluginLoaded function might be called on Chrome/Firefox.
+// This function is the only private function that is not encapsulated to
+// allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
   arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
   if (arguments.callee.StaticWasInit === 1) {
@@ -143,51 +79,29 @@ __TemWebRTCReady0 = function () {
       if (document.readyState === 'complete') {
         // TODO: update comments, we wait for the document to be ready
         clearInterval(Temasys.WebRTCPlugin.documentReadyInterval);
-        Temasys.WebRTCPlugin.isPluginReady = true;
-        Temasys.WebRTCPlugin.pluginReadyState =
-          Temasys.WebRTCPlugin.pluginReadyStates.ready;
+        Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.READY;
       }
     }, 100);
   }
   arguments.callee.StaticWasInit++;
 };
-/**
- * The results of each states returns.
- * @attribute pluginReadyStates
- * @type JSON
- * @param {Integer} init  Plugin is loading.
- * @param {Integer} ready Plugin has been loaded and is ready to use.
- * @readOnly
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.pluginReadyStates = {
-  init : 0,
-  ready : 1
-};
-/**
- * State of Plugin ready
- * @attribute pluginReadyState
- * @type String
- * @readyOnly
- * @for Temasys.WebRTCPlugin
- */
-Temasys.WebRTCPlugin.pluginReadyState = Temasys.WebRTCPlugin.pluginReadyStates.init;
-/**
- * The result of ice connection states.
- * @attribute _iceConnectionStates
- * @type JSON
- * @param {String} starting: Ice connection is starting.
- * @param {String} checking: Ice connection is checking.
- * @param {String} connected Ice connection is connected.
- * @param {String} completed Ice connection is connected.
- * @param {String} done Ice connection has been completed.
- * @param {String} disconnected Ice connection has been disconnected.
- * @param {String} failed Ice connection has failed.
- * @param {String} closed Ice connection is closed.
- * @for Temasys
- * @private
- */
-Temasys._iceConnectionStates = {
+
+// Temasys Adapter's interface.
+Temasys.AdapterJS={};
+
+// Temasys AdapterJS version
+Temasys.AdapterJS.VERSION = '0.9.2';
+
+// The result of ice connection states.
+// - starting: Ice connection is starting.
+// - checking: Ice connection is checking.
+// - connected Ice connection is connected.
+// - completed Ice connection is connected.
+// - done Ice connection has been completed.
+// - disconnected Ice connection has been disconnected.
+// - failed Ice connection has failed.
+// - closed Ice connection is closed.
+Temasys.AdapterJS._iceConnectionStates = {
   starting : 'starting',
   checking : 'checking',
   connected : 'connected',
@@ -197,27 +111,19 @@ Temasys._iceConnectionStates = {
   failed : 'failed',
   closed : 'closed'
 };
-/**
- * The IceConnection states that has been fired for each peer.
- * @attribute _iceConnectionFiredStates
- * @type Array
- * @for Temasys
- * @private
- */
-Temasys._iceConnectionFiredStates = [];
-/**
- * This function helps to retrieve the webrtc detected browser information.
- * This sets:
- * - webrtcDetectedBrowser: The browser agent name.
- * - webrtcDetectedVersion: The browser version.
- * - webrtcDetectedType: The types of webRTC support.
- *   - 'moz': Mozilla implementation of webRTC.
- *   - 'webkit': WebKit implementation of webRTC.
- *   - 'plugin': Using Temasys's plugin implementation.
- * @method parseWebrtcDetectedBrowser
- * @for Temasys
- */
-parseWebrtcDetectedBrowser = function () {
+
+//The IceConnection states that has been fired for each peer.
+Temasys.AdapterJS._iceConnectionFiredStates = [];
+
+// This function helps to retrieve the webrtc detected browser information.
+// This sets:
+// - webrtcDetectedBrowser: The browser agent name.
+// - webrtcDetectedVersion: The browser version.
+// - webrtcDetectedType: The types of webRTC support.
+//   - 'moz': Mozilla implementation of webRTC.
+//   - 'webkit': WebKit implementation of webRTC.
+//   - 'plugin': Using Temasys's plugin implementation.
+Temasys.AdapterJS.parseWebrtcDetectedBrowser = function () {
   var hasMatch, checkMatch = navigator.userAgent.match(
     /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
   if (/trident/i.test(checkMatch[1])) {
@@ -259,35 +165,10 @@ parseWebrtcDetectedBrowser = function () {
     } catch (error) { }
   }
 };
-/**
- * Detected webrtc implementation. Types are:
- * - 'moz': Mozilla implementation of webRTC.
- * - 'webkit': WebKit implementation of webRTC.
- * - 'plugin': Using Temasys's plugin implementation.
- * @attribute webrtcDetectedType
- * @type String
- * @readOnly
- * @for Temasys
- */
-webrtcDetectedType = null;
-/**
- * Detected webrtc datachannel support. Types are:
- * - 'SCTP': SCTP datachannel support.
- * - 'RTP': RTP datachannel support.
- * @attribute webrtcDetectedDCSupport
- * @type String
- * @readOnly
- * @for Temasys
- */
-webrtcDetectedDCSupport = null;
-/**
- * To fix configuration as some browsers does not support
- * the 'urls' attribute.
- * @method maybeFixConfiguration
- * @param {JSON} pcConfig
- * @for Temasys
- */
-maybeFixConfiguration = function (pcConfig) {
+
+// To fix configuration as some browsers does not support
+// the 'urls' attribute.
+Temasys.AdapterJS.maybeFixConfiguration = function (pcConfig) {
   if (pcConfig === null) {
     return;
   }
@@ -298,32 +179,24 @@ maybeFixConfiguration = function (pcConfig) {
     }
   }
 };
-/**
- * Set the settings for creating DataChannels, MediaStream for
- * Cross-browser compability.
- * - This is only for SCTP based support browsers.
- * the 'urls' attribute.
- * @method checkMediaDataChannelSettings
- * @param {Boolean} isParseOC If function just needs to parse the offer constraints.
- * @param {String} peerBrowserAgent Peer browser agent.
- * @param {String} peerBrowserVersion Peer browser version.
- * @param {Function} callback The callback once it's done.
- * @param {JSON} constraints The offer constraints.
- * @example
- *   checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion,
- *     function (beOfferer, unifiedOfferConstraints) {
- *       if (beOfferer) {
- *         peerConnection.createOffer(function (offer) {
- *           // success
- *         }, function (error) {
- *           // failure
- *         }, unifiedOfferConstraints);
- *       } else {
- *          // let someone else do the job
- *       }
- *   }, inputConstraints);
- * @for Temasys
- */
+
+//// Codes in meant to be in Temasys.AdapterJS
+// -----------------------------------------------------------
+// Detected webrtc implementation. Types are:
+// - 'moz': Mozilla implementation of webRTC.
+// - 'webkit': WebKit implementation of webRTC.
+// - 'plugin': Using Temasys's plugin implementation.
+webrtcDetectedType = null;
+
+// Detected webrtc datachannel support. Types are:
+// - 'SCTP': SCTP datachannel support.
+// - 'RTP': RTP datachannel support.
+webrtcDetectedDCSupport = null;
+
+// Set the settings for creating DataChannels, MediaStream for
+// Cross-browser compability.
+// - This is only for SCTP based support browsers.
+// the 'urls' attribute.
 checkMediaDataChannelSettings =
   function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
   if (typeof callback !== 'function') {
@@ -361,32 +234,18 @@ checkMediaDataChannelSettings =
   }
   // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
   // interopability of the media stream
-  if (isLocalFirefox && !isPeerFirefox && !isPeerFirefoxInterop) {
+  if (isLocalFirefox && !isPeerFirefox && !isLocalFirefoxInterop) {
     beOfferer = false;
   }
   callback(beOfferer, constraints);
 };
-/**
- * Handles the differences for all browsers ice connection state output.
- * - Tested outcomes are:
- *   - Chrome (offerer)  : 'checking' > 'completed' > 'completed'
- *   - Chrome (answerer) : 'checking' > 'connected'
- *   - Firefox (offerer) : 'checking' > 'connected'
- *   - Firefox (answerer): 'checking' > 'connected'
- * @method checkIceConnectionState
- * @param {String} peerId A unique identifier for the peer.
- * @param {String} iceConnectionState The current ice connection state.
- * @param {Function} callback The callback fired once the state is loaded.
- * @return {String} The updated ice connection state.
- * @example
- *   peerConnection.oniceconnectionstatechange = function () {
- *     checkICEConnectionState(peerId, peerConnection.iceConnectionState,
- *       function (updatedIceConnectionState) {
- *         // do Something every time there's a new state
- *       });
- *   };
- * @for Temasys
- */
+
+// Handles the differences for all browsers ice connection state output.
+// - Tested outcomes are:
+//   - Chrome (offerer)  : 'checking' > 'completed' > 'completed'
+//   - Chrome (answerer) : 'checking' > 'connected'
+//   - Firefox (offerer) : 'checking' > 'connected'
+//   - Firefox (answerer): 'checking' > 'connected'
 checkIceConnectionState = function (peerId, iceConnectionState, callback) {
   if (typeof callback !== 'function') {
     console.warn('No callback specified in checkIceConnectionState. Aborted.');
@@ -394,218 +253,94 @@ checkIceConnectionState = function (peerId, iceConnectionState, callback) {
   }
   peerId = (peerId) ? peerId : 'peer';
 
-  if (!Temasys._iceConnectionStates[peerId] ||
-    iceConnectionState === Temasys._iceConnectionStates.disconnected ||
-    iceConnectionState === Temasys._iceConnectionStates.failed ||
-    iceConnectionState === Temasys._iceConnectionStates.closed) {
-    Temasys._iceConnectionStates[peerId] = [];
+  if (!Temasys.AdapterJS._iceConnectionFiredStates[peerId] ||
+    iceConnectionState === Temasys.AdapterJS._iceConnectionStates.disconnected ||
+    iceConnectionState === Temasys.AdapterJS._iceConnectionStates.failed ||
+    iceConnectionState === Temasys.AdapterJS._iceConnectionStates.closed) {
+    Temasys.AdapterJS._iceConnectionFiredStates[peerId] = [];
   }
-  iceConnectionState = Temasys._iceConnectionStates[iceConnectionState];
-  if (Temasys._iceConnectionStates[peerId].indexOf(iceConnectionState) < 0) {
-    Temasys._iceConnectionStates[peerId].push(iceConnectionState);
-    if (iceConnectionState === Temasys._iceConnectionStates.connected) {
+  iceConnectionState = Temasys.AdapterJS._iceConnectionStates[iceConnectionState];
+  if (Temasys.AdapterJS._iceConnectionFiredStates[peerId].indexOf(iceConnectionState) < 0) {
+    Temasys.AdapterJS._iceConnectionFiredStates[peerId].push(iceConnectionState);
+    if (iceConnectionState === Temasys.AdapterJS._iceConnectionStates.connected) {
       setTimeout(function () {
-        Temasys._iceConnectionStates[peerId]
-          .push(Temasys._iceConnectionStates.done);
-        callback(Temasys._iceConnectionStates.done);
+        Temasys.AdapterJS._iceConnectionFiredStates[peerId]
+          .push(Temasys.AdapterJS._iceConnectionStates.done);
+        callback(Temasys.AdapterJS._iceConnectionStates.done);
       }, 1000);
     }
     callback(iceConnectionState);
   }
   return;
 };
-/**
- * Check the availability of the MediaStream and DataChannel.
- * Method to be called after getUserMedia
- * @method checkMediaDataChannel
- * @param {MediaStream} stream
- * @param {JSON} constraints
- * @for Temasys
- */
-checkMediaDataChannel = function (stream, constraints) {
-  var testedOptions = {
-    audio : false,
-    video : false,
-    data : false
-  };
-  // Test MediaStream
-  if (constraints.audio && stream.getAudioTracks().length > 0) {
-    testedOptions.audio = true;
-  }
-  if (constraints.video && stream.getVideoTracks().length > 0) {
-    testedOptions.video = true;
-  }
-  // Test DataChannel
-  var testPeer = new RTCPeerConnection();
-  try {
-    var dc = testPeer.createDataChannel('_');
-    if (dc) {
-      testedOptions.data = true;
-    }
-  } catch (error) {
-    console.error('Failed creating DataChannel');
-    console.error(error);
-  }
-  return testedOptions;
-};
-/**
- * AdapterJS original google code.
- * - Adapted from: https://code.google.com/p/webrtc/source/
- * browse/trunk/samples/js/base/adapter.js?r=3905
- * @class Original
- */
-/**
- * The RTCPeerConnection object.
- * @function RTCPeerConnection
- * @param {JSON} pcConfig Servers configuration
- * @param {JSON} pcConstraints Constraints
- * @return {Object} The PeerConnection object.
- * @for Original
- */
+
+// Firefox:
+// - Creates iceServer from the url for Firefox.
+// - Create iceServer with stun url.
+// - Create iceServer with turn url.
+//   - Ignore the transport parameter from TURN url for FF version <=27.
+//   - Return null for createIceServer if transport=tcp.
+// - FF 27 and above supports transport parameters in TURN url,
+// - So passing in the full url to create iceServer.
+// Chrome:
+// - Creates iceServer from the url for Chrome M33 and earlier.
+//   - Create iceServer with stun url.
+//   - Chrome M28 & above uses below TURN format.
+// Plugin:
+// - Creates Ice Server for Plugin Browsers
+//   - If Stun - Create iceServer with stun url.
+//   - Else - Create iceServer with turn url
+//   - This is a WebRTC Function
+createIceServer = null;
+
+// Firefox:
+// - Creates IceServers for Firefox
+//   - Use .url for FireFox.
+//   - Multiple Urls support
+// Chrome:
+// - Creates iceServers from the urls for Chrome M34 and above.
+//   - .urls is supported since Chrome M34.
+//   - Multiple Urls support
+// Plugin:
+// - Creates Ice Servers for Plugin Browsers
+//   - Multiple Urls support
+//   - This is a WebRTC Function
+createIceServers = null;
+//------------------------------------------------------------
+
+//The RTCPeerConnection object.
 RTCPeerConnection = null;
-/**
- * Plugin:
- * - Creates RTCSessionDescription object for Plugin Browsers
- *   - This is a WebRTC Function
- * @method RTCSessionDescription
- * @param {JSON} info
- * @return {Object} The RTCSessionDescription object
- * @for Original
- */
+
+// Creates RTCSessionDescription object for Plugin Browsers
 RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
   RTCSessionDescription : null;
-/**
- * Plugin:
- * - Creates RTCIceCandidate object for Plugin Browsers
- *   - This is a WebRTC Function
- * @method RTCIceCandidate
- * @param {Object} candidate
- * @return {Object} The RTCIceCandidate object
- * @for Original
- */
+
+// Creates RTCIceCandidate object for Plugin Browsers
 RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
   RTCIceCandidate : null;
-/**
- * Get UserMedia (only difference is the prefix).
- * @function getUserMedia
- * @param {JSON} mediaConstraints Media constraints
- * @param {JSON} successCallback Callback when MediaStream is obtained
- *   successfully.
- * @param {JSON} failuedCallback Callback when MediaStream failed to
- *   be obtained.
- * @return {Object} The MediaStream object.
- * @author Adam Barth.
- * @for Original
- */
+
+// Get UserMedia (only difference is the prefix).
+// Code from Adam Barth.
 getUserMedia = null;
-/**
- * Attach a media stream to an element.
- * @function attachMediaStream
- * @param {DOM} videoElement The Video element
- * @param {Object} mediaStream The MediaStream object
- * @for Original
- */
+
+// Attach a media stream to an element.
 attachMediaStream = null;
-/**
- * Re-attach a media stream to an element.
- * @function reattachMediaStream
- * @param {DOM} fromVideoElement The Video element with the stream url
- * @param {DOM} toVideoElement The Video element to be duplicated with
- *   the stream url.
- * @for Original
- */
+
+// Re-attach a media stream to an element.
 reattachMediaStream = null;
-/**
- * Firefox:
- * - Creates iceServer from the url for Firefox.
- * - Create iceServer with stun url.
- * - Create iceServer with turn url.
- *   - Ignore the transport parameter from TURN url for FF version <=27.
- *   - Return null for createIceServer if transport=tcp.
- * - FF 27 and above supports transport parameters in TURN url,
- *   - So passing in the full url to create iceServer.
- * Chrome:
- * - Creates iceServer from the url for Chrome M33 and earlier.
- *   - Create iceServer with stun url.
- *   - Chrome M28 & above uses below TURN format.
- * Plugin:
- * - Creates Ice Server for Plugin Browsers
- *   - If Stun - Create iceServer with stun url.
- *   - Else - Create iceServer with turn url
- *   - This is a WebRTC Function
- * @method createIceServer
- * @param {String} url
- * @param {String} username
- * @param {String} password
- * @return {JSON} Ice Server Configuration
- * @for Original
- */
-createIceServer = null;
-/**
- * Firefox:
- * - Creates IceServers for Firefox
- *   - Use .url for FireFox.
- *   - Multiple Urls support
- * Chrome:
- * - Creates iceServers from the urls for Chrome M34 and above.
- *   - .urls is supported since Chrome M34.
- *   - Multiple Urls support
- * Plugin:
- * - Creates Ice Servers for Plugin Browsers
- *   - Multiple Urls support
- *   - This is a WebRTC Function
- * @method createIceServers
- * @param {Array} urls
- * @param {String} username
- * @param {String} password
- * @return {Array} List of Ice Servers Configuration
- * @for Original
- */
-createIceServers = null;
-/**
- * Firefox:
- * - Creates IceServers for Firefox
- *   - Use .url for FireFox.
- *   - Multiple Urls support
- * Chrome:
- * - Creates iceServers from the urls for Chrome M34 and above.
- *   - .urls is supported since Chrome M34.
- *   - Multiple Urls support
- * Plugin:
- * - Creates Ice Servers for Plugin Browsers
- *   - Multiple Urls support
- *   - This is a WebRTC Function
- * @method createIceServers
- * @param {Array} urls
- * @param {String} username
- * @param {String} password
- * @return {Array} List of Ice Servers Configuration
- * @for Original
- */
-createIceServers = null;
-/**
- * Detected browser agent name. Types are:
- * - 'firefox': Firefox browser.
- * - 'chrome': Chrome browser.
- * - 'opera': Opera browser.
- * - 'safari': Safari browser.
- * - 'IE' - Internet Explorer browser.
- * @attribute webrtcDetectedBrowser
- * @type String
- * @readOnly
- * @required
- * @for Original
- */
+
+
+// Detected browser agent name. Types are:
+// - 'firefox': Firefox browser.
+// - 'chrome': Chrome browser.
+// - 'opera': Opera browser.
+// - 'safari': Safari browser.
+// - 'IE' - Internet Explorer browser.
 webrtcDetectedBrowser = null;
-/**
- * Detected browser version.
- * @attribute webrtcDetectedVersion
- * @type Integer
- * @readOnly
- * @required
- * @for Original
- */
+
+// Detected browser version.
 webrtcDetectedVersion = null;
+
 // Check for browser types and react accordingly
 if (navigator.mozGetUserMedia) {
   webrtcDetectedBrowser = 'firefox';
@@ -615,7 +350,7 @@ if (navigator.mozGetUserMedia) {
   webrtcDetectedDCSupport = 'SCTP';
 
   RTCPeerConnection = function (pcConfig, pcConstraints) {
-    maybeFixConfiguration(pcConfig);
+    Temasys.AdapterJS.maybeFixConfiguration(pcConfig);
     return new mozRTCPeerConnection(pcConfig, pcConstraints);
   };
 
@@ -672,6 +407,14 @@ if (navigator.mozGetUserMedia) {
     to.mozSrcObject = from.mozSrcObject;
     to.play();
     return to;
+  };
+
+  MediaStreamTrack.getSources = MediaStreamTrack.getSources || function (callback) {
+    if (!callback) {
+      throw new TypeError('Failed to execute \'getSources\' on \'MediaStreamTrack\'' +
+        ': 1 argument required, but only 0 present.');
+    }
+    return callback([]);
   };
 
   // Fake get{Video,Audio}Tracks
@@ -743,7 +486,7 @@ if (navigator.mozGetUserMedia) {
 
   RTCPeerConnection = function (pcConfig, pcConstraints) {
     if (webrtcDetectedVersion < 34) {
-      maybeFixConfiguration(pcConfig);
+      Temasys.AdapterJS.maybeFixConfiguration(pcConfig);
     }
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
   };
@@ -771,7 +514,8 @@ if (navigator.mozGetUserMedia) {
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
-    console = console || {};
+    /* jshint -W020 */
+    console = {} || console;
     // Implemented based on console specs from MDN
     // You may override these functions
     console.log = function (arg) {};
@@ -789,21 +533,24 @@ if (navigator.mozGetUserMedia) {
     console.group = function (arg) {};
     console.groupCollapsed = function (arg) {};
     console.groupEnd = function (arg) {};
+    /* jshint +W020 */
   }
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
-  parseWebrtcDetectedBrowser();
+  Temasys.AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
+  /* jshint -W035 */
   Temasys.WebRTCPlugin.WaitForPluginReady = function() {
-    while (!Temasys.WebRTCPlugin.isPluginReady) {
+    while (Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.READY) {
       /* empty because it needs to prevent the function from running. */
     }
   };
+  /* jshint +W035 */
 
   Temasys.WebRTCPlugin.callWhenPluginReady = function (callback) {
     var checkPluginReadyState = setInterval(function () {
-      if (Temasys.WebRTCPlugin.isPluginReady) {
+      if (Temasys.WebRTCPlugin.pluginState === Temasys.WebRTCPlugin.PLUGIN_STATES.READY) {
         clearInterval(checkPluginReadyState);
         callback();
       }
@@ -811,6 +558,16 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.injectPlugin = function () {
+    // only inject once the page is ready
+    if (document.readyState !== 'complete')
+      return;
+
+    // Prevent multiple injections
+    if (Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.INITIALIZING)
+      return;
+
+    Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTING;
+
     if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 9) {
       var frag = document.createDocumentFragment();
       Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('div');
@@ -857,6 +614,9 @@ if (navigator.mozGetUserMedia) {
         '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
       document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
     }
+
+
+    Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTED;
   };
 
   Temasys.WebRTCPlugin.isPluginInstalled =
@@ -882,6 +642,8 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.defineWebRTCInterface = function () {
+    Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INITIALIZING;
+
     Temasys.WebRTCPlugin.isDefined = function (variable) {
       return variable !== null && variable !== undefined;
     };
@@ -1043,6 +805,8 @@ if (navigator.mozGetUserMedia) {
       );
     };
 
+    // inject plugin
+    document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
     Temasys.WebRTCPlugin.injectPlugin();
   };
 

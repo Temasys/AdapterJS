@@ -45,14 +45,14 @@ expected parameters:
 
 - `url`: The iceServer url.
 - `username`: The username.
-- `password`: The password.
+- `password`: The credential password.
 
 expected return values:
 
 - `iceServer`: The iceServer object.
    - `url`: The iceServer url.
   - `username`: The username.
-  - `password`: The password.
+  - `credential`: The credetial password.
 
 ##### `createIceServers(urls, username, password)`
 
@@ -62,15 +62,15 @@ expected parameters:
 
 - `urls`: The array of iceServer urls.
 - `username`: The username.
-- `password`: The password.
+- `password`: The credential password.
 
 expected return values:
 
-- `iceServerList`: The array of iceServer objects. 
+- `iceServerList`: The array of iceServer objects.
   - `iceServer`: The iceServer object.
      - `url`: The iceServer url.
      - `username`: The username.
-     - `password`: The password.
+     - `credential`: The credential password.
 
 ##### `checkIceConnectionState(peerId, iceConnectionState, callback)`
 
@@ -109,7 +109,7 @@ peerConnection.oniceconnectionstatechange = function () {
 handles all MediaStream and DataChannel differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
 
-- For some older (20+) versions of Firefox and Chrome MediaStream interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection. 
+- For some older (20+) versions of Firefox and Chrome MediaStream interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a DataChannel connection as an offerer, and results in no DataChannel connection.
 - To achieve both MediaStream and DataChannel connection interopability, Chrome or other browsers has to be the one creating the offer.
 
 expected parameters:
@@ -148,7 +148,7 @@ displays the browser webrtc implementation type.
 
 expected values:
 
-- `na`: No webrtc implementation.
+- null: Not implemented with webrtc.
 - `webkit`: Webkit implementation of webrtc.
 - `moz`: Mozilla implementation of webrtc.
 - `plugin`: Temasys plugin implementation of webrtc.
@@ -159,7 +159,7 @@ displays the browser webrtc datachannel support type.
 
 expected values:
 
-- `na`: No datachannel support.
+- null: No datachannel support.
 - `SCTP`: SCTP enabled datachannel.
 - `RTP`: RTP enabled datachannel.
 
@@ -191,7 +191,7 @@ The adapter.js library development file
 
 ##### tests
 
-Tape tests
+Tape tests. Run `test.sh` for windows and `npm test` for mac.
 
 
 ## License
