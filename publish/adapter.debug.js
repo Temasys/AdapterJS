@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.1 - 2014-10-02 */
+/*! adapterjs - v0.9.2 - 2014-10-02 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
@@ -90,7 +90,7 @@ __TemWebRTCReady0 = function () {
 Temasys.AdapterJS={};
 
 // Temasys AdapterJS version
-Temasys.AdapterJS.VERSION = '0.9.1';
+Temasys.AdapterJS.VERSION = '0.9.2';
 
 // The result of ice connection states.
 // - starting: Ice connection is starting.
