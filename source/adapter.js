@@ -48,7 +48,7 @@ Temasys.WebRTCPlugin.PLUGIN_STATES = {
 
 // Current state of the plugin. You cannot use the plugin before this is
 // equal to Temasys.WebRTCPlugin.PLUGIN_STATES.READY
-Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.NONE; 
+Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.NONE;
 
 // Does a waiting check before proceeding to load the plugin.
 Temasys.WebRTCPlugin.WaitForPluginReady = null;
@@ -85,7 +85,7 @@ __TemWebRTCReady0 = function () {
 };
 
 // Temasys Adapter's interface.
-Temasys.AdapterJS = {};
+Temasys.AdapterJS={};
 
 // Temasys AdapterJS version
 Temasys.AdapterJS.VERSION = '@@version';
@@ -557,12 +557,12 @@ if (navigator.mozGetUserMedia) {
 
   Temasys.WebRTCPlugin.injectPlugin = function () {
     // only inject once the page is ready
-    if (document.readyState !== 'complete') 
+    if (document.readyState !== 'complete')
       return;
 
     // Prevent multiple injections
     if (Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.INITIALIZING)
-      return;      
+      return;
 
     Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTING;
 
@@ -803,11 +803,9 @@ if (navigator.mozGetUserMedia) {
       );
     };
 
-
     // inject plugin
     document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
-    Temasys.WebRTCPlugin.injectPlugin();   
-    
+    Temasys.WebRTCPlugin.injectPlugin();
   };
 
   Temasys.WebRTCPlugin.getWebsiteLink = function() {
