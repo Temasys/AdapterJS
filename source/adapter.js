@@ -566,7 +566,7 @@ if (navigator.mozGetUserMedia) {
 
     Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTING;
 
-    if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 9) {
+    if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 10) {
       var frag = document.createDocumentFragment();
       Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('div');
       Temasys.WebRTCPlugin.TemRTCPlugin.innerHTML = '<object id="' +

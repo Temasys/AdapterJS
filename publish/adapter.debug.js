@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.2 - 2014-10-02 */
+/*! adapterjs - v0.9.2 - 2014-10-07 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
@@ -568,7 +568,7 @@ if (navigator.mozGetUserMedia) {
 
     Temasys.WebRTCPlugin.pluginState = Temasys.WebRTCPlugin.PLUGIN_STATES.INJECTING;
 
-    if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 9) {
+    if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 10) {
       var frag = document.createDocumentFragment();
       Temasys.WebRTCPlugin.TemRTCPlugin = document.createElement('div');
       Temasys.WebRTCPlugin.TemRTCPlugin.innerHTML = '<object id="' +
