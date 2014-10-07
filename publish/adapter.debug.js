@@ -806,7 +806,8 @@ if (navigator.mozGetUserMedia) {
     };
 
     // inject plugin
-    document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
+    document.addEventListener('readystatechange', Temasys.WebRTCPlugin.injectPlugin, false);
+    // document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
     Temasys.WebRTCPlugin.injectPlugin();
   };
 
@@ -824,7 +825,12 @@ if (navigator.mozGetUserMedia) {
     return null;
   };
 
-  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function () {
+  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function() {
+    document.addEventListener('readystatechange', Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv, false);
+    Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
+  }
+
+  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
     var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
     if(downloadLink) {
       Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="' +
@@ -837,6 +843,10 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
+    // only inject once the page is ready
+    if (document.readyState !== 'complete')
+      return;
+
     var w = window;
     var i = document.createElement('iframe');
     i.style.position = 'fixed';
