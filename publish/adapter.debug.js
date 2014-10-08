@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.3 - 2014-10-07 */
+/*! adapterjs - v0.9.3 - 2014-10-08 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
