@@ -1,4 +1,4 @@
-/*! adapterjs - v0.9.2 - 2014-10-07 */
+/*! adapterjs - v0.9.3 - 2014-10-08 */
 
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
@@ -90,7 +90,7 @@ __TemWebRTCReady0 = function () {
 Temasys.AdapterJS={};
 
 // Temasys AdapterJS version
-Temasys.AdapterJS.VERSION = '0.9.2';
+Temasys.AdapterJS.VERSION = '0.9.3';
 
 // The result of ice connection states.
 // - starting: Ice connection is starting.
@@ -806,7 +806,8 @@ if (navigator.mozGetUserMedia) {
     };
 
     // inject plugin
-    document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
+    document.addEventListener('readystatechange', Temasys.WebRTCPlugin.injectPlugin, false);
+    // document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
     Temasys.WebRTCPlugin.injectPlugin();
   };
 
@@ -824,7 +825,12 @@ if (navigator.mozGetUserMedia) {
     return null;
   };
 
-  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function () {
+  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function() {
+    document.addEventListener('readystatechange', Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv, false);
+    Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
+  }
+
+  Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
     var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
     if(downloadLink) {
       Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="' +
@@ -837,6 +843,10 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
+    // only inject once the page is ready
+    if (document.readyState !== 'complete')
+      return;
+
     var w = window;
     var i = document.createElement('iframe');
     i.style.position = 'fixed';
