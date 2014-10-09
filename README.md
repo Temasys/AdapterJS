@@ -12,6 +12,8 @@ Find the most recent version hosted on our CDN.
 
 AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
 
+- [AdapterJS browser compatibility table](https://temasys.atlassian.net/wiki/display/TPD/AdapterJS+-+Browser+support+and+compatibility)
+
 ![Plugin Install Bar in IE and Safari](http://temasys.github.io/resources/img/adapterheader.png)
 > In versions of IE and Safari that don't support WebRTC natively, AdapterJS will suggest to the user to install the [Temasys WebRTC plugin](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins) for Mac or Windows when you try to access getUserMedia or RTCPeerConnection.
 
