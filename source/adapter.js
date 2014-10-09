@@ -1,6 +1,9 @@
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
-var Temasys = Temasys || {};
+var Temasys = Temasys || {opts:{}};
+
+// uncomment to get virtual webcams
+// Temasys.opts.getAllCams = true;
 
 // Temasys plugin interface.
 // Please download our plugin for Safari and IE users:
@@ -579,7 +582,8 @@ if (navigator.mozGetUserMedia) {
         '<param name="onload" value="' + Temasys.WebRTCPlugin.temPluginInfo.onload +
         '" />' +
         // uncomment to be able to use virtual cams
-        // '<param name="forceGetAllCams" value="True" />' +
+	(Temasys.opts.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
+	
         '</object>';
       while (Temasys.WebRTCPlugin.TemRTCPlugin.firstChild) {
         frag.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin.firstChild);
@@ -608,7 +612,7 @@ if (navigator.mozGetUserMedia) {
         Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
         '<param name="windowless" value="false" /> ' +
         // uncomment to be able to use virtual cams
-        // '<param name="forceGetAllCams" value="True" />' +
+        (Temasys.opts.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
         '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
       document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
     }
