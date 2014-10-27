@@ -178,6 +178,16 @@ Temasys.AdapterJS.maybeFixConfiguration = function (pcConfig) {
   }
 };
 
+Temasys.AdapterJS.addEvent = function(elem, evnt, func) {
+   if (elem.addEventListener)  // W3C DOM
+      elem.addEventListener(evnt, func, false);
+   else if (elem.attachEvent) // OLD IE DOM 
+      elem.attachEvent("on"+evnt, func);
+   else // No much to do
+      elem[evnt] = func;
+   
+}
+
 //// Codes in meant to be in Temasys.AdapterJS
 // -----------------------------------------------------------
 // Detected webrtc implementation. Types are:
@@ -804,7 +814,7 @@ if (navigator.mozGetUserMedia) {
     };
 
     // inject plugin
-    document.addEventListener('readystatechange', Temasys.WebRTCPlugin.injectPlugin, false);
+    Temasys.AdapterJS.addEvent(document, 'readystatechange', Temasys.WebRTCPlugin.injectPlugin);
     // document.onreadystatechange = Temasys.WebRTCPlugin.injectPlugin;
     Temasys.WebRTCPlugin.injectPlugin();
   };
@@ -824,7 +834,7 @@ if (navigator.mozGetUserMedia) {
   };
 
   Temasys.WebRTCPlugin.pluginNeededButNotInstalledCb = function() {
-    document.addEventListener('readystatechange', Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv, false);
+    Temasys.AdapterJS.addEvent(document, 'readystatechange', Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
     Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
   }
 
@@ -872,7 +882,7 @@ if (navigator.mozGetUserMedia) {
     if(buttonText && buttonLink) {
       c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
       c.document.close();
-      c.document.getElementById('okay').addEventListener('click', function(e) {
+      Temasys.AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
         window.open(buttonLink, '_top');
         e.preventDefault();
         try {
@@ -883,7 +893,7 @@ if (navigator.mozGetUserMedia) {
     else {
       c.document.close();
     }
-    c.document.addEventListener('click', function() {
+    Temasys.AdapterJS.addEvent(c.document, 'click', function() {
       w.document.body.removeChild(i);
     });
     setTimeout(function() {
