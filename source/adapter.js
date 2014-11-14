@@ -833,6 +833,10 @@ if (navigator.mozGetUserMedia) {
   }
 
   Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
+    if (!Temasys.opts.showPluginInstallPrompt)
+    {
+	return;
+    }
     var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
     if(downloadLink) {
       Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="' +
