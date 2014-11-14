@@ -17,6 +17,13 @@ Temasys.WebRTCPlugin.temPluginInfo = {
   onload : '__TemWebRTCReady0'
 };
 
+// Public function to check if plugin is installed
+// Must be called after page has loaded
+Temasys.WebRTCPlugin.isPluginInstalledAsync = function()
+{
+	return Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.NONE;
+}
+
 // Unique identifier of each opened page
 Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
 
