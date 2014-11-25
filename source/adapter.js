@@ -1,9 +1,12 @@
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
-var Temasys = Temasys || {opts:{}};
+var Temasys = Temasys || {options:{}};
 
 // uncomment to get virtual webcams
-// Temasys.opts.getAllCams = true;
+// Temasys.options.getAllCams = true;
+
+// uncomment to prevent the install prompt when the plugin in not yet installed
+// Temasys.options.hidePluginInstallPrompt
 
 // Temasys plugin interface.
 // Please download our plugin for Safari and IE users:
@@ -16,13 +19,6 @@ Temasys.WebRTCPlugin.temPluginInfo = {
   type : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0'
 };
-
-// Public function to check if plugin is installed
-// Must be called after page has loaded
-Temasys.WebRTCPlugin.isPluginInstalledAsync = function()
-{
-	return Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.NONE;
-}
 
 // Unique identifier of each opened page
 Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
@@ -599,7 +595,7 @@ if (navigator.mozGetUserMedia) {
         '<param name="onload" value="' + Temasys.WebRTCPlugin.temPluginInfo.onload +
         '" />' +
         // uncomment to be able to use virtual cams
-	(Temasys.opts.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
+        (Temasys.options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
 	
         '</object>';
       while (Temasys.WebRTCPlugin.TemRTCPlugin.firstChild) {
@@ -629,7 +625,7 @@ if (navigator.mozGetUserMedia) {
         Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
         '<param name="windowless" value="false" /> ' +
         // uncomment to be able to use virtual cams
-        (Temasys.opts.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
+        (Temasys.options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
         '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
       document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
     }
@@ -850,10 +846,9 @@ if (navigator.mozGetUserMedia) {
   }
 
   Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
-    if (!Temasys.opts.showPluginInstallPrompt)
-    {
-	return;
-    }
+    if (Temasys.options.hidePluginInstallPrompt)
+      return;
+    
     var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
     if(downloadLink) {
       Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="' +
