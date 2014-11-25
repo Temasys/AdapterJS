@@ -1,6 +1,9 @@
 // Temasys reserved namespace.
 // This are where all Temasys implemented functions are.
-var Temasys = Temasys || {};
+var Temasys = Temasys || {opts:{}};
+
+// uncomment to get virtual webcams
+// Temasys.opts.getAllCams = true;
 
 // Temasys plugin interface.
 // Please download our plugin for Safari and IE users:
@@ -13,6 +16,13 @@ Temasys.WebRTCPlugin.temPluginInfo = {
   type : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0'
 };
+
+// Public function to check if plugin is installed
+// Must be called after page has loaded
+Temasys.WebRTCPlugin.isPluginInstalledAsync = function()
+{
+	return Temasys.WebRTCPlugin.pluginState !== Temasys.WebRTCPlugin.PLUGIN_STATES.NONE;
+}
 
 // Unique identifier of each opened page
 Temasys.WebRTCPlugin.TemPageId = Math.random().toString(36).slice(2);
@@ -589,7 +599,8 @@ if (navigator.mozGetUserMedia) {
         '<param name="onload" value="' + Temasys.WebRTCPlugin.temPluginInfo.onload +
         '" />' +
         // uncomment to be able to use virtual cams
-        // '<param name="forceGetAllCams" value="True" />' +
+	(Temasys.opts.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
+	
         '</object>';
       while (Temasys.WebRTCPlugin.TemRTCPlugin.firstChild) {
         frag.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin.firstChild);
@@ -618,7 +629,7 @@ if (navigator.mozGetUserMedia) {
         Temasys.WebRTCPlugin.temPluginInfo.pluginId + '">' +
         '<param name="windowless" value="false" /> ' +
         // uncomment to be able to use virtual cams
-        // '<param name="forceGetAllCams" value="True" />' +
+        (Temasys.opts.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
         '<param name="pageId" value="' + Temasys.WebRTCPlugin.TemPageId + '">';
       document.body.appendChild(Temasys.WebRTCPlugin.TemRTCPlugin);
     }
@@ -839,6 +850,10 @@ if (navigator.mozGetUserMedia) {
   }
 
   Temasys.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
+    if (!Temasys.opts.showPluginInstallPrompt)
+    {
+	return;
+    }
     var downloadLink = Temasys.WebRTCPlugin.getDownloadLink();
     if(downloadLink) {
       Temasys.WebRTCPlugin.renderNotificationBar('This website needs to install the <a href="' +
