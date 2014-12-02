@@ -629,7 +629,7 @@ if (navigator.mozGetUserMedia) {
         AdapterJS.WebRTCPlugin.pluginInfo.pluginId + '">' +
         '<param name="windowless" value="false" /> ' +
         (AdapterJS.options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
-        '<param name="pageId" value="' + AdapterJS.WebRTCPlugin.TemPageId + '">';
+        '<param name="pageId" value="' + AdapterJS.WebRTCPlugin.pageId + '">';
       document.body.appendChild(AdapterJS.WebRTCPlugin.plugin);
     }
 
