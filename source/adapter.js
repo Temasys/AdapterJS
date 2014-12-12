@@ -890,7 +890,7 @@ if (navigator.mozGetUserMedia) {
     if(buttonText && buttonLink) {
       c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
       c.document.close();
-      dapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
+      AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
         window.open(buttonLink, '_top');
         e.preventDefault();
         try {

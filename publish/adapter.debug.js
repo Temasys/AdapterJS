@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.0 - 2014-12-11 */
+/*! adapterjs - v0.10.0 - 2014-12-12 */
 
 // Adapter's interface.
 AdapterJS = { options:{} };
@@ -892,7 +892,7 @@ if (navigator.mozGetUserMedia) {
     if(buttonText && buttonLink) {
       c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
       c.document.close();
-      dapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
+      AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
         window.open(buttonLink, '_top');
         e.preventDefault();
         try {
