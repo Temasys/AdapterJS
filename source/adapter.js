@@ -372,10 +372,27 @@ if (navigator.mozGetUserMedia) {
     return new mozRTCPeerConnection(pcConfig, pcConstraints);
   };
 
+ // The RTCSessionDescription object.
   RTCSessionDescription = mozRTCSessionDescription;
+  window.RTCSessionDescription = RTCSessionDescription;
+
+  // The RTCIceCandidate object.
   RTCIceCandidate = mozRTCIceCandidate;
+  window.RTCIceCandidate = RTCIceCandidate;
+
   getUserMedia = navigator.mozGetUserMedia.bind(navigator);
   navigator.getUserMedia = getUserMedia;
+
+  // Shim for MediaStreamTrack.getSources.
+  MediaStreamTrack.getSources = function(successCb) {
+    setTimeout(function() {
+      var infos = [
+        { kind: 'audio', id: 'default', label:'', facing:'' },
+        { kind: 'video', id: 'default', label:'', facing:'' }
+      ];
+      successCb(infos);
+    }, 0);
+  };
 
   createIceServer = function (url, username, password) {
     var iceServer = null;
