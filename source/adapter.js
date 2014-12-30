@@ -78,8 +78,6 @@ AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
 // details to the plugin.
-// If you need to do something once the page/plugin is ready, override
-// window.onwebrtcready instead.
 // This function is not in the IE/Safari condition brackets so that
 // TemPluginLoaded function might be called on Chrome/Firefox.
 // This function is the only private function that is not encapsulated to
