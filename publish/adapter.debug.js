@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.0 - 2014-12-30 */
+/*! adapterjs - v0.10.0 - 2015-01-03 */
 
 // Adapter's interface.
 AdapterJS = { options:{} };
@@ -7,7 +7,7 @@ AdapterJS = { options:{} };
 // AdapterJS.options.getAllCams = true;
 
 // uncomment to prevent the install prompt when the plugin in not yet installed
-// AdapterJS.options.hidePluginInstallPrompt
+// AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
 AdapterJS.VERSION = '0.10.0';

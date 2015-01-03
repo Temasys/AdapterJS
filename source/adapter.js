@@ -5,7 +5,7 @@ AdapterJS = { options:{} };
 // AdapterJS.options.getAllCams = true;
 
 // uncomment to prevent the install prompt when the plugin in not yet installed
-// AdapterJS.options.hidePluginInstallPrompt
+// AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
 AdapterJS.VERSION = '@@version';
