@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.0 - 2015-01-06 */
+/*! adapterjs - v0.10.1 - 2015-01-06 */
 
 // Adapter's interface.
 AdapterJS = { options:{} };
@@ -10,7 +10,7 @@ AdapterJS = { options:{} };
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.10.0';
+AdapterJS.VERSION = '0.10.1';
 
 // Plugin namespace
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
