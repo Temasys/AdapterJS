@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.2 - 2015-01-06 */
+/*! adapterjs - v0.10.3 - 2015-01-06 */
 
 // Adapter's interface.
 AdapterJS = { options:{} };
@@ -10,7 +10,7 @@ AdapterJS = { options:{} };
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.10.2';
+AdapterJS.VERSION = '0.10.3';
 
 // Plugin namespace
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
@@ -644,8 +644,6 @@ if (navigator.mozGetUserMedia) {
         AdapterJS.WebRTCPlugin.plugin.width = '1px';
         AdapterJS.WebRTCPlugin.plugin.height = '1px';
       }
-      AdapterJS.WebRTCPlugin.plugin.width = '1px';
-      AdapterJS.WebRTCPlugin.plugin.height = '1px';
       AdapterJS.WebRTCPlugin.plugin.type = AdapterJS.WebRTCPlugin.pluginInfo.type;
       AdapterJS.WebRTCPlugin.plugin.innerHTML = '<param name="onload" value="' +
         AdapterJS.WebRTCPlugin.pluginInfo.onload + '">' +
