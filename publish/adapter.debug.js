@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.1 - 2015-01-06 */
+/*! adapterjs - v0.10.2 - 2015-01-06 */
 
 // Adapter's interface.
 AdapterJS = { options:{} };
@@ -10,7 +10,7 @@ AdapterJS = { options:{} };
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.10.1';
+AdapterJS.VERSION = '0.10.2';
 
 // Plugin namespace
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
@@ -861,23 +861,21 @@ if (navigator.mozGetUserMedia) {
     if (AdapterJS.options.hidePluginInstallPrompt)
       return;
 
-    var downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLink;
-    if(downloadLink) {
+    if(AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) { // if download link
       var popupString;
-      if (AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) {
+      if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) { // is portal link
        popupString = 'This website requires you to install the ' +
         ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink + 
         '" target="_blank">' + AdapterJS.WebRTCPlugin.pluginInfo.companyName +
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
-      } else {
+      } else { // no portal link, just print a generic explanation
        popupString = 'This website requires you to install a WebRTC-enabling plugin ' +
         'to work on this browser.';
       }
 
       AdapterJS.WebRTCPlugin.renderNotificationBar(popupString, 'Install Now', downloadLink);
-    }
-    else {
+    } else { // no download link, just print a generic explanation
       AdapterJS.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
     }
   };

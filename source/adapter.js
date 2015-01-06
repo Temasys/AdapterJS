@@ -859,23 +859,21 @@ if (navigator.mozGetUserMedia) {
     if (AdapterJS.options.hidePluginInstallPrompt)
       return;
 
-    var downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLink;
-    if(downloadLink) {
+    if(AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) { // if download link
       var popupString;
-      if (AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) {
+      if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) { // is portal link
        popupString = 'This website requires you to install the ' +
         ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink + 
         '" target="_blank">' + AdapterJS.WebRTCPlugin.pluginInfo.companyName +
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
-      } else {
+      } else { // no portal link, just print a generic explanation
        popupString = 'This website requires you to install a WebRTC-enabling plugin ' +
         'to work on this browser.';
       }
 
       AdapterJS.WebRTCPlugin.renderNotificationBar(popupString, 'Install Now', downloadLink);
-    }
-    else {
+    } else { // no download link, just print a generic explanation
       AdapterJS.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
     }
   };
