@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.3 - 2015-01-06 */
+/*! adapterjs - v0.10.3 - 2015-01-12 */
 
 // Adapter's interface.
 AdapterJS = { options:{} };
@@ -859,7 +859,8 @@ if (navigator.mozGetUserMedia) {
     if (AdapterJS.options.hidePluginInstallPrompt)
       return;
 
-    if(AdapterJS.WebRTCPlugin.pluginInfo.downloadLink) { // if download link
+    var downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLink;
+    if(downloadLink) { // if download link
       var popupString;
       if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) { // is portal link
        popupString = 'This website requires you to install the ' +
