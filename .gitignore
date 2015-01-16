@@ -79,14 +79,5 @@ dwsync.xml
 .svn
 .CVS
 .idea
-appdirectory-build
-pids
-logs
-results
-staging
-_site
-source/config/local.json
-node_modules/
-demo/
-doc/
-doc-style/
+bamboo
+
