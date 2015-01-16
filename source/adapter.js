@@ -29,13 +29,18 @@ if(!!navigator.platform.match(/^Mac/i)) {
 }
 else if(!!navigator.platform.match(/^Win/i)) {
   AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1kkS4FN';
-};
+}
 
 // Unique identifier of each opened page
 AdapterJS.WebRTCPlugin.pageId = Math.random().toString(36).slice(2);
 
 // Use this whenever you want to call the plugin.
 AdapterJS.WebRTCPlugin.plugin = null;
+
+// Set log level for the plugin once it is ready.
+// The different values are 
+// This is an asynchronous function that will run when the plugin is ready 
+AdapterJS.WebRTCPlugin.setLogLevel = null;
 
 // Defines webrtc's JS interface according to the plugin's implementation.
 // Define plugin Browsers as WebRTC Interface.
@@ -52,6 +57,8 @@ AdapterJS.WebRTCPlugin.pluginInjectionInterval = null;
 // Inject the HTML DOM object element into the page.
 AdapterJS.WebRTCPlugin.injectPlugin = null;
 
+// States of readiness that the plugin goes through when
+// being injected and stated
 AdapterJS.WebRTCPlugin.PLUGIN_STATES = {
   NONE : 0,           // no plugin use
   INITIALIZING : 1,   // Detected need for plugin
@@ -63,6 +70,24 @@ AdapterJS.WebRTCPlugin.PLUGIN_STATES = {
 // Current state of the plugin. You cannot use the plugin before this is
 // equal to AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY
 AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.NONE;
+
+// Log levels for the plugin. 
+// To be set by calling AdapterJS.WebRTCPlugin.setLogLevel
+/*
+Log outputs are prefixed in some cases. 
+  INFO: Information reported by the plugin. 
+  ERROR: Errors originating from within the plugin.
+  WEBRTC: Error originating from within the libWebRTC library
+*/
+// From the least verbose to the most verbose
+AdapterJS.WebRTCPlugin.PLUGIN_LOG_LEVELS = {
+  NONE : 'NONE',
+  ERROR : 'ERROR',  
+  WARNING : 'WARNING', 
+  INFO: 'INFO', 
+  VERBOSE: 'VERBOSE', 
+  SENSITIVE: 'SENSITIVE'  
+};
 
 // Does a waiting check before proceeding to load the plugin.
 AdapterJS.WebRTCPlugin.WaitForPluginReady = null;
@@ -598,6 +623,12 @@ if (navigator.mozGetUserMedia) {
         }
       }, 100);
     }
+  };
+
+  AdapterJS.WebRTCPlugin.setLogLevel = function(logLevel) {
+    AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
+      AdapterJS.WebRTCPlugin.plugin.setLogLevel(logLevel);
+    });
   };
 
   AdapterJS.WebRTCPlugin.injectPlugin = function () {
