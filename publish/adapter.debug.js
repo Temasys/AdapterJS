@@ -31,7 +31,7 @@ if(!!navigator.platform.match(/^Mac/i)) {
 }
 else if(!!navigator.platform.match(/^Win/i)) {
   AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1kkS4FN';
-};
+}
 
 // Unique identifier of each opened page
 AdapterJS.WebRTCPlugin.pageId = Math.random().toString(36).slice(2);
@@ -83,12 +83,12 @@ Log outputs are prefixed in some cases.
 */
 // From the least verbose to the most verbose
 AdapterJS.WebRTCPlugin.PLUGIN_LOG_LEVELS = {
-  NONE : "NONE",
-  ERROR : "ERROR",  
-  WARNING : "WARNING", 
-  INFO: "INFO", 
-  VERBOSE: "VERBOSE", 
-  SENSITIVE: "SENSITIVE"  
+  NONE : 'NONE',
+  ERROR : 'ERROR',  
+  WARNING : 'WARNING', 
+  INFO: 'INFO', 
+  VERBOSE: 'VERBOSE', 
+  SENSITIVE: 'SENSITIVE'  
 };
 
 // Does a waiting check before proceeding to load the plugin.
