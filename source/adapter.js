@@ -78,13 +78,17 @@ AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
 // details to the plugin.
+// The function will wait for the document to be ready and the set the
+// plugin state to AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY,
+// indicating that it can start being requested.
 // This function is not in the IE/Safari condition brackets so that
 // TemPluginLoaded function might be called on Chrome/Firefox.
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
-  arguments.callee.StaticWasInit = arguments.callee.StaticWasInit || 1;
-  if (arguments.callee.StaticWasInit === 1) {
+  if (document.readyState === 'complete') {
+    AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
+  } else {
     AdapterJS.WebRTCPlugin.documentReadyInterval = setInterval(function () {
       if (document.readyState === 'complete') {
         // TODO: update comments, we wait for the document to be ready
@@ -93,7 +97,6 @@ __TemWebRTCReady0 = function () {
       }
     }, 100);
   }
-  arguments.callee.StaticWasInit++;
 };
 
 // The result of ice connection states.
@@ -622,7 +625,7 @@ if (navigator.mozGetUserMedia) {
         '" />' +
         // uncomment to be able to use virtual cams
         (AdapterJS.options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
-	
+  
         '</object>';
       while (AdapterJS.WebRTCPlugin.plugin.firstChild) {
         frag.appendChild(AdapterJS.WebRTCPlugin.plugin.firstChild);
