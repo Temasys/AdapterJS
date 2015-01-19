@@ -4,8 +4,8 @@
 
 Find the most recent version hosted on our CDN.
 
-- Minified version: `//cdn.temasys.com.sg/adapterjs/latest/adapter.min.js`
-- Debug version `//cdn.temasys.com.sg/adapterjs/latest/adapter.debug.js`
+- Minified version: `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.min.js`
+- Debug version `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.debug.js`
 
 
 ## Compatibility
