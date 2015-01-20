@@ -1,5 +1,5 @@
 // Adapter's interface.
-AdapterJS = AdapterJS || {};
+var AdapterJS = AdapterJS || {};
 
 AdapterJS.options = {};
 
