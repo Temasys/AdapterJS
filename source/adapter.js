@@ -1,5 +1,7 @@
 // Adapter's interface.
-AdapterJS = { options:{} };
+AdapterJS = AdapterJS || {};
+
+AdapterJS.options = {};
 
 // uncomment to get virtual webcams
 // AdapterJS.options.getAllCams = true;
@@ -71,6 +73,25 @@ AdapterJS.WebRTCPlugin.PLUGIN_STATES = {
 // equal to AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY
 AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.NONE;
 
+// This function will be called when the WebRTC API is ready to be used
+// Whether it is the native implementation (Chrome, Firefox, Opera) or 
+// the plugin
+// You may Override this function to synchronise the start of your application
+// with the WebRTC API being ready.
+// If you decide not to override use this synchronisation, it may result in 
+// an extensive CPU usage on the plugin start (once per tab loaded) 
+// Params:
+//    - isUsingPlugin: true is the WebRTC plugin is being used, false otherwise
+//
+// AdapterJS.WebRTCReadyCallback = function(isUsingPlugin) {
+//   // The WebRTC API is ready.
+//   // Override me and do whatever you want here
+// };
+
+// True is AdapterJS.WebRTCReadyCallback was already called, false otherwise
+// Used to make sure AdapterJS.WebRTCReadyCallback is only called once
+AdapterJS.WebRTCReadyCallbackDone = false;
+
 // Log levels for the plugin. 
 // To be set by calling AdapterJS.WebRTCPlugin.setLogLevel
 /*
@@ -113,16 +134,29 @@ AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
 __TemWebRTCReady0 = function () {
   if (document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
+
+    AdapterJS.tryWebRTCReadyCallback();
   } else {
     AdapterJS.WebRTCPlugin.documentReadyInterval = setInterval(function () {
       if (document.readyState === 'complete') {
         // TODO: update comments, we wait for the document to be ready
         clearInterval(AdapterJS.WebRTCPlugin.documentReadyInterval);
         AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
+
+        AdapterJS.tryWebRTCReadyCallback();
       }
     }, 100);
   }
 };
+
+AdapterJS.tryWebRTCReadyCallback = function() {
+  if (!AdapterJS.WebRTCReadyCallbackDone) {
+    AdapterJS.WebRTCReadyCallbackDone = true;
+
+    if (typeof(AdapterJS.WebRTCReadyCallback) == 'function')
+      AdapterJS.WebRTCReadyCallback(AdapterJS.WebRTCPlugin.plugin !== null);
+  }
+}
 
 // The result of ice connection states.
 // - starting: Ice connection is starting.
@@ -489,6 +523,8 @@ if (navigator.mozGetUserMedia) {
       return [];
     };
   }
+
+  AdapterJS.tryWebRTCReadyCallback();
 } else if (navigator.webkitGetUserMedia) {
   webrtcDetectedBrowser = 'chrome';
   webrtcDetectedType = 'webkit';
@@ -572,6 +608,8 @@ if (navigator.mozGetUserMedia) {
     to.src = from.src;
     return to;
   };
+
+  AdapterJS.tryWebRTCReadyCallback();
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
