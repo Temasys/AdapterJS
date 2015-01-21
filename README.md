@@ -27,6 +27,10 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 ## Using AdapterJS
 
+#### Integration
+
+The integration with your application consists in a few simple steps, described in the  [Temasys Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+plugin+with+your+website).
+
 #### Helper functions
 
 ##### `attachMediaStream(element, stream)`
