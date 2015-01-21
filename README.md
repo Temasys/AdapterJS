@@ -27,9 +27,19 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 ## Using AdapterJS
 
-#### Integration
+#### Working with AdapterJS
 
-The integration with your application consists in a few simple steps, described in the  [Temasys Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+plugin+with+your+website).
+We *strongly* recommend only executing any WebRTC related code when AdapterJS triggers the `AdapterJS.onwebrtcready` event. This function is called whenever the browser or our Temasys WebRTC plugin are ready.
+
+```javascript
+AdapterJS.onwebrtcready = function() {
+   // Your WebRTC code goes here... e.g.
+   pc = new RTCPeerConnection();
+}
+```
+
+Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+plugin+with+your+website).
+
 
 #### Helper functions
 
