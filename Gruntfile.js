@@ -35,7 +35,8 @@ module.exports = function (grunt) {
                 	expand: true,
                 	cwd: '<%= production %>/',
                     src: ['**'],
-                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>.<%= pkg.version_minor %>.x'
+                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>'+
+                    '<%= pkg.version_minor %>.x'
                 }, {
                 	expand: true,
                 	cwd: '<%= production %>/',
@@ -146,7 +147,8 @@ module.exports = function (grunt) {
         });
 
         try {
-            var version = grunt.config('pkg.version').match('^([0-9]+)\.([0-9]+)\.([0-9]+)$')
+            var version = grunt.config('pkg.version').
+            match('^([0-9]+)\.([0-9]+)\.([0-9]+)$');
             grunt.config('pkg.version_major', version[1]);
             grunt.config('pkg.version_minor', version[2]);
             grunt.config('pkg.version_release', version[3]);
