@@ -12,6 +12,21 @@ AdapterJS.options = {};
 // AdapterJS version
 AdapterJS.VERSION = '@@version';
 
+// This function will be called when the WebRTC API is ready to be used
+// Whether it is the native implementation (Chrome, Firefox, Opera) or 
+// the plugin
+// You may Override this function to synchronise the start of your application
+// with the WebRTC API being ready.
+// If you decide not to override use this synchronisation, it may result in 
+// an extensive CPU usage on the plugin start (once per tab loaded) 
+// Params:
+//    - isUsingPlugin: true is the WebRTC plugin is being used, false otherwise
+//
+AdapterJS.WebRTCReadyCallback = AdapterJS.WebRTCReadyCallback || function(isUsingPlugin) {
+  // The WebRTC API is ready.
+  // Override me and do whatever you want here
+};
+
 // Plugin namespace
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
 
@@ -72,21 +87,6 @@ AdapterJS.WebRTCPlugin.PLUGIN_STATES = {
 // Current state of the plugin. You cannot use the plugin before this is
 // equal to AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY
 AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.NONE;
-
-// This function will be called when the WebRTC API is ready to be used
-// Whether it is the native implementation (Chrome, Firefox, Opera) or 
-// the plugin
-// You may Override this function to synchronise the start of your application
-// with the WebRTC API being ready.
-// If you decide not to override use this synchronisation, it may result in 
-// an extensive CPU usage on the plugin start (once per tab loaded) 
-// Params:
-//    - isUsingPlugin: true is the WebRTC plugin is being used, false otherwise
-//
-// AdapterJS.WebRTCReadyCallback = function(isUsingPlugin) {
-//   // The WebRTC API is ready.
-//   // Override me and do whatever you want here
-// };
 
 // True is AdapterJS.WebRTCReadyCallback was already called, false otherwise
 // Used to make sure AdapterJS.WebRTCReadyCallback is only called once
