@@ -924,14 +924,13 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.injectPlugin();
   };
 
-  if (AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb === null) {
-    AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = function() {
+  AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb ||
+    function() {
       AdapterJS.addEvent(document,
                         'readystatechange',
                          AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
       AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
     };
-  }
 
   AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
     if (AdapterJS.options.hidePluginInstallPrompt) {
