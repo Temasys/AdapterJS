@@ -1,7 +1,7 @@
 {
     "name": "adapterjs",
     "description": "Creating a common API for WebRTC in the browser",
-    "version": "0.10.4",
+    "version": "0.10.5",
     "homepage": "https://temasys.github.io/",
     "author": {
         "name": "Temasys Communications Pte. Ltd.",
@@ -51,5 +51,5 @@
         "npm": "1.4.6",
         "grunt": "0.4.1a"
     },
-    "keywords": []
+    "keywords": ["webrtc", "ortc", "adapter", "shim", "polyfill", "rtc"]
 }
