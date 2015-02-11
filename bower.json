@@ -1,0 +1,6 @@
+{
+  "name": "adapterjs",
+  "version": "0.10.3",
+  "main": "publish/adapter.min.js",
+  "keywords": ["webrtc", "real-time", "p2p", "shim", "polyfill", "ortc"]
+}
