@@ -1,6 +1,20 @@
 {
-  "name": "adapterjs",
-  "version": "0.10.4",
-  "main": "publish/adapter.min.js",
-  "keywords": ["webrtc", "real-time", "p2p", "shim", "polyfill", "ortc"]
+    "name": "adapterjs",
+    "description": "Creating a common API for WebRTC in the browser",
+    "version": "0.10.4",
+    "homepage": "https://temasys.github.io/",
+    "author": {
+        "name": "Temasys Communications Pte. Ltd.",
+        "email": "info@temasys.com.sg"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:Temasys/AdapterJS.git"
+    },
+    "licenses": [{
+        "type": "Apache",
+        "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }],
+    "main": "publish/adapter.min.js",
+    "keywords": ["webrtc", "real-time", "p2p", "shim", "polyfill", "ortc"]
 }
