@@ -185,7 +185,10 @@ module.exports = function (grunt) {
     });
 
 	grunt.registerTask('bamboovars', 'Write bamboo variables to file', function() {
-		grunt.file.write('bamboo/vars', 'version=' + grunt.config('pkg.version'));
+		grunt.file.write('bamboo/vars', 'version=' + grunt.config('pkg.version') + '\n' +
+                                        'version_major=' + grunt.config('pkg.version_major') + '\n' +
+                                        'version_minor=' + grunt.config('pkg.version_minor') + '\n' +
+                                        'version_release=' + grunt.config('pkg.version_release'));
 		grunt.log.writeln('bamboo/vars file successfully created');
 	});
 
