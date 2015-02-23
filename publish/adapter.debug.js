@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-02-11 */
+/*! adapterjs - v0.10.5 - 2015-02-23 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -926,12 +926,13 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.injectPlugin();
   };
 
-  AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = function() {
-    AdapterJS.addEvent(document, 
-                      'readystatechange',
-                       AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
-    AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
-  };
+  AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb ||
+    function() {
+      AdapterJS.addEvent(document,
+                        'readystatechange',
+                         AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
+      AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
+    };
 
   AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
     if (AdapterJS.options.hidePluginInstallPrompt) {

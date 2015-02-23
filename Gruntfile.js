@@ -35,8 +35,8 @@ module.exports = function (grunt) {
                 	expand: true,
                 	cwd: '<%= production %>/',
                     src: ['**'],
-                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>'+
-                    '<%= pkg.version_minor %>.x'
+                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>.' +
+                        '<%= pkg.version_minor %>.x'
                 }, {
                 	expand: true,
                 	cwd: '<%= production %>/',
