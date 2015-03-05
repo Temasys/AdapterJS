@@ -37,7 +37,7 @@ AdapterJS.WebRTCPlugin.pluginInfo = {
   pluginId : 'plugin0',
   type : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0',
-  portalLink : 'http://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins',
+  portalLink : 'http://skylink.io/plugin/',
   downloadLink : null, //set below
   companyName: 'Temasys'
 };
