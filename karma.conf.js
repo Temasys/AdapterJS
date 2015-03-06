@@ -9,10 +9,10 @@ module.exports = function (config) {
 
     files: [
         'source/*.js',
-        'tests/*.spec.js'
+        'tests/*.spec.js',
     ],
 
-    reporters: ['progress'],
+    reporters: ['mocha'],
 
     port: 9876,
     colors: true,
@@ -23,7 +23,18 @@ module.exports = function (config) {
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
-    browsers: ['Chrome']
+    browsers: ['Chrome', 'Safari', 'Opera', 'Firefox', 'IE'],
+
+    plugins: [
+      'karma-mocha',
+      'karma-mocha-reporter',
+      'karma-chai',
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-opera-launcher',
+      'karma-safari-launcher',
+      'karma-ie-launcher'
+    ]
 
   });
 };

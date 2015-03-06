@@ -1,45 +1,56 @@
 {
-    "name": "adapterjs",
-    "description": "Creating a common API for WebRTC in the browser",
-    "version": "0.10.5",
-    "homepage": "https://temasys.github.io/",
-    "author": {
-        "name": "Temasys Communications Pte. Ltd.",
-        "email": "info@temasys.com.sg"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:Temasys/AdapterJS.git"
-    },
-    "licenses": [{
-        "type": "Apache",
-        "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }],
-    "scripts": {},
-    "dependencies": {},
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-cli": "^0.1.13",
-        "grunt-contrib-compress": "^0.13.0",
-        "grunt-contrib-copy": "^0.7.0",
-        "grunt-contrib-clean": "^0.6.0",
-        "grunt-contrib-concat": "^0.5.0",
-        "grunt-contrib-jshint": "^0.10.0",
-        "grunt-contrib-uglify": "^0.6.0",
-        "grunt-replace": "^0.7.9",
-        "karma": "^0.12.17",
-        "karma-chai": "^0.1.0",
-        "karma-mocha": "^0.1.4",
-        "karma-chrome-launcher": "^0.1.0",
-        "karma-safari-launcher": "^0.1.0",
-        "karma-opera-launcher": "^0.1.0",
-        "karma-firefox-launcher": "^0.1.0",
-        "karma-ie-launcher": "^0.1.0"
-    },
-    "engines": {
-        "node": ">=0.10.26",
-        "npm": ">=1.4.6",
-        "grunt": ">=0.4.1"
-    },
-    "keywords": ["webrtc", "ortc", "adapter", "shim", "polyfill", "rtc"]
+  "name": "adapterjs",
+  "description": "Creating a common API for WebRTC in the browser",
+  "version": "0.10.5",
+  "homepage": "https://temasys.github.io/",
+  "author": {
+    "name": "Temasys Communications Pte. Ltd.",
+    "email": "info@temasys.com.sg"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Temasys/AdapterJS.git"
+  },
+  "licenses": [
+    {
+      "type": "Apache",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-compress": "^0.13.0",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-copy": "^0.7.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-replace": "^0.7.9",
+    "karma": "^0.12.31",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.0",
+    "karma-firefox-launcher": "^0.1.0",
+    "karma-ie-launcher": "^0.1.0",
+    "karma-mocha": "^0.1.10",
+    "karma-mocha-reporter": "^0.3.0",
+    "karma-opera-launcher": "^0.1.0",
+    "karma-safari-launcher": "^0.1.0",
+    "mocha-funnynyan-reporter": "*"
+  },
+  "engines": {
+    "node": ">=0.10.26",
+    "npm": ">=1.4.6",
+    "grunt": ">=0.4.1"
+  },
+  "keywords": [
+    "webrtc",
+    "ortc",
+    "adapter",
+    "shim",
+    "polyfill",
+    "rtc"
+  ]
 }
