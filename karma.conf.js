@@ -8,8 +8,8 @@ module.exports = function (config) {
     frameworks: ['mocha', 'chai'],
 
     files: [
-        'source/*.js',
-        'tests/*.spec.js',
+      'source/*.js',
+      'tests/*.spec.js'
     ],
 
     reporters: ['mocha'],
@@ -23,7 +23,16 @@ module.exports = function (config) {
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
-    browsers: ['Chrome', 'Safari', 'Opera', 'Firefox', 'IE'],
+    // you can define custom flags
+    customLaunchers: {
+      Chrome_gUM: {
+        base: 'Chrome',
+        flags: ['--use-fake-ui-for-media-stream']
+      }
+    },
+
+    browsers: ['Chrome_gUM'], //, 'Safari', 'Opera', 'Firefox', 'IE'],
+
 
     plugins: [
       'karma-mocha',

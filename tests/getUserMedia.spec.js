@@ -9,16 +9,14 @@ var slowTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDete
 
 
 describe('getUserMedia: Parameters', function() {
+	this.timeout(15000 + slowTimeout);
+	this.slow(slowTimeout);
 
 	it('Is supported', function () {
-		this.slow(slowTimeout);
-
 		assert.typeOf(window.getUserMedia, 'function');
 	});
 
 	it('Expects 3 parameters when 1 is only provided', function () {
-		this.slow(slowTimeout);
-
 		expect(function () {
 			window.getUserMedia({
 				audio: true,
@@ -28,8 +26,6 @@ describe('getUserMedia: Parameters', function() {
 	});
 
 	it('Expects 3 parameters when 2 is only provided', function () {
-		this.slow(slowTimeout);
-
 		expect(function () {
 			window.getUserMedia({
 				audio: true,
@@ -39,8 +35,6 @@ describe('getUserMedia: Parameters', function() {
 	});
 
 	it('Expects 3 parameters should pass', function () {
-		this.slow(slowTimeout);
-
 		var checkFn = function (media) {
 			assert.typeOf(media, 'object');
 		};
