@@ -9,7 +9,6 @@ var slowTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDete
 
 
 describe('getUserMedia: Parameters', function() {
-	this.timeout(15000 + slowTimeout);
 	this.slow(slowTimeout);
 
 	it('Is supported', function () {
@@ -34,9 +33,11 @@ describe('getUserMedia: Parameters', function() {
 		}).to.throw(TypeError);
 	});
 
-	it('Expects 3 parameters should pass', function () {
+	it('Expects 3 parameters should pass', function (done) {
 		var checkFn = function (media) {
 			assert.typeOf(media, 'object');
+
+			done();
 		};
 
 		window.getUserMedia({
