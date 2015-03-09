@@ -51,7 +51,11 @@ module.exports = function (config) {
       }
     },
 
-    browsers: ['SafariUM'], //['ChromeUM', 'SafariUM', 'OperaUM', 'FirefoxUM', 'IEUM'],
+    // For automated tests on Firefox, go to about:config, set the media.navigator.permission.disabled to true
+    // Modify karma-firefox-launcher in index.js line where self._execCommand is and set as self._execCommand(command, [url]);
+    // This should run the Firefox browser. Do not have any open Firefox browsers meanwhile.
+
+    browsers: ['FirefoxUM'], //, 'SafariUM', 'OperaUM', 'FirefoxUM', 'IEUM'],
 
 
     plugins: [
