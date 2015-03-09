@@ -17,7 +17,7 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
     autoWatch: false,
-    singleRun: false,
+    singleRun: true,
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
@@ -25,13 +25,33 @@ module.exports = function (config) {
 
     // you can define custom flags
     customLaunchers: {
-      Chrome_gUM: {
+      ChromeUM: {
         base: 'Chrome',
         flags: ['--use-fake-ui-for-media-stream']
+      },
+
+      FirefoxUM: {
+        base: 'Firefox',
+        profile: 'default-1410323712842'
+      },
+
+      SafariUM: {
+        base: 'Safari',
+        flags: []
+      },
+
+      OperaUM: {
+        base: 'Opera',
+        flags: ['--use-fake-ui-for-media-stream']
+      },
+
+      IEUM: {
+        base: 'IE',
+        flags: []
       }
     },
 
-    browsers: ['Chrome_gUM'], //, 'Safari', 'Opera', 'Firefox', 'IE'],
+    browsers: ['SafariUM'], //['ChromeUM', 'SafariUM', 'OperaUM', 'FirefoxUM', 'IEUM'],
 
 
     plugins: [
