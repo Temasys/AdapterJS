@@ -24,6 +24,8 @@ describe('MediaStreamTrack: Properties', function() {
 	};
 
 	before(function (done) {
+		this.timeout(15000);
+
 		window.getUserMedia({
 			audio: true,
 			video: true

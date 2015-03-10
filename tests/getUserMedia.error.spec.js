@@ -15,11 +15,12 @@ describe('getUserMedia: Errors', function() {
 		this.timeout(8000);
 
 		var checkerFn = setTimeout(function () {
-			assert.notOk(null, 'Error does not trigger');
+			assert.fail(null, new Error('NavigatorUserMediaError'), 'Error does not trigger');
+			done();
 		}, 5000);
 
 		window.getUserMedia({}, function (stream) {
-			assert.notOk(stream, 'Error does not trigger');
+			assert.fail(stream, new Error('NavigatorUserMediaError'), 'Error does not trigger');
 			clearTimeout(checkerFn);
 		}, function (error) {
 			error.name.should.be = 'MANDATORY_UNSATISFIED_ERROR';
@@ -28,11 +29,7 @@ describe('getUserMedia: Errors', function() {
 		});
 	});
 
-	it('Error: PERMISSION_DENIED', function (done) {
-		assert.notOk(null, 'No available automated test for this');
-	});
+	it.skip('Error: PERMISSION_DENIED | No available testing environment to automated this test', function () {});
 
-	it('Error: MANDATORY_UNSATISFIED_ERROR', function (done) {
-		assert.notOk(null, 'No available testing environment for this');
-	});
+	it.skip('Error: NOT_SUPPORTED_ERROR | No available testing environment to test this', function () {});
 });

@@ -24,6 +24,8 @@ describe('MediaStream: Properties', function() {
 	};
 
 	before(function (done) {
+		this.timeout(5000);
+
 		window.getUserMedia({
 			audio: true,
 			video: true

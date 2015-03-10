@@ -24,12 +24,7 @@ describe('MediaStreamTrack: Events', function() {
 	};
 
 	it('.onstarted', function (done) {
-		this.timeout(10000);
-
-		var checkerFn = setTimeout(function () {
-			assert.notOk(null, 'Does not triggers when getUserMedia has started');
-			done();
-		}, 7000);
+		this.timeout(7000);
 
 		window.getUserMedia({
 			audio: true,
@@ -48,20 +43,11 @@ describe('MediaStreamTrack: Events', function() {
 		});
 	});
 
-	it('.onmute', function (done) {
-		assert.notOk(null, 'No environment to test');
-		done();
-	});
+	it.skip('.onmute | No available testing environment to test this', function () {});
 
-	it('.onunmute', function (done) {
-		assert.notOk(null, 'No environment to test');
-		done();
-	});
+	it.skip('.onunmute | No available testing environment to test this', function () {});
 
-	it('.onoverconstrained', function (done) {
-		assert.notOk(null, 'No environment to test');
-		done();
-	});
+	it.skip('.onoverconstrained | No available testing environment to test this', function () {});
 
 	it('.onended', function (done) {
 		track.onended = function (event) {

@@ -43,7 +43,9 @@ var checkCanvas = function (ctx, width, height) {
 
   var d = nimg.data;
 
-  for (var i=0; i<d.length; i+=4) {
+  var i;
+
+  for (i = 0; i < d.length; i += 4) {
     var r = d[i];
     var g = d[i + 1];
     var b = d[i + 2];
@@ -145,58 +147,24 @@ describe('getUserMedia: Constraints', function() {
 		};
 
 		var checkFn = setTimeout(function () {
-			if (stream === null) {
-				assert.ok(stream, 'Does not do anything');
-				doneFn();
-			}
+			assert(stream === null, 'Does not do anything or gets an empty stream');
+			done();
 		}, 5000);
 
 		try {
 			window.getUserMedia({ video: false, audio: false }, function (data) {
-				assert.notOk(data, 'Gets an empty stream');
+				stream = data;
+				assert.fail(data, null, 'Gets an empty stream');
 				doneFn();
 			}, function (error) {
-				assert.ok(error, 'Throws an Error when invoking getUserMedia');
+				assert.ok(error, 'Throws an error when getUserMedia is invoked');
 				doneFn();
 			});
 
 		} catch (error) {
-			assert.ok(error, 'Throws an Error when invoking getUserMedia');
+			assert.ok(error, 'Throws an error when invoking getUserMedia');
 			doneFn();
 		}
-	});
-
-	it('Constraints = { video: { mandatory: { maxWidth: 357, maxHeight: 55 } } }', function (done) {
-		this.timeout(6500);
-
-		var video = document.createElement('video');
-		video.autoplay = 'autoplay';
-
-		document.body.appendChild(video);
-
-		var checkFn = function (stream) {
-			attachMediaStream(video, stream);
-
-			setTimeout(function () {
-				video.offsetWidth.should.most(357);
-				video.offsetHeight.should.most(55);
-				done();
-			}, 5000);
-		};
-
-		var errorFn = function (error) {
-			throw error;
-			done();
-		};
-
-		window.getUserMedia({
-			video: {
-				mandatory: {
-	        maxWidth: 357,
-	        maxHeight: 55
-	      }
-			}
-		}, checkFn, errorFn)
 	});
 
 	it('Constraints = { video: { mandatory: { minWidth: 357, minHeight: 55 } } }', function (done) {
@@ -230,6 +198,39 @@ describe('getUserMedia: Constraints', function() {
 	      }
 			}
 		}, checkFn, errorFn);
+	});
+
+	it('Constraints = { video: { mandatory: { maxWidth: 1357, maxHeight: 135 } } }', function (done) {
+		this.timeout(6500);
+
+		var video = document.createElement('video');
+		video.autoplay = 'autoplay';
+
+		document.body.appendChild(video);
+
+		var checkFn = function (stream) {
+			attachMediaStream(video, stream);
+
+			setTimeout(function () {
+				video.offsetWidth.should.most(1357);
+				video.offsetHeight.should.most(135);
+				done();
+			}, 5000);
+		};
+
+		var errorFn = function (error) {
+			throw error;
+			done();
+		};
+
+		window.getUserMedia({
+			video: {
+				mandatory: {
+	        maxWidth: 1357,
+	        maxHeight: 135
+	      }
+			}
+		}, checkFn, errorFn)
 	});
 
 	it('Constraints = { video: { mandatory: { minFrameRate: 15 } } }', function (done) {
@@ -298,7 +299,7 @@ describe('getUserMedia: Constraints', function() {
 		}, checkFn, errorFn);
 	});
 
-	it('Constraints = { video: { mandatory: { minAspectRatio: "16:5" } } }', function (done) {
+	it('Constraints = { video: { mandatory: { minAspectRatio: "16:10" } } }', function (done) {
 		this.timeout(15000);
 
 		var video = document.createElement('video');
@@ -307,12 +308,12 @@ describe('getUserMedia: Constraints', function() {
 		document.body.appendChild(video);
 
 		var checkerFn = setTimeout(function () {
-			assert.notOk(null, 'Does not receive stream or throw an error');
+			assert.fail(null, new Object(), 'Does not receive stream or throw an error');
 		}, 14000);
 
 		var checkFn = function (stream) {
 			attachMediaStream(video, stream);
-			(video.offsetWidth / video.offsetHeight).should.least(16 / 5);
+			(video.offsetWidth / video.offsetHeight).should.least(16 / 10);
 			clearInterval(checkerFn);
 			done();
 		};
@@ -326,13 +327,13 @@ describe('getUserMedia: Constraints', function() {
 		window.getUserMedia({
 			video: {
 				mandatory: {
-	        minAspectRatio: '16:5'
+	        minAspectRatio: '16:10'
 	      }
 			}
 		}, checkFn, errorFn);
 	});
 
-	it('Constraints = { video: { mandatory: { maxAspectRatio: "16:5" } } }', function (done) {
+	it('Constraints = { video: { mandatory: { maxAspectRatio: "21:9" } } }', function (done) {
 		this.timeout(15000);
 
 		var video = document.createElement('video');
@@ -341,12 +342,13 @@ describe('getUserMedia: Constraints', function() {
 		document.body.appendChild(video);
 
 		var checkerFn = setTimeout(function () {
-			assert.notOk(null, 'Does not receive stream or throw an error');
+			assert.fail(null, new Object(), 'Does not receive stream or throw an error');
+			done();
 		}, 14000);
 
 		var checkFn = function (stream) {
 			attachMediaStream(video, stream);
-			(video.offsetWidth / video.offsetHeight).should.most(16 / 5);
+			(video.offsetWidth / video.offsetHeight).should.most(21 / 9);
 			clearInterval(checkerFn);
 			done();
 		};
@@ -360,7 +362,7 @@ describe('getUserMedia: Constraints', function() {
 		window.getUserMedia({
 			video: {
 				mandatory: {
-	        minAspectRatio: '16:5'
+	        minAspectRatio: '21:9'
 	      }
 			}
 		}, checkFn, errorFn);
