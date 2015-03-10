@@ -717,6 +717,10 @@ if (navigator.mozGetUserMedia) {
       if (isIE) {
         AdapterJS.WebRTCPlugin.plugin.width = '1px';
         AdapterJS.WebRTCPlugin.plugin.height = '1px';
+      } else { // The size of the plugin on Safari should be 0x0px 
+              // so that the autorisation prompt is at the top
+        AdapterJS.WebRTCPlugin.plugin.width = '0px';
+        AdapterJS.WebRTCPlugin.plugin.height = '0px';
       }
       AdapterJS.WebRTCPlugin.plugin.type = AdapterJS.WebRTCPlugin.pluginInfo.type;
       AdapterJS.WebRTCPlugin.plugin.innerHTML = '<param name="onload" value="' +
