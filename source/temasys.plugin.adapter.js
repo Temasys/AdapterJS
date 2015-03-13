@@ -235,7 +235,7 @@ AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
  * @for WebRTCPlugin
  * @since 0.10.5
  */
-__TemWebRTCReady0 = function () {
+window.__TemWebRTCReady0 = function () {
   if (document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
 

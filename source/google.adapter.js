@@ -9,26 +9,37 @@
 /* More information about these options at jshint.com/docs/options */
 /* global mozRTCIceCandidate, mozRTCPeerConnection,
 mozRTCSessionDescription, webkitRTCPeerConnection */
+/* exported trace,requestUserMedia */
 
 'use strict';
 
-window.RTCPeerConnection = null;
-window.RTCSessionDescription = RTCSessionDescription; // prevent chrome override
-window.RTCIceCandidate = RTCIceCandidate;
-window.getUserMedia = null;
-window.attachMediaStream = null;
-window.reattachMediaStream = null;
-window.webrtcDetectedBrowser = null;
-window.webrtcDetectedVersion = null;
-window.createIceServer = null;
-window.createIceServers = null;
+var RTCPeerConnection = null;
+var getUserMedia = null;
+var attachMediaStream = null;
+var reattachMediaStream = null;
+var webrtcDetectedBrowser = null;
+var webrtcDetectedVersion = null;
+
+function trace(text) {
+  // This function is used for logging.
+  if (text[text.length - 1] === '\n') {
+    text = text.substring(0, text.length - 1);
+  }
+  if (window.performance) {
+    var now = (window.performance.now() / 1000).toFixed(3);
+    console.log(now + ': ' + text);
+  } else {
+    console.log(text);
+  }
+}
 
 if (navigator.mozGetUserMedia) {
   console.log('This appears to be Firefox');
 
   webrtcDetectedBrowser = 'firefox';
 
-  webrtcDetectedVersion = parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1], 10);
+  webrtcDetectedVersion =
+    parseInt(navigator.userAgent.match(/Firefox\/([0-9]+)\./)[1], 10);
 
   // The RTCPeerConnection object.
   RTCPeerConnection = function(pcConfig, pcConstraints) {
@@ -45,14 +56,15 @@ if (navigator.mozGetUserMedia) {
   };
 
   // The RTCSessionDescription object.
-  RTCSessionDescription = mozRTCSessionDescription;
+  window.RTCSessionDescription = mozRTCSessionDescription;
 
   // The RTCIceCandidate object.
-  RTCIceCandidate = mozRTCIceCandidate;
+  window.RTCIceCandidate = mozRTCIceCandidate;
 
   // getUserMedia shim (only difference is the prefix).
   // Code from Adam Barth.
   getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+  navigator.getUserMedia = getUserMedia;
 
   // Shim for MediaStreamTrack.getSources.
   MediaStreamTrack.getSources = function(successCb) {
@@ -66,7 +78,7 @@ if (navigator.mozGetUserMedia) {
   };
 
   // Creates ICE server from the URL for FF.
-  createIceServer = function(url, username, password) {
+  window.createIceServer = function(url, username, password) {
     var iceServer = null;
     var urlParts = url.split(':');
     if (urlParts[0].indexOf('stun') === 0) {
@@ -101,7 +113,7 @@ if (navigator.mozGetUserMedia) {
     return iceServer;
   };
 
-  createIceServers = function(urls, username, password) {
+  window.createIceServers = function(urls, username, password) {
     var iceServers = [];
     // Use .url for FireFox.
     for (var i = 0; i < urls.length; i++) {
@@ -139,7 +151,7 @@ if (navigator.mozGetUserMedia) {
   }
 
   // Creates iceServer from the url for Chrome M33 and earlier.
-  createIceServer = function(url, username, password) {
+  window.createIceServer = function(url, username, password) {
     var iceServer = null;
     var urlParts = url.split(':');
     if (urlParts[0].indexOf('stun') === 0) {
@@ -159,7 +171,7 @@ if (navigator.mozGetUserMedia) {
   };
 
   // Creates an ICEServer object from multiple URLs.
-  createIceServers = function(urls, username, password) {
+  window.createIceServers = function(urls, username, password) {
     return {
       'urls': urls,
       'credential': password,
@@ -175,6 +187,7 @@ if (navigator.mozGetUserMedia) {
   // Get UserMedia (only difference is the prefix).
   // Code from Adam Barth.
   getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+  navigator.getUserMedia = getUserMedia;
 
   // Attach a media stream to an element.
   attachMediaStream = function(element, stream) {
@@ -192,4 +205,24 @@ if (navigator.mozGetUserMedia) {
   reattachMediaStream = function(to, from) {
     to.src = from.src;
   };
+} else {
+  console.log('Browser does not appear to be WebRTC-capable');
+}
+
+// Returns the result of getUserMedia as a Promise.
+function requestUserMedia(constraints) {
+  return new Promise(function(resolve, reject) {
+    var onSuccess = function(stream) {
+      resolve(stream);
+    };
+    var onError = function(error) {
+      reject(error);
+    };
+
+    try {
+      getUserMedia(constraints, onSuccess, onError);
+    } catch (e) {
+      reject(e);
+    }
+  });
 }

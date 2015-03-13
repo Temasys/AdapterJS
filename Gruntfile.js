@@ -56,7 +56,7 @@ module.exports = function(grunt) {
                     '<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
             },
             production: {
-                src: ['<%= source %>/*.js'],
+                src: ['<%= source %>/*.adapter.js', '<%= source %>/temasys.*.js'],
                 dest: '<%= production %>/adapter.debug.js'
             }
         },

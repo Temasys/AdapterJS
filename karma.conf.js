@@ -8,7 +8,7 @@ module.exports = function (config) {
     frameworks: ['mocha', 'chai'],
 
     files: [
-      'source/*.js',
+      'publish/adapter.debug.js',
       'tests/*.spec.js'
     ],
 
@@ -55,7 +55,7 @@ module.exports = function (config) {
     // Modify karma-firefox-launcher in index.js line where self._execCommand is and set as self._execCommand(command, [url]);
     // This should run the Firefox browser. Do not have any open Firefox browsers meanwhile.
 
-    browsers: ['ChromeUM', 'FirefoxUM'], //, 'SafariUM', 'OperaUM', 'IEUM'],
+    browsers: ['FirefoxUM'], //, 'SafariUM', 'OperaUM', 'IEUM'],
 
 
     plugins: [

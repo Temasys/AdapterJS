@@ -3,7 +3,7 @@
  * @class AdapterJS
  * @since 0.10.5
  */
-window.AdapterJS = AdapterJS || {};
+window.AdapterJS = typeof window.AdapterJS !== 'undefined' ? window.AdapterJS : {};
 
 /**
  * Contains the options of the Temasys Plugin.
@@ -223,7 +223,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
  * @for AdapterJS
  * @since 0.10.5
  */
-webrtcDetectedType = null;
+window.webrtcDetectedType = null;
 
 /**
  * Detected webrtc datachannel support. Types are:
@@ -235,7 +235,41 @@ webrtcDetectedType = null;
  * @for AdapterJS
  * @since 0.10.5
  */
-webrtcDetectedDCSupport = null;
+window.webrtcDetectedDCSupport = null;
+
+/**
+ * Checks if a MediaStream's MediaStreamTracks have ended.
+ * @method checkMediaTracksEnded
+ * @param {Object} stream The MediaStream object.
+ * @private
+ * @for AdapterJS
+ * @since 0.10.5
+ */
+window.checkMediaTracksEnded = null;
+
+/**
+ * Detected webrtc datachannel support. Types are:
+ * - 'SCTP': SCTP datachannel support.
+ * - 'RTP': RTP datachannel support.
+ * @property webrtcDetectedType
+ * @type String
+ * @readOnly
+ * @for AdapterJS
+ * @since 0.10.5
+ */
+window.setRemoteMedia = null;
+
+/**
+ * Detected webrtc datachannel support. Types are:
+ * - 'SCTP': SCTP datachannel support.
+ * - 'RTP': RTP datachannel support.
+ * @property webrtcDetectedType
+ * @type String
+ * @readOnly
+ * @for AdapterJS
+ * @since 0.10.5
+ */
+window.setMediaTrack = null;
 
 /**
  * Set the settings for creating DataChannels, MediaStream for
@@ -254,7 +288,7 @@ webrtcDetectedDCSupport = null;
  * @for AdapterJS
  * @since 0.10.5
  */
-checkMediaDataChannelSettings = function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
+window.checkMediaDataChannelSettings = function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
   if (typeof callback !== 'function') {
     return;
   }
@@ -312,7 +346,7 @@ checkMediaDataChannelSettings = function (peerBrowserAgent, peerBrowserVersion, 
  * @for AdapterJS
  * @since 0.10.5
  */
-checkIceConnectionState = function (peerId, iceConnectionState, callback) {
+window.checkIceConnectionState = function (peerId, iceConnectionState, callback) {
   if (typeof callback !== 'function') {
     console.warn('No callback specified in checkIceConnectionState. Aborted.');
     return;
