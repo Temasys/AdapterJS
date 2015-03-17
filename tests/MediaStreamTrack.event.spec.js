@@ -24,7 +24,7 @@ describe('MediaStreamTrack: Events', function() {
 	};
 
 	it('.onstarted', function (done) {
-		this.timeout(7000);
+		this.timeout(8500);
 
 		window.getUserMedia({
 			audio: true,
@@ -34,7 +34,6 @@ describe('MediaStreamTrack: Events', function() {
 			track = stream.getAudioTracks()[0];
 			track.onstarted = function (event) {
 				assert.ok(event, 'Triggers when getUserMedia has started');
-				clearTimeout(checkerFn);
 				done();
 			};
 		}, function (error) {
@@ -50,13 +49,15 @@ describe('MediaStreamTrack: Events', function() {
 	it.skip('.onoverconstrained | No available testing environment to test this', function () {});
 
 	it('.onended', function (done) {
+		this.timeout(15000);
+
 		track.onended = function (event) {
 			assert.ok(event, 'Triggers when stop() is invoked');
 			done();
 		};
 
 		catchFn(function () {
-			track.stop();
+			track.polystop();
 		}, done);
 	});
 });

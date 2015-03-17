@@ -238,40 +238,6 @@ window.webrtcDetectedType = null;
 window.webrtcDetectedDCSupport = null;
 
 /**
- * Checks if a MediaStream's MediaStreamTracks have ended.
- * @method checkMediaTracksEnded
- * @param {Object} stream The MediaStream object.
- * @private
- * @for AdapterJS
- * @since 0.10.5
- */
-window.checkMediaTracksEnded = null;
-
-/**
- * Detected webrtc datachannel support. Types are:
- * - 'SCTP': SCTP datachannel support.
- * - 'RTP': RTP datachannel support.
- * @property webrtcDetectedType
- * @type String
- * @readOnly
- * @for AdapterJS
- * @since 0.10.5
- */
-window.setRemoteMedia = null;
-
-/**
- * Detected webrtc datachannel support. Types are:
- * - 'SCTP': SCTP datachannel support.
- * - 'RTP': RTP datachannel support.
- * @property webrtcDetectedType
- * @type String
- * @readOnly
- * @for AdapterJS
- * @since 0.10.5
- */
-window.setMediaTrack = null;
-
-/**
  * Set the settings for creating DataChannels, MediaStream for
  *   Cross-browser compability. This is only for SCTP based support browsers.
  * @method checkMediaDataChannelSettings

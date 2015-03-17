@@ -25,7 +25,7 @@ if (!navigator.mozGetUserMedia && !navigator.webkitGetUserMedia) {
   webrtcDetectedType = 'plugin';
   webrtcDetectedDCSupport = 'plugin';
   AdapterJS.parseWebrtcDetectedBrowser();
-  isIE = webrtcDetectedBrowser === 'IE';
+  var isIE = webrtcDetectedBrowser === 'IE';
 
   /* jshint -W035 */
   AdapterJS.WebRTCPlugin.WaitForPluginReady = function() {
@@ -148,7 +148,7 @@ if (!navigator.mozGetUserMedia && !navigator.webkitGetUserMedia) {
       return variable !== null && variable !== undefined;
     };
 
-    createIceServer = function (url, username, password) {
+    window.createIceServer = function (url, username, password) {
       var iceServer = null;
       var url_parts = url.split(':');
       if (url_parts[0].indexOf('stun') === 0) {
@@ -167,7 +167,7 @@ if (!navigator.mozGetUserMedia && !navigator.webkitGetUserMedia) {
       return iceServer;
     };
 
-    createIceServers = function (urls, username, password) {
+    window.createIceServers = function (urls, username, password) {
       var iceServers = [];
       for (var i = 0; i < urls.length; ++i) {
         iceServers.push(createIceServer(urls[i], username, password));
@@ -175,7 +175,7 @@ if (!navigator.mozGetUserMedia && !navigator.webkitGetUserMedia) {
       return iceServers;
     };
 
-    RTCSessionDescription = function (info) {
+    window.RTCSessionDescription = function (info) {
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
       return AdapterJS.WebRTCPlugin.plugin.
         ConstructSessionDescription(info.type, info.sdp);
@@ -205,7 +205,7 @@ if (!navigator.mozGetUserMedia && !navigator.webkitGetUserMedia) {
         iceServers, mandatory, optional);
     };
 
-    MediaStreamTrack = {};
+    window.MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.GetSources(callback);
@@ -294,7 +294,7 @@ if (!navigator.mozGetUserMedia && !navigator.webkitGetUserMedia) {
       }
     };
 
-    RTCIceCandidate = function (candidate) {
+    window.RTCIceCandidate = function (candidate) {
       if (!candidate.sdpMid) {
         candidate.sdpMid = '';
       }

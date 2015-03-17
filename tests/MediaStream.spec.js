@@ -13,6 +13,7 @@ describe('MediaStream: Properties', function() {
 
 	var stream = null;
 	var track = null;
+	var removeTrackSuccess = false;
 
 	var catchFn = function (code, done) {
 		try {
@@ -57,43 +58,55 @@ describe('MediaStream: Properties', function() {
 		}, done);
 	});
 
-	it('.removeTrack ()', function (done) {
-		assert.typeOf(stream.removeTrack, 'function');
+	it('.removeTrack () = .polyremoveTrack ()', function (done) {
+		assert.typeOf(stream.polyremoveTrack, 'function');
 
 		catchFn(function () {
-			stream.removeTrack(track);
+			stream.polyremoveTrack(track);
+			removeTrackSuccess = stream.getAudioTracks().length === 0;
+
 			stream.getAudioTracks().length.should.equal(0);
 			done();
 		}, done);
 	});
 
-	it('.addTrack ()', function (done) {
-		assert.typeOf(stream.addTrack, 'function');
+	it('.addTrack () = .polyaddTrack ()', function (done) {
+		assert.typeOf(stream.polyaddTrack, 'function');
 
 		catchFn(function () {
-			stream.addTrack(track);
-			stream.getAudioTracks().length.should.equal(1);
+			stream.polyaddTrack(track);
+
+			if (removeTrackSuccess) {
+				stream.getAudioTracks().length.should.equal(1);
+			} else {
+				assert.fail(removeTrackSuccess, true, 'Remove track failed. Unable to proceed checking of addTrack');
+			}
 			done();
 		}, done);
 	});
 
-	it('.getTrackById ()', function (done) {
-		assert.typeOf(stream.getTrackById, 'function');
+	it('.getTrackById () = .polygetTrackById () ', function (done) {
+		assert.typeOf(stream.polygetTrackById, 'function');
 
 		catchFn(function () {
-			var check = stream.getTrackById(track.id);
+			var check = stream.polygetTrackById(track.id);
 			check.should.equal(track);
 			done();
 		}, done);
 	});
 
-	it('.stop ()', function (done) {
-		assert.typeOf(stream.stop, 'function');
+	it('.stop () = .polystop ()', function (done) {
+		this.timeout(4000);
+
+		assert.typeOf(stream.polystop, 'function');
 
 		catchFn(function () {
-			stream.stop();
-			stream.ended.should.equal(true);
-			done();
+			stream.polystop();
+
+			setTimeout(function () {
+				stream.ended.should.equal(true);
+				done();
+			}, 2000);
 		}, done);
 	});
 });

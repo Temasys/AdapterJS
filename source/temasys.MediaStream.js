@@ -1,8 +1,26 @@
-(function () {
+// Polyfill all MediaStream objects
+var polyfillMediaStream = null;
 
-'use strict';
+// Return the event payload
+var returnEventPayloadFn = function (stream) {
+	return {
+  	bubbles: false,
+  	cancelBubble: false,
+  	cancelable: false,
+  	currentTarget: stream,
+  	defaultPrevented: false,
+  	eventPhase: 0,
+  	returnValue: true,
+  	srcElement: stream,
+  	target: stream,
+  	timeStamp: stream.currentTime || (new Date()).getTime()
+  };
+};
 
+// MediaStreamTracks Polyfilled
+var storePolyfillMediaStreamTracks = {};
 
+// Firefox MediaStream
 if (navigator.mozGetUserMedia) {
 
 	/**
@@ -10,64 +28,83 @@ if (navigator.mozGetUserMedia) {
 	 * @class MediaStream
 	 * @since 0.10.5
 	 */
-	var polyfillMedia = function (stream, checkEnded) {
+	polyfillMediaStream = function (stream) {
 
 		/**
-	   * Event triggered when MediaStream has ended streaming.
-	   * @event onended
-	   * @for MediaStream
-	   * @since 0.10.6
-	   */
-		stream.onended = function () { };
+		 * The MediaStream object id.
+		 * @attribute id
+		 * @type String
+		 * @readOnly
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.id = stream.id || (new Date()).getTime().toString();
 
 		/**
-	   * Event triggered when MediaStream has added a new track.
-	   * @event onaddtrack
-	   * @for MediaStream
-	   * @since 0.10.6
-	   */
-		stream.onaddtrack = function () { };
+		 * The flag that indicates if a MediaStream object has ended.
+		 * @attribute ended
+		 * @type Boolean
+		 * @readOnly
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.ended = false;
 
 		/**
-	   * Event triggered when MediaStream has removed an existing track.
-	   * @event onremovetrack
-	   * @for MediaStream
-	   * @since 0.10.6
-	   */
-		stream.onremovetrack = function () { };
+		 * Event triggered when MediaStream has ended streaming.
+		 * @event onended
+		 * @param {String} type The type of event: <code>"ended"</code>.
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.onended = null;
 
 		/**
-	   * Event triggered when a feature in the MediaStream is not supported
-	   *   but used.
-	   * @event onunsupported
-	   * @param {String} type The feature that is not supported.
-	   * @param {Error} error The error received natively.
-	   * @for MediaStream
-	   * @since 0.10.6
-	   */
-		stream.onunsupported = function () { };
+		 * Event triggered when MediaStream has added a new track.
+		 * @event onaddtrack
+		 * @param {String} type The type of event: <code>"addtrack"</code>.
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.onaddtrack = null;
+
+		/**
+		 * Event triggered when MediaStream has removed an existing track.
+		 * @event onremovetrack
+		 * @param {String} type The type of event: <code>"removetrack"</code>.
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.onremovetrack = null;
+
+		/**
+		 * Event triggered when a feature in the MediaStream is not supported
+		 *   but used.
+		 * @event onunsupported
+		 * @param {String} feature The feature that is not supported. <i>Eg. <code>"addTrack"</code></i>.
+		 * @param {Object} error The error received natively.
+		 * @param {String} type The type of event: <code>"unsupported"</code>.
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.onunsupported = null;
 
 
+		(function () {
+			var i, j;
 
-		// Checks if event is subscribed before triggering them
-		var runFn = function (event, error) {
-			if (typeof stream[event] === 'function') {
-				stream[event]({
-        	bubbles: false,
-        	cancelBubble: false,
-        	cancelable: false,
-        	currentTarget: stream,
-        	defaultPrevented: false,
-        	eventPhase: 0,
-        	returnValue: true,
-        	srcElement: stream,
-        	target: stream,
-        	error: error,
-        	timeStamp: stream.currentTime,
-        	type: 'ended'
-        });
-			}
-		};
+			var audioTracks = stream.getAudioTracks();
+	    var videoTracks = stream.getVideoTracks();
+
+	    // Check for all tracks if ended
+	    for (i = 0; i < audioTracks.length; i += 1) {
+	      polyfillMediaStreamTrack( audioTracks[i] );
+	    }
+
+	    for (j = 0; j < videoTracks.length; j += 1) {
+	      polyfillMediaStreamTrack( videoTracks[j] );
+	    }
+		})();
 
 		/**
 		 * Stops a MediaStream streaming.
@@ -76,28 +113,115 @@ if (navigator.mozGetUserMedia) {
 		 * @since 0.10.6
 		 */
 		stream.polystop = function () {
-			stream.stop();
+			if (stream instanceof LocalMediaStream) {
+				stream.stop();
+
+			} else {
+				var i, j;
+
+				var audioTracks = stream.getAudioTracks();
+				var videoTracks = stream.getVideoTracks();
+
+				for (i = 0; i < audioTracks.length; i += 1) {
+					audioTracks[i].polystop();
+				}
+
+				for (j = 0; j < videoTracks.length; j += 1) {
+					videoTracks[j].polystop();
+				}
+			}
+		};
+
+		/**
+		 * Adds a MediaStreamTrack to an object.
+		 * @method polyaddTrack
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.polyaddTrack = function (track) {
+			try {
+				stream.addTrack(track);
+			} catch (error) {
+				// trigger that it has ended
+        if (typeof stream.onunsupported === 'function') {
+          var eventPayload = returnEventPayloadFn(stream);
+          eventPayload.type = 'unsupported';
+          eventPayload.error = error;
+          eventPayload.feature = 'addTrack';
+          stream.onunsupported(eventPayload);
+        }
+			}
+		};
+
+		/**
+		 * Gets a MediaStreamTrack from a MediaStreamTrack based on the object id provided.
+		 * @method polygetTrackById
+		 * @param {String} trackId The MediaStreamTrack object id.
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.polygetTrackById = function (trackId) {
+			var i, j;
+
+			var audioTracks = stream.getAudioTracks();
+	    var videoTracks = stream.getVideoTracks();
+
+	    // Check for all tracks if ended
+	    for (i = 0; i < audioTracks.length; i += 1) {
+	      if (audioTracks[i].id === trackId) {
+	      	return audioTracks[i];
+	      }
+	    }
+
+	    for (j = 0; j < videoTracks.length; j += 1) {
+	      if (videoTracks[i].id === trackId) {
+	      	return videoTracks[i];
+	      }
+	    }
+
+	    return null;
+		};
+
+		/**
+		 * Removes a MediaStreamTrack from an object.
+		 * @method polyremoveTrack
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.polyremoveTrack = function (track) {
+			try {
+				stream.removeTrack(track);
+			} catch (error) {
+				// trigger that it has ended
+        if (typeof stream.onunsupported === 'function') {
+          var eventPayload = returnEventPayloadFn(stream);
+          eventPayload.type = 'unsupported';
+          eventPayload.error = error;
+          eventPayload.feature = 'removeTrack';
+          stream.onunsupported(eventPayload);
+        }
+			}
 		};
 
 		/**
 		 * Gets the list of audio MediaStreamTracks of a MediaStream.
-		 * @method polyGetAudioTracks
+		 * @method polygetAudioTracks
 		 * @return {Array} Returns a list of the audio MediaStreamTracks
 		 *   available for the MediaStream.
 		 * @for MediaStream
 		 * @since 0.10.6
 		 */
-		stream.polyGetAudioTracks = stream.getAudioTracks;
+		stream.polygetAudioTracks = stream.getAudioTracks;
 
 		/**
 		 * Gets the list of video MediaStreamTracks of a MediaStream.
-		 * @method polyGetVideoTracks
+		 * @method polygetVideoTracks
 		 * @return {Array} Returns a list of the video MediaStreamTracks
 		 *   available for the MediaStream.
 		 * @for MediaStream
 		 * @since 0.10.6
 		 */
-		stream.polyGetVideoTracks = stream.getVideoTracks;
+		stream.polygetVideoTracks = stream.getVideoTracks;
 
 		/**
 		 * Listens and waits to check if all MediaStreamTracks of a MediaStream
@@ -105,6 +229,7 @@ if (navigator.mozGetUserMedia) {
 		 * This loops every second.
 		 * @method _polyOnTracksEndedListener
 		 * @private
+		 * @optional
 		 * @for MediaStream
 		 * @since 0.10.6
 		 */
@@ -143,70 +268,21 @@ if (navigator.mozGetUserMedia) {
 		 * This loops every second.
 		 * @method _polyOnEndedListener
 		 * @private
+		 * @optional
 		 * @for MediaStream
 		 * @since 0.10.6
 		 */
-		 stream._polyOnEndedListener = checkEnded();
-
-		/**
-		 * The flag that indicates if a MediaStream object has ended.
-		 * @attribute ended
-		 * @for MediaStream
-		 * @since 0.10.6
-		 */
-		stream.ended = false;
-
-		/**
-		 * Adds a MediaStreamTrack to an object.
-		 * @method polyAddTrack
-		 * @private
-		 * @for MediaStream
-		 * @since 0.10.6
-		 */
-		stream.polyAddTrack = function (track) {
-			try {
-				stream.addTrack(track);
-			} catch (error) {
-				runFn('onnotsupported', error);
-			}
-		};
-
-	};
-
-	var checkMediaTracksEnded = function (stream) {
-		
-	};
-
-
-
-	getUserMedia = function (constraints, successCb, failureCb) {
-
-		var polyfillMedia = function (stream) {
-
-			stream.polystop = function () {
-      	stream.stop();
-      };
-
-      stream._onendedListener = setInterval(function () {
+		if (stream instanceof LocalMediaStream) {
+			stream._polyOnEndedListener = setInterval(function () {
 				// If stream has flag ended because of media tracks being stopped
         if (stream.ended) {
-          clearInterval(stream._onendedListener);
+          clearInterval(stream._polyOnEndedListener);
 
           // trigger that it has ended
           if (typeof stream.onended === 'function') {
-            stream.onended({
-            	bubbles: false,
-            	cancelBubble: false,
-            	cancelable: false,
-            	currentTarget: stream,
-            	defaultPrevented: false,
-            	eventPhase: 0,
-            	returnValue: true,
-            	srcElement: stream,
-            	target: stream,
-            	timeStamp: stream.currentTime,
-            	type: 'ended'
-            });
+            var eventPayload = returnEventPayloadFn(stream);
+            eventPayload.type = 'ended';
+            stream.onended(eventPayload);
           }
         }
 
@@ -215,25 +291,15 @@ if (navigator.mozGetUserMedia) {
         }
 
         if (stream.recordedTime === stream.currentTime) {
-          clearInterval(stream._onendedListener);
+          clearInterval(stream._polyOnEndedListener);
 
           stream.ended = true;
 
           // trigger that it has ended
           if (typeof stream.onended === 'function') {
-            stream.onended({
-            	bubbles: false,
-            	cancelBubble: false,
-            	cancelable: false,
-            	currentTarget: stream,
-            	defaultPrevented: false,
-            	eventPhase: 0,
-            	returnValue: true,
-            	srcElement: stream,
-            	target: stream,
-            	timeStamp: stream.currentTime,
-            	type: 'ended'
-            });
+            var eventPayload = returnEventPayloadFn(stream);
+            eventPayload.type = 'ended';
+            stream.onended(eventPayload);
           }
 
         } else {
@@ -241,130 +307,77 @@ if (navigator.mozGetUserMedia) {
         }
 			}, 1000);
 
-			stream.ended = false;
+		} else {
+			/**
+			 * Stores the attached video element with the existing MediaStream
+			 * This loops every second.
+			 * - This only exists in Firefox browsers.
+			 * @attribute _polyOnEndedListenerObj
+			 * @type DOM
+			 * @private
+			 * @optional
+			 * @for MediaStream
+			 * @since 0.10.6
+			 */
+			// Use a video to attach to check if stream has ended
+	    var video = document.createElement('video');
 
-			checkMediaTracksEnded(stream);
+			video._polyOnEndedListener = setInterval(function () {
+	      // If stream has flag ended because of media tracks being stopped
+	      if (stream.ended) {
+	        clearInterval(video._polyOnEndedListener);
+
+	        // trigger that it has ended
+	        if (typeof stream.onended === 'function') {
+	        	var eventPayload = returnEventPayloadFn(stream);
+	        	eventPayload.type = 'ended';
+	          stream.onended(eventPayload);
+	        }
+	      }
+
+	      // Check if mozSrcObject is not empty
+	      if (typeof video.mozSrcObject === 'object' &&
+	          video.mozSrcObject !== null) {
+
+	        if (video.mozSrcObject.ended === true) {
+	          clearInterval(video._polyOnEndedListener);
+
+	          stream.ended = true;
+
+	          // trigger that it has ended
+	          if (typeof stream.onended === 'function') {
+	            var eventPayload = returnEventPayloadFn(stream);
+		        	eventPayload.type = 'ended';
+		          stream.onended(eventPayload);
+	          }
+	        }
+	      }
+	    }, 1000);
+
+	    // Bind the video element to MediaStream object
+	    stream._polyOnEndedListenerObj = video;
+
+	    window.attachMediaStream(video, stream);
+		}
+	};
+
+	window.getUserMedia = function (constraints, successCb, failureCb) {
+
+		navigator.mozGetUserMedia(constraints, function (stream) {
+			polyfillMediaStream(stream);
 
 			successCb(stream);
-		};
 
-		navigator.mozGetUserMedia(constraints, polyfillMedia, failureCb);
+		}, failureCb);
 	};
 
-
-	setRemoteMedia = function (stream) {
-		// Use a video to attach to check if stream has ended
-    var video = document.createElement('video');
-
-    var i, j;
-
-		var audioTracks = stream.getAudioTracks();
-    var videoTracks = stream.getVideoTracks();
-
-    // Check for all tracks if ended
-    for (i = 0; i < audioTracks.length; i += 1) {
-      setMediaTrack( audioTracks[i] );
-    }
-
-    for (j = 0; j < videoTracks.length; j += 1) {
-      setMediaTrack( videoTracks[j] );
-    }
-
-    stream.polystop = function () {
-    	try {
-    		stream.stop();
-    	} catch () {
-    		console.warn('MediaStream.stop is current not yet supported. Fallback to stopping all tracks.');
-
-    		var k, l;
-
-    		// Check for all tracks if ended
-		    for (k = 0; k < audioTracks.length; k += 1) {
-		      audioTracks[k].stop();
-		    }
-
-		    for (l = 0; l < videoTracks.length; l += 1) {
-		      videoTracks[l].stop();
-		    }
-    	}
-    };
-
-    /**
-		 * Checks if MediaStream has ended
-		 * @attribute _onendedListener
-		 * @type Object
-		 * @for MediaStream
-		 * @since 0.10.6
-		 */
-    video._onendedListener = setInterval(function () {
-      // If stream has flag ended because of media tracks being stopped
-      if (stream.ended) {
-        clearInterval(video._onendedListener);
-
-        // trigger that it has ended
-        if (typeof stream.onended === 'function') {
-          stream.onended({
-            	bubbles: false,
-            	cancelBubble: false,
-            	cancelable: false,
-            	currentTarget: stream,
-            	defaultPrevented: false,
-            	eventPhase: 0,
-            	returnValue: true,
-            	srcElement: stream,
-            	target: stream,
-            	timeStamp: stream.currentTime,
-            	type: 'ended'
-            });
-        }
-      }
-
-      // Check if mozSrcObject is not empty
-      if (typeof video.mozSrcObject === 'object' &&
-          video.mozSrcObject !== null) {
-
-        if (video.mozSrcObject.ended === true) {
-          clearInterval(video._onendedListener);
-
-          stream.ended = true;
-
-          // trigger that it has ended
-          if (typeof stream.onended === 'function') {
-            stream.onended({
-            	bubbles: false,
-            	cancelBubble: false,
-            	cancelable: false,
-            	currentTarget: stream,
-            	defaultPrevented: false,
-            	eventPhase: 0,
-            	returnValue: true,
-            	srcElement: stream,
-            	target: stream,
-            	timeStamp: stream.currentTime,
-            	type: 'ended'
-            });
-          }
-        }
-      }
-    }, 1000);
-
-		stream.ended = false;
-
-    // Bind the video element to MediaStream object
-    stream._onendedListenerObj = video;
-
-    checkMediaTracksEnded(stream);
-
-    window.attachMediaStream(video, stream);
-	};
-
-	attachMediaStream = function (element, stream) {
+	window.attachMediaStream = function (element, stream) {
     // If there's an element used for checking stream stop
     // for an instance remote MediaStream for firefox
     // reattachmediastream instead
-    if (typeof stream._onendedListenerObj !== 'undefined' &&
+    if (typeof stream._polyOnEndedListenerObj !== 'undefined' &&
       stream instanceof LocalMediaStream === false) {
-      window.reattachMediaStream(element, bind._onendedListenerObj);
+      window.reattachMediaStream(element, bind._polyOnEndedListenerObj);
 
     // LocalMediaStream
     } else {
@@ -373,58 +386,246 @@ if (navigator.mozGetUserMedia) {
     }
   };
 
+// Chrome / Opera MediaStream
 } else if (navigator.webkitGetUserMedia) {
 
-	getUserMedia = function (constraints, successCb, failureCb) {
-		navigator.webkitGetUserMedia(constraints, function (stream) {
+	polyfillMediaStream = function (stream) {
 
+		stream.onended = null;
+
+		stream.onaddtrack = null;
+
+		stream.onremovetrack = null;
+
+		stream.onunsupported = null;
+
+
+		(function () {
 			var i, j;
 
 			var audioTracks = stream.getAudioTracks();
-      var videoTracks = stream.getVideoTracks();
+	    var videoTracks = stream.getVideoTracks();
 
-      // Check for all tracks if ended
-      for (i = 0; i < audioTracks.length; i += 1) {
-        setMediaTrack( audioTracks[i] );
-      }
+	    // Check for all tracks if ended
+	    for (i = 0; i < audioTracks.length; i += 1) {
+	      polyfillMediaStreamTrack( audioTracks[i] );
+	    }
 
-      for (j = 0; j < videoTracks.length; j += 1) {
-        setMediaTrack( videoTracks[j] );
-      }
+	    for (j = 0; j < videoTracks.length; j += 1) {
+	      polyfillMediaStreamTrack( videoTracks[j] );
+	    }
+		})();
 
-      stream.polystop = function () {
-      	stream.stop();
-      };
+		stream.polystop = function () {
+			stream.stop();
+		};
+
+		stream.polyaddTrack = function (track) {
+			try {
+				stream.addTrack(track);
+			} catch (error) {
+				// trigger that it has ended
+        if (typeof stream.onunsupported === 'function') {
+          var eventPayload = returnEventPayloadFn(stream);
+          eventPayload.type = 'unsupported';
+          eventPayload.error = error;
+          eventPayload.feature = 'addTrack';
+          stream.onunsupported(eventPayload);
+        }
+			}
+		};
+
+		stream.polygetTrackById = stream.getTrackById;
+
+		stream.polyremoveTrack = function (track) {
+			try {
+				stream.removeTrack(track);
+			} catch (error) {
+				// trigger that it has ended
+        if (typeof stream.onunsupported === 'function') {
+          var eventPayload = returnEventPayloadFn(stream);
+          eventPayload.type = 'unsupported';
+          eventPayload.error = error;
+          eventPayload.feature = 'removeTrack';
+          stream.onunsupported(eventPayload);
+        }
+			}
+		};
+
+		stream.polygetAudioTracks = stream.getAudioTracks;
+
+		stream.polygetVideoTracks = stream.getVideoTracks;
+	};
+
+	window.getUserMedia = function (constraints, successCb, failureCb) {
+		navigator.webkitGetUserMedia(constraints, function (stream) {
+
+			polyfillMediaStream(stream);
 
 			successCb(stream);
 		}, failureCb);
 
 	};
 
+// Safari MediaStream
 } else {
 
-	getUserMedia = function (constraints, successCb, failureCb) {
+	polyfillMediaStream = function (stream) {
+
+		/**
+		 * Stores the store Id to store MediaStreamTrack functions.
+		 * - This only exists in Safari / IE (Plugin-enabled) browsers.
+		 * @attribute _polyStoreId
+		 * @type String
+		 * @optional
+		 * @private
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream._polyStoreId = (new Date()).getTime().toString();
+
+		stream.ended = typeof stream.ended === 'boolean' ? stream.ended : false;
+
+		stream.onended = null;
+
+		stream.onaddtrack = null;
+
+		stream.onremovetrack = null;
+
+		stream.onunsupported = null;
+
+		(function () {
+			var i, j;
+
+			var audioTracks = stream.getAudioTracks();
+	    var videoTracks = stream.getVideoTracks();
+
+	    var outputAudioTracks = [];
+	    var outputVideoTracks = [];
+
+	    // Check for all tracks if ended
+	    for (i = 0; i < audioTracks.length; i += 1) {
+	      var track = polyfillMediaStreamTrack( audioTracks[i] );
+	      outputAudioTracks.push(track);
+	      console.log('i', outputAudioTracks.length);
+	    }
+
+	    for (j = 0; j < videoTracks.length; j += 1) {
+	      var track = polyfillMediaStreamTrack( videoTracks[i] );
+	      outputVideoTracks.push(track);
+	    }
+
+	    storePolyfillMediaStreamTracks[stream._polyStoreId] = {
+	    	audio: outputAudioTracks,
+	    	video: outputVideoTracks
+	    };
+		})();
+
+		stream.polystop = function () {
+			stream.stop();
+
+			var i, j;
+
+			var outputAudioTracks = storePolyfillMediaStreamTracks[stream._polyStoreId].audio;
+			var outputVideoTracks = storePolyfillMediaStreamTracks[stream._polyStoreId].video;
+
+	    // Check for all tracks if ended
+	    for (i = 0; i < outputAudioTracks.length; i += 1) {
+	    	var track = outputAudioTracks[i];
+	      track.ended = true;
+
+	      if (typeof track.onended === 'function') {
+	      	var eventPayload = returnEventPayloadFn(track);
+          eventPayload.type = 'ended';
+
+          if (typeof track.onended === 'function') {
+          	track.onended(eventPayload);
+          }
+	      }
+	    }
+
+	    for (j = 0; j < outputVideoTracks.length; j += 1) {
+	      var track = outputVideoTracks[j];
+	      track.ended = true;
+
+	      if (typeof track.onended === 'function') {
+	      	var eventPayload = returnEventPayloadFn(track);
+          eventPayload.type = 'ended';
+
+          if (typeof track.onended === 'function') {
+          	track.onended(eventPayload);
+          }
+	      }
+	    }
+		};
+
+		stream.polyaddTrack = function (track) {
+			try {
+				stream.addTrack(track);
+			} catch (error) {
+				// trigger that it has ended
+        if (typeof stream.onunsupported === 'function') {
+          var eventPayload = returnEventPayloadFn(stream);
+          eventPayload.type = 'unsupported';
+          eventPayload.error = error;
+          eventPayload.feature = 'addTrack';
+          stream.onunsupported(eventPayload);
+        }
+			}
+		};
+
+		stream.polygetTrackById = function (trackId) {
+			var i, j;
+
+			var outputAudioTracks = storePolyfillMediaStreamTracks[stream._polyStoreId].audio;
+			var outputVideoTracks = storePolyfillMediaStreamTracks[stream._polyStoreId].video;
+
+	    // Check for all tracks if ended
+	    for (i = 0; i < outputAudioTracks.length; i += 1) {
+	    	if (outputAudioTracks[i].id === trackId) {
+	      	return outputAudioTracks[i];
+	      }
+	    }
+
+	    for (j = 0; j < outputVideoTracks.length; j += 1) {
+	      if (outputVideoTracks[i].id === trackId) {
+	      	return outputVideoTracks[i];
+	      }
+	    }
+
+	    return null;
+		};
+
+		stream.polyremoveTrack = function (track) {
+			try {
+				stream.removeTrack(track);
+			} catch (error) {
+				// trigger that it has ended
+        if (typeof stream.onunsupported === 'function') {
+          var eventPayload = returnEventPayloadFn(stream);
+          eventPayload.type = 'unsupported';
+          eventPayload.error = error;
+          eventPayload.feature = 'removeTrack';
+          stream.onunsupported(eventPayload);
+        }
+			}
+		};
+
+		stream.polygetAudioTracks = function () {
+			return storePolyfillMediaStreamTracks[stream._polyStoreId].audio;
+		};
+
+		stream.polygetVideoTracks = function () {
+			return storePolyfillMediaStreamTracks[stream._polyStoreId].video;
+		};
+	};
+
+	window.getUserMedia = function (constraints, successCb, failureCb) {
 		navigator.getUserMedia(constraints, function(stream) {
-      var audioTracks = stream.getAudioTracks();
-      var videoTracks = stream.getVideoTracks();
 
-      // Check for all tracks if ended
-      for (i = 0; i < audioTracks.length; i += 1) {
-        setMediaTrack( audioTracks[i] );
-      }
-
-      for (i = 0; i < videoTracks.length; i += 1) {
-        setMediaTrack( videoTracks[i] );
-      }
-
-      stream.polystop = function () {
-      	stream.stop();
-      };
+      polyfillMediaStream(stream);
 
      	successCb(stream);
     }, failureCb);
   };
 }
-
-
-})();

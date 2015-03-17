@@ -39,6 +39,8 @@
                         <div id="api-tabview-panel">
                             <ul id="api-classes" class="apis classes">
                                 <li><a href="../classes/AdapterJS.html">AdapterJS</a></li>
+                                <li><a href="../classes/MediaStream.html">MediaStream</a></li>
+                                <li><a href="../classes/MediaStreamTrack.html">MediaStreamTrack</a></li>
                                 <li><a href="../classes/WebRTCPlugin.html">WebRTCPlugin</a></li>
                             </ul>
                 
@@ -85,7 +87,7 @@
  * @class AdapterJS
  * @since 0.10.5
  */
-window.AdapterJS = AdapterJS || {};
+window.AdapterJS = typeof window.AdapterJS !== &#x27;undefined&#x27; ? window.AdapterJS : {};
 
 /**
  * Contains the options of the Temasys Plugin.
@@ -305,7 +307,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
  * @for AdapterJS
  * @since 0.10.5
  */
-webrtcDetectedType = null;
+window.webrtcDetectedType = null;
 
 /**
  * Detected webrtc datachannel support. Types are:
@@ -317,7 +319,7 @@ webrtcDetectedType = null;
  * @for AdapterJS
  * @since 0.10.5
  */
-webrtcDetectedDCSupport = null;
+window.webrtcDetectedDCSupport = null;
 
 /**
  * Set the settings for creating DataChannels, MediaStream for
@@ -336,7 +338,7 @@ webrtcDetectedDCSupport = null;
  * @for AdapterJS
  * @since 0.10.5
  */
-checkMediaDataChannelSettings = function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
+window.checkMediaDataChannelSettings = function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
   if (typeof callback !== &#x27;function&#x27;) {
     return;
   }
@@ -394,7 +396,7 @@ checkMediaDataChannelSettings = function (peerBrowserAgent, peerBrowserVersion, 
  * @for AdapterJS
  * @since 0.10.5
  */
-checkIceConnectionState = function (peerId, iceConnectionState, callback) {
+window.checkIceConnectionState = function (peerId, iceConnectionState, callback) {
   if (typeof callback !== &#x27;function&#x27;) {
     console.warn(&#x27;No callback specified in checkIceConnectionState. Aborted.&#x27;);
     return;

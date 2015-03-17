@@ -143,13 +143,17 @@ describe('MediaStreamTrack: Properties', function() {
 		}, done);
 	});
 
-	it('.stop ()', function (done) {
-		assert.typeOf(track.stop, 'function');
+	it('.stop () = .polystop ()', function (done) {
+		this.timeout(4000);
+
+		assert.typeOf(track.polystop, 'function');
 
 		catchFn(function () {
-			track.stop();
-			track.ended.should.equal(true);
-			done();
+			track.polystop();
+			setTimeout(function () {
+				track.ended.should.equal(true);
+				done();
+			}, 3000);
 		}, done);
 	});
 });

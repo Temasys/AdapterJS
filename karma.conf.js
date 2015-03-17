@@ -55,7 +55,7 @@ module.exports = function (config) {
     // Modify karma-firefox-launcher in index.js line where self._execCommand is and set as self._execCommand(command, [url]);
     // This should run the Firefox browser. Do not have any open Firefox browsers meanwhile.
 
-    browsers: ['FirefoxUM'], //, 'SafariUM', 'OperaUM', 'IEUM'],
+    browsers: ['SafariUM'], //, 'SafariUM', 'OperaUM', 'IEUM'],
 
 
     plugins: [

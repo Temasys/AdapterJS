@@ -6,6 +6,28 @@
         "url": "https://temasys.github.io/"
     },
     "files": {
+        "source/temasys.MediaStream.js": {
+            "name": "source/temasys.MediaStream.js",
+            "modules": {},
+            "classes": {
+                "MediaStream": 1
+            },
+            "fors": {
+                "MediaStream": 1
+            },
+            "namespaces": {}
+        },
+        "source/temasys.MediaStreamTrack.js": {
+            "name": "source/temasys.MediaStreamTrack.js",
+            "modules": {},
+            "classes": {
+                "MediaStreamTrack": 1
+            },
+            "fors": {
+                "MediaStreamTrack": 1
+            },
+            "namespaces": {}
+        },
         "source/temasys.adapter.js": {
             "name": "source/temasys.adapter.js",
             "modules": {},
@@ -32,6 +54,32 @@
     },
     "modules": {},
     "classes": {
+        "MediaStream": {
+            "name": "MediaStream",
+            "shortname": "MediaStream",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "source/temasys.MediaStream.js",
+            "line": 26,
+            "description": "The polyfilled MediaStream class.",
+            "since": "0.10.5"
+        },
+        "MediaStreamTrack": {
+            "name": "MediaStreamTrack",
+            "shortname": "MediaStreamTrack",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 22,
+            "description": "The polyfilled MediaStreamTrack class.",
+            "since": "0.10.5"
+        },
         "AdapterJS": {
             "name": "AdapterJS",
             "shortname": "AdapterJS",
@@ -60,6 +108,407 @@
         }
     },
     "classitems": [
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 33,
+            "description": "The MediaStream object id.",
+            "itemtype": "attribute",
+            "name": "id",
+            "type": "String",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 43,
+            "description": "The flag that indicates if a MediaStream object has ended.",
+            "itemtype": "attribute",
+            "name": "ended",
+            "type": "Boolean",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 53,
+            "description": "Event triggered when MediaStream has ended streaming.",
+            "itemtype": "event",
+            "name": "onended",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"ended\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 62,
+            "description": "Event triggered when MediaStream has added a new track.",
+            "itemtype": "event",
+            "name": "onaddtrack",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"addtrack\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 71,
+            "description": "Event triggered when MediaStream has removed an existing track.",
+            "itemtype": "event",
+            "name": "onremovetrack",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"removetrack\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 80,
+            "description": "Event triggered when a feature in the MediaStream is not supported\n  but used.",
+            "itemtype": "event",
+            "name": "onunsupported",
+            "params": [
+                {
+                    "name": "feature",
+                    "description": "The feature that is not supported. <i>Eg. <code>\"addTrack\"</code></i>.",
+                    "type": "String"
+                },
+                {
+                    "name": "error",
+                    "description": "The error received natively.",
+                    "type": "Object"
+                },
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"unsupported\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 109,
+            "description": "Stops a MediaStream streaming.",
+            "itemtype": "method",
+            "name": "polystop",
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 135,
+            "description": "Adds a MediaStreamTrack to an object.",
+            "itemtype": "method",
+            "name": "polyaddTrack",
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 156,
+            "description": "Removes a MediaStreamTrack from an object.",
+            "itemtype": "method",
+            "name": "polyremoveTrack",
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 177,
+            "description": "Gets the list of audio MediaStreamTracks of a MediaStream.",
+            "itemtype": "method",
+            "name": "polygetAudioTracks",
+            "return": {
+                "description": "Returns a list of the audio MediaStreamTracks\n  available for the MediaStream.",
+                "type": "Array"
+            },
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 187,
+            "description": "Gets the list of video MediaStreamTracks of a MediaStream.",
+            "itemtype": "method",
+            "name": "polygetVideoTracks",
+            "return": {
+                "description": "Returns a list of the video MediaStreamTracks\n  available for the MediaStream.",
+                "type": "Array"
+            },
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 197,
+            "description": "Listens and waits to check if all MediaStreamTracks of a MediaStream\n  has ended. Once ended, this invokes the ended flag of the MediaStream.\nThis loops every second.",
+            "itemtype": "method",
+            "name": "_polyOnTracksEndedListener",
+            "access": "private",
+            "tagname": "",
+            "optional": 1,
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 237,
+            "description": "Listens and waits to check if all MediaStream has ended.\nThis loops every second.",
+            "itemtype": "method",
+            "name": "_polyOnEndedListener",
+            "access": "private",
+            "tagname": "",
+            "optional": 1,
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 282,
+            "description": "Stores the attached video element with the existing MediaStream\nThis loops every second.\n- This only exists in Firefox browsers.",
+            "itemtype": "attribute",
+            "name": "_polyOnEndedListenerObj",
+            "type": "DOM",
+            "access": "private",
+            "tagname": "",
+            "optional": 1,
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStream.js",
+            "line": 444,
+            "description": "Stores the store Id to store MediaStreamTrack functions.\n- This only exists in Safari / IE (Plugin-enabled) browsers.",
+            "itemtype": "attribute",
+            "name": "_polyStoreId",
+            "type": "String",
+            "optional": 1,
+            "access": "private",
+            "tagname": "",
+            "since": "0.10.6",
+            "class": "MediaStream"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 29,
+            "description": "The MediaStreamTrack object id.",
+            "itemtype": "attribute",
+            "name": "id",
+            "type": "String",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 39,
+            "description": "The MediaStreamTrack object label.",
+            "itemtype": "attribute",
+            "name": "label",
+            "type": "String",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 49,
+            "description": "The flag that indicates if a MediaStreamTrack object has ended.",
+            "itemtype": "attribute",
+            "name": "ended",
+            "type": "Boolean",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 59,
+            "description": "The flag that indicates if a MediaStreamTrack object is enabled.\n- Set it to <code>true</code> for enabled track stream or set it to\n  <code>false</code> for disable track stream.",
+            "itemtype": "attribute",
+            "name": "enabled",
+            "type": "Boolean",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 70,
+            "description": "The flag that indicates if a MediaStreamTrack object is muted.",
+            "itemtype": "attribute",
+            "name": "muted",
+            "type": "Boolean",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 80,
+            "description": "The ready state status of a MediaStreamTrack object.",
+            "itemtype": "attribute",
+            "name": "readyState",
+            "type": "String",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 90,
+            "description": "The MediaStreamTrack object type.\n- <code>\"audio\"</code>: The MediaStreamTrack object type is an audio track.\n- <code>\"video\"</code>: The MediaStreamTrack object type is an video track.",
+            "itemtype": "attribute",
+            "name": "kind",
+            "type": "String",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 102,
+            "description": "The status if a MediaStreamTrack object is read only and cannot to be overwritten.",
+            "itemtype": "attribute",
+            "name": "readOnly",
+            "type": "Boolean",
+            "readonly": "",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 112,
+            "description": "Event triggered when MediaStreamTrack has ended streaming.",
+            "itemtype": "event",
+            "name": "onended",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"ended\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 121,
+            "description": "Event triggered when MediaStreamTrack has started streaming.",
+            "itemtype": "event",
+            "name": "onstarted",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"started\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 130,
+            "description": "Event triggered when MediaStreamTrack has been muted.",
+            "itemtype": "event",
+            "name": "onmute",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"mute\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 139,
+            "description": "Event triggered when MediaStreamTrack has been unmuted.",
+            "itemtype": "event",
+            "name": "onunmute",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"unmute\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 148,
+            "description": "Event triggered when MediaStreamTrack is over constrained.",
+            "itemtype": "event",
+            "name": "onoverconstrained",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"overconstrained\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 157,
+            "description": "Event triggered when a feature in the MediaStreamTrack is not supported\n  but used.",
+            "itemtype": "event",
+            "name": "onunsupported",
+            "params": [
+                {
+                    "name": "feature",
+                    "description": "The feature that is not supported. <i>Eg. <code>\"stop\"</code></i>.",
+                    "type": "String"
+                },
+                {
+                    "name": "error",
+                    "description": "The error received natively.",
+                    "type": "Object"
+                },
+                {
+                    "name": "type",
+                    "description": "The type of event: <code>\"unsupported\"</code>.",
+                    "type": "String"
+                }
+            ],
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
+        {
+            "file": "source/temasys.MediaStreamTrack.js",
+            "line": 169,
+            "description": "Stops a MediaStreamTrack streaming.",
+            "itemtype": "method",
+            "name": "polystop",
+            "since": "0.10.6",
+            "class": "MediaStreamTrack"
+        },
         {
             "file": "source/temasys.adapter.js",
             "line": 8,

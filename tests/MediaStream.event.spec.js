@@ -40,35 +40,41 @@ describe('MediaStream: Events', function() {
 	});
 
 	it('.onremovetrack', function (done) {
+		this.timeout(4000);
+
 		stream.onremovetrack = function (event) {
 			assert.ok(event, 'Triggers when removeTrack() is invoked');
 			done();
 		};
 
 		catchFn(function () {
-			stream.removeTrack(track);
+			stream.polyremoveTrack(track);
 		}, done);
 	});
 
 	it('.onaddtrack', function (done) {
+		this.timeout(4000);
+
 		stream.onaddtrack = function (event) {
 			assert.ok(event, 'Triggers when addTrack() is invoked');
 			done();
 		};
 
 		catchFn(function () {
-			stream.addTrack(track);
+			stream.polyaddTrack(track);
 		}, done);
 	});
 
 	it('.onended', function (done) {
+		this.timeout(15000);
+
 		stream.onended = function (event) {
 			assert.ok(event, 'Triggers when stop() is invoked');
 			done();
 		};
 
 		catchFn(function () {
-			stream.stop();
+			stream.polystop();
 		}, done);
 	});
 });
