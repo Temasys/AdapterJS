@@ -23,6 +23,9 @@ module.exports = function (config) {
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,
 
+    // set the timeout
+    browserNoActivityTimeout: 100000,
+
     // you can define custom flags
     customLaunchers: {
       ChromeUM: {
@@ -42,7 +45,7 @@ module.exports = function (config) {
 
       OperaUM: {
         base: 'Opera',
-        flags: ['--use-fake-ui-for-media-stream']
+        flags: []
       },
 
       IEUM: {
@@ -55,7 +58,8 @@ module.exports = function (config) {
     // Modify karma-firefox-launcher in index.js line where self._execCommand is and set as self._execCommand(command, [url]);
     // This should run the Firefox browser. Do not have any open Firefox browsers meanwhile.
 
-    browsers: ['SafariUM'], //, 'SafariUM', 'OperaUM', 'IEUM'],
+    // Run each browser manually for automated test
+    browsers: ['OperaUM'], //'FirefoxUM', 'OperaUM', 'SafariUM', 'IEUM'],
 
 
     plugins: [
