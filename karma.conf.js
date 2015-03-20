@@ -17,7 +17,7 @@ module.exports = function (config) {
     port: 9876,
     colors: true,
     autoWatch: false,
-    singleRun: true,
+    singleRun: false,
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
@@ -59,7 +59,7 @@ module.exports = function (config) {
     // This should run the Firefox browser. Do not have any open Firefox browsers meanwhile.
 
     // Run each browser manually for automated test
-    browsers: ['OperaUM'], //'FirefoxUM', 'OperaUM', 'SafariUM', 'IEUM'],
+    browsers: ['SafariUM'], //'FirefoxUM', 'OperaUM', 'SafariUM', 'IEUM'],
 
 
     plugins: [

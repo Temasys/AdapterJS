@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-03-17 */
+/*! adapterjs - v0.10.5 - 2015-03-20 */
 
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
@@ -1745,7 +1745,7 @@ if (navigator.mozGetUserMedia) {
 	    }
 
 	    for (j = 0; j < videoTracks.length; j += 1) {
-	      var track = polyfillMediaStreamTrack( videoTracks[i] );
+	      var track = polyfillMediaStreamTrack( videoTracks[j] );
 	      outputVideoTracks.push(track);
 	    }
 
@@ -1822,8 +1822,8 @@ if (navigator.mozGetUserMedia) {
 	    }
 
 	    for (j = 0; j < outputVideoTracks.length; j += 1) {
-	      if (outputVideoTracks[i].id === trackId) {
-	      	return outputVideoTracks[i];
+	      if (outputVideoTracks[j].id === trackId) {
+	      	return outputVideoTracks[j];
 	      }
 	    }
 
@@ -2118,7 +2118,9 @@ if (navigator.mozGetUserMedia) {
 
     //track.id = track.id || (new Date()).getTime().toString();
 
-    track.label = track.label || track.kind + '-' + track.id;
+    console.log('Data received: ', track);
+
+    track.label = typeof track.label === 'undefined' ? track.kind + '-' + track.id : track.label;
 
     track.ended = false;
 

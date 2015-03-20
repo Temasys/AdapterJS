@@ -253,7 +253,9 @@ if (navigator.mozGetUserMedia) {
 
     //track.id = track.id || (new Date()).getTime().toString();
 
-    track.label = track.label || track.kind + '-' + track.id;
+    console.log('Data received: ', track);
+
+    track.label = typeof track.label === 'undefined' ? track.kind + '-' + track.id : track.label;
 
     track.ended = false;
 

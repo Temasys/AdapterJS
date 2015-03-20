@@ -1,5 +1,36 @@
 <!DOCTYPE html>
 <html>
 
-<head></head>
+<head>
+	<script src="../publish/adapter.debug.js"></script>
+</head>
+
+<body>
+	<video id="test" autoplay="autoplay"></video>
+
+	<script>
+		var data = null;
+		var video = document.getElementById('test');
+
+		getUserMedia({ audio: true, video: true }, function (stream) {
+			data = stream;
+
+			data.polygetVideoTracks()[0].onended = function () {
+				console.log('I am called', data.polygetVideoTracks()[0].ended);
+			};
+
+			data.polygetAudioTracks()[0].onended = function () {
+				console.log('I am called 2', data.polygetAudioTracks()[0].ended);
+			};
+
+			//attachMediaStream(video, data);
+
+			//data.polystop();*/
+		}, function (error) {
+			throw error;
+		});
+
+
+	</script>
+</body>
 </html>

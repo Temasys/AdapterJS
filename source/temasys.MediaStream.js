@@ -511,7 +511,7 @@ if (navigator.mozGetUserMedia) {
 	    }
 
 	    for (j = 0; j < videoTracks.length; j += 1) {
-	      var track = polyfillMediaStreamTrack( videoTracks[i] );
+	      var track = polyfillMediaStreamTrack( videoTracks[j] );
 	      outputVideoTracks.push(track);
 	    }
 
@@ -588,8 +588,8 @@ if (navigator.mozGetUserMedia) {
 	    }
 
 	    for (j = 0; j < outputVideoTracks.length; j += 1) {
-	      if (outputVideoTracks[i].id === trackId) {
-	      	return outputVideoTracks[i];
+	      if (outputVideoTracks[j].id === trackId) {
+	      	return outputVideoTracks[j];
 	      }
 	    }
 
