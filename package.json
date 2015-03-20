@@ -7,6 +7,7 @@
         "name": "Temasys Communications Pte. Ltd.",
         "email": "info@temasys.com.sg"
     },
+    "main": "publish/adapter.min.js",
     "repository": {
         "type": "git",
         "url": "git@github.com:Temasys/AdapterJS.git"
