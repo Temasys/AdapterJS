@@ -252,9 +252,6 @@ if (navigator.mozGetUserMedia) {
   polyfillMediaStreamTrack = function (track) {
 
     //track.id = track.id || (new Date()).getTime().toString();
-
-    console.log('Data received: ', track);
-
     track.label = typeof track.label === 'undefined' ? track.kind + '-' + track.id : track.label;
 
     track.ended = false;

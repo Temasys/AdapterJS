@@ -31,7 +31,7 @@ describe('MediaStream: Events', function() {
 			video: true
 		}, function (data) {
 			stream = data;
-			track = stream.getAudioTracks()[0];
+			track = stream.polygetAudioTracks()[0];
 			done();
 		}, function (error) {
 			throw error;

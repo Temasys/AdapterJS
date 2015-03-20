@@ -31,7 +31,7 @@ describe('MediaStreamTrack: Properties', function() {
 			video: true
 		}, function (data) {
 			stream = data;
-			track = stream.getVideoTracks()[0];
+			track = stream.polygetVideoTracks()[0];
 			done();
 		}, function (error) {
 			throw error;
@@ -77,7 +77,7 @@ describe('MediaStreamTrack: Properties', function() {
 		assert.typeOf(track.kind, 'string');
 		track.kind.should.equal('video');
 		// get audio
-		stream.getAudioTracks()[0].kind.should.equal('audio');
+		stream.polygetAudioTracks()[0].kind.should.equal('audio');
 	});
 
 	it('.readOnly : boolean', function () {

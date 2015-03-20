@@ -1741,7 +1741,6 @@ if (navigator.mozGetUserMedia) {
 	    for (i = 0; i < audioTracks.length; i += 1) {
 	      var track = polyfillMediaStreamTrack( audioTracks[i] );
 	      outputAudioTracks.push(track);
-	      console.log('i', outputAudioTracks.length);
 	    }
 
 	    for (j = 0; j < videoTracks.length; j += 1) {
@@ -2117,9 +2116,6 @@ if (navigator.mozGetUserMedia) {
   polyfillMediaStreamTrack = function (track) {
 
     //track.id = track.id || (new Date()).getTime().toString();
-
-    console.log('Data received: ', track);
-
     track.label = typeof track.label === 'undefined' ? track.kind + '-' + track.id : track.label;
 
     track.ended = false;

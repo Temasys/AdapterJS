@@ -31,7 +31,7 @@ describe('MediaStreamTrack: Events', function() {
 			video: true
 		}, function (data) {
 			stream = data;
-			track = stream.getAudioTracks()[0];
+			track = stream.polygetAudioTracks()[0];
 			track.onstarted = function (event) {
 				assert.ok(event, 'Triggers when getUserMedia has started');
 				done();
