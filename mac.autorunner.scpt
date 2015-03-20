@@ -1,13 +1,11 @@
 repeat
-	set started to false
 	if application "Safari" is running then
-		tell application "System Events" to tell process "Safari"
-			set frontmost to true
-			if started is false then
-	    	delay 2
-	    	set started to true
-	    end if
-	    keystroke return
+		tell application "System Events" to tell process "npTemWebRTCPlugin (Safari Internet plug-in)"
+			if window 0 exists then
+        if exists (button "OK" of front window) then
+          click (button "OK" of front window)
+        end if
+      end if
 	  end tell
   end if
 
