@@ -18,6 +18,7 @@ describe('RTCPeerConnection: Properties', function() {
 	var answer;
 
 	var candidates = [];
+	var candidates2 = [];
 	var ready = false;
 
 	var catchFn = function (code, done) {
@@ -32,11 +33,6 @@ describe('RTCPeerConnection: Properties', function() {
 	/*
 
 	interface RTCPeerConnection : EventTarget  {
-    Promise<RTCSessionDescription> createOffer (optional RTCOfferOptions options);
-    Promise<RTCSessionDescription> createAnswer ();
-    Promise<void>                  setLocalDescription (RTCSessionDescription description);
-    Promise<void>                  setRemoteDescription (RTCSessionDescription description);
-    Promise<void>                  addIceCandidate (RTCIceCandidate candidate);
     void                           close ();
                 attribute EventHandler           onnegotiationneeded;
                 attribute EventHandler           onicecandidate;
@@ -60,6 +56,10 @@ describe('RTCPeerConnection: Properties', function() {
 
 		peer.onicegatheringstatechange = function () {
 			ready = peer.iceGatheringState === 'complete';
+		};
+
+		peer2.onicecandidate = function (event) {
+			candidates2.push(event.candidate || event);
 		};
 	});
 
@@ -170,7 +170,30 @@ describe('RTCPeerConnection: Properties', function() {
 		}, done);
 	});
 
-	it('.createOffer ()', function (done) {
+	it('.createDataChannel ()', function (done) {
+		assert.typeOf(peer.createDataChannel, 'function');
+
+		catchFn(function () {
+			var channel = peer.createDataChannel('Test');
+			assert.typeOf(channel, 'object');
+			channel.label.should.equal('Test');
+			done(0;)
+		}, done);
+	});
+
+	it('.createDTMFSender ()', function (done) {
+		assert.typeOf(peer.createDTMFSender, 'function');
+
+		catchFn(function () {
+			var track = stream.getAudioTracks()[0];
+			var sender = peer.createDTMFSender(track);
+			assert.typeOf(sender, 'object');
+			sender.track.should.equal(track);
+			done();
+		}, done);
+	});
+
+	it('.createOffer () -> offer', function (done) {
 		assert.typeOf(peer.createOffer, 'function');
 
 		catchFn(function () {
@@ -183,26 +206,120 @@ describe('RTCPeerConnection: Properties', function() {
 		}, done);
 	});
 
-	it('.setLocalDescription ()', function (done) {
+	it('.setLocalDescription () -> offer', function (done) {
 		assert.typeOf(peer.setLocalDescription, 'function');
 
 		catchFn(function () {
 			peer.setLocalDescription(offer, function () {
-				assert.ok(null, null, 'setLocalDescription success');
+				assert.ok(null, null, 'setLocalDescription (offer) success');
 			}, done);
 			done();
 		}, done);
 	});
 
-	it('.stop () = .polystop ()', function (done) {
-		this.timeout(4000);
-
-		assert.typeOf(track.polystop, 'function');
+	it('.setRemoteDescription () -> offer', function (done) {
+		assert.typeOf(peer2.setRemoteDescription, 'function');
 
 		catchFn(function () {
-			track.polystop();
+			peer2.setRemoteDescription(offer, function () {
+				assert.ok(null, null, 'setRemoteDescription (offer) success');
+			}, done);
+			done();
+		}, done);
+	});
+
+	it('.createAnswer () -> answer', function (done) {
+		assert.typeOf(peer2.createAnswer, 'function');
+
+		catchFn(function () {
+			peer2.createAnswer(function (sdp) {
+				answer = sdp;
+				sdp.type.should.equal('answer');
+				assert.typeOf(sdp.sdp, 'string');
+				done();
+			}, done);
+		}, done);
+	});
+
+	it('.setLocalDescription () -> answer', function (done) {
+		assert.typeOf(peer2.setLocalDescription, 'function');
+
+		catchFn(function () {
+			peer2.setLocalDescription(answer, function () {
+				assert.ok(null, null, 'setLocalDescription (answer) success');
+			}, done);
+			done();
+		}, done);
+	});
+
+	it('.setRemoteDescription () -> answer', function (done) {
+		assert.typeOf(peer.setRemoteDescription, 'function');
+
+		catchFn(function () {
+			peer.setRemoteDescription(answer, function () {
+				assert.ok(null, null, 'setRemoteDescription (answer) success');
+			}, done);
+			done();
+		}, done);
+	});
+
+	it('.addIceCandidate ()', function (done) {
+		this.timeout(8000);
+
+		assert.typeOf(peer.setRemoteDescription, 'function');
+
+		catchFn(function () {
+			// Without callbacks
+			peer.addIceCandidate(candidates2[0]);
+
 			setTimeout(function () {
-				track.ended.should.equal(true);
+				assert.ok(null, null, 'addIceCandidate can be called without callbacks');
+
+				// With callbacks
+				peer2.addIceCandidate(candidates[0], function () {
+					assert.ok(null, null, 'addIceCandidate added successfully triggers success callback');
+				}, function (error) {
+					assert.instanceOf(error, Error);
+					assert.ok(null, null, 'addIceCandidate added failure triggers failure callback');
+				});
+
+				var checkerFn = setInterval((function () {
+					if (ready === true) {
+						clearInterval(checkerFn);
+						clearTimeout(timeoutFn);
+						candidates[candidates.length - 1].candidate.should.equal(null);
+
+						var i, j;
+
+						for (i = 1; i < candidates.length - 1; i += 1) {
+							peer2.addIceCandidate(candidates[i]);
+						}
+
+						for (j = 1; j < candidates2.length - 1, j += 1) {
+							peer.addIceCandidate(candidates2[j])
+						}
+
+						done();
+					}
+				}, 1000);
+
+				var timeoutFn = setTimeout(function () {
+					done();
+				}, 5000);
+			}, 100);
+		}, done);
+	});
+
+	it('.close ()', function (done) {
+		this.timeout(4000);
+
+		assert.typeOf(peer.close, 'function');
+
+		catchFn(function () {
+			peer.close();
+			setTimeout(function () {
+				peer.signalingState.should.equal('closed');
+				peer.iceConnectionState.should.equal('closed');
 				done();
 			}, 3000);
 		}, done);
