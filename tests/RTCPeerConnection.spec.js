@@ -165,7 +165,7 @@ describe('RTCPeerConnection: Properties', function() {
 		peer.addStream(stream);
 
 		catchFn(function () {
-			var result = peer.getStreamById(stream.id)
+			var result = peer.getStreamById(stream.id);
 			result.should.equal(stream);
 		}, done);
 	});
@@ -177,7 +177,7 @@ describe('RTCPeerConnection: Properties', function() {
 			var channel = peer.createDataChannel('Test');
 			assert.typeOf(channel, 'object');
 			channel.label.should.equal('Test');
-			done(0;)
+			done();
 		}, done);
 	});
 
@@ -283,7 +283,7 @@ describe('RTCPeerConnection: Properties', function() {
 					assert.ok(null, null, 'addIceCandidate added failure triggers failure callback');
 				});
 
-				var checkerFn = setInterval((function () {
+				var checkerFn = setInterval(function () {
 					if (ready === true) {
 						clearInterval(checkerFn);
 						clearTimeout(timeoutFn);
@@ -295,8 +295,8 @@ describe('RTCPeerConnection: Properties', function() {
 							peer2.addIceCandidate(candidates[i]);
 						}
 
-						for (j = 1; j < candidates2.length - 1, j += 1) {
-							peer.addIceCandidate(candidates2[j])
+						for (j = 1; j < candidates2.length - 1; j += 1) {
+							peer.addIceCandidate(candidates2[j]);
 						}
 
 						done();
