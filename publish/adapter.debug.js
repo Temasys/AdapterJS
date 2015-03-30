@@ -847,8 +847,11 @@ if (navigator.mozGetUserMedia) {
     navigator.getUserMedia = getUserMedia;
 
     attachMediaStream = function (element, stream) {
-      
+
       var streamId = (stream === null ? '' : stream.id);
+      if (!element || !element.parentNode) {
+        return;
+      }
 
       stream.enableSoundTracks(true);
       if (element.nodeName.toLowerCase() !== 'audio') {
@@ -856,7 +859,13 @@ if (navigator.mozGetUserMedia) {
         if (!element.isWebRTCPlugin || !element.isWebRTCPlugin()) {
           var frag = document.createDocumentFragment();
           var temp = document.createElement('div');
-          var classHTML = (element.className) ? 'class="' + element.className + '" ' : '';
+          var classHTML = '';
+          if (element.className) {
+            classHTML = 'class="' + element.className + '" ';
+          } else if (element.attributes && element.attributes['class']) {
+            classHTML = 'class="' + element.attributes['class'].value + '" ';
+          }
+
           temp.innerHTML = '<object id="' + elementId + '" ' + classHTML +
             'type="' + AdapterJS.WebRTCPlugin.pluginInfo.type + '">' +
             '<param name="pluginId" value="' + elementId + '" /> ' +
@@ -867,11 +876,25 @@ if (navigator.mozGetUserMedia) {
           while (temp.firstChild) {
             frag.appendChild(temp.firstChild);
           }
-          var rectObject = element.getBoundingClientRect();
+
+          var height = '';
+          var width = '';
+          if (element.getBoundingClientRect) {
+            var rectObject = element.getBoundingClientRect();
+            width = rectObject.width + 'px';
+            height = rectObject.height + 'px';
+          }
+          else if (element.width) {
+            width = element.width;
+            height = element.height;
+          } else {
+            // TODO: What scenario could bring us here?
+          }
+
           element.parentNode.insertBefore(frag, element);
           frag = document.getElementById(elementId);
-          frag.width = rectObject.width + 'px';
-          frag.height = rectObject.height + 'px';
+          frag.width = width;
+          frag.height = height;
           element.parentNode.removeChild(element);
         } else {
           var children = element.children;
