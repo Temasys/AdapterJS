@@ -5,59 +5,65 @@ var expect = chai.expect;
 var assert = chai.assert;
 var should = chai.should;
 
-var slowTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 5000 : 1;
+// Test timeouts
+var testTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 5000 : 1;
+
+// Get User Media timeout
+var gUMTimeout = 8000;
+
+// Test item timeout
+var testItemTimeout = 4000;
 
 
-describe('MediaStreamTrack: Events', function() {
-	this.slow(slowTimeout);
+describe('MediaStreamTrack | EventHandler', function() {
+	this.slow(testTimeout);
 
+	/* Attributes */
 	var stream = null;
 	var track = null;
 
-	var catchFn = function (code, done) {
-		try {
-			return code();
-		} catch (error) {
-			throw error;
-			done();
-		}
-	};
-
-	it('.onstarted', function (done) {
-		this.timeout(8500);
+	/* Get User Media */
+	before(function (done) {
+		this.timeout(gUMTimeout);
 
 		window.getUserMedia({
 			audio: true,
 			video: true
+
 		}, function (data) {
 			stream = data;
 			track = stream.polygetAudioTracks()[0];
-			track.onstarted = function (event) {
-				assert.ok(event, 'Triggers when getUserMedia has started');
-				done();
-			};
+			done();
+
 		}, function (error) {
 			throw error;
 			done();
 		});
 	});
 
-	it.skip('.onmute | No available testing environment to test this', function () {});
+	it.skip('MediaStreamTrack.onstarted :: emit', function () {});
 
-	it.skip('.onunmute | No available testing environment to test this', function () {});
+	it.skip('MediaStreamTrack.onmute :: emit', function () {});
 
-	it.skip('.onoverconstrained | No available testing environment to test this', function () {});
+	it.skip('MediaStreamTrack.onunmute :: emit', function () {});
 
-	it('.onended', function (done) {
-		this.timeout(15000);
+	it.skip('MediaStreamTrack.onoverconstrained :: emit', function () {});
+
+	it('MediaStreamTrack.onended :: emit', function (done) {
+		this.timeout(testItemTimeout);
 
 		track.onended = function (event) {
 			assert.ok(event, 'Triggers when stop() is invoked');
 			done();
 		};
 
-		catchFn(function () {
+		try {
 			track.polystop();
-		}, done);
+			done();
+
+		} catch (error) {
+			throw error;
+			done();
+		}
 	});
 });

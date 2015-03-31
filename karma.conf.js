@@ -9,7 +9,8 @@ module.exports = function (config) {
 
     files: [
       'publish/adapter.debug.js',
-      'tests/*.spec.js'
+      'tests/MediaStream.*.spec.js',
+      'tests/MediaStreamTrack.*.spec.js'
     ],
 
     reporters: ['mocha'],

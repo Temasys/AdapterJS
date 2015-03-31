@@ -5,76 +5,92 @@ var expect = chai.expect;
 var assert = chai.assert;
 var should = chai.should;
 
-var slowTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 5000 : 1;
+// Test timeouts
+var testTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 5000 : 1;
+
+// Get User Media timeout
+var gUMTimeout = 8000;
+
+// Test item timeout
+var testItemTimeout = 4000;
 
 
-describe('MediaStream: Events', function() {
-	this.slow(slowTimeout);
+describe('MediaStream | EventHandler', function() {
+	this.slow(testTimeout);
 
+	/* Attributes */
 	var stream = null;
 	var track = null;
 
-	var catchFn = function (code, done) {
-		try {
-			return code();
-		} catch (error) {
-			throw error;
-			done();
-		}
-	};
-
+	/* Get User Media */
 	before(function (done) {
-		this.timeout(15000);
+		this.timeout(gUMTimeout);
 
 		window.getUserMedia({
 			audio: true,
 			video: true
+
 		}, function (data) {
 			stream = data;
 			track = stream.polygetAudioTracks()[0];
 			done();
+
 		}, function (error) {
 			throw error;
 			done();
 		});
 	});
 
-	it('.onremovetrack', function (done) {
-		this.timeout(4000);
+	it('MediaStream.onremovetrack :: emit', function (done) {
+		this.timeout(testItemTimeout);
 
 		stream.onremovetrack = function (event) {
 			assert.ok(event, 'Triggers when removeTrack() is invoked');
 			done();
 		};
 
-		catchFn(function () {
+		try {
 			stream.polyremoveTrack(track);
-		}, done);
+
+		} catch (error) {
+			throw error;
+			done();
+		}
 	});
 
-	it('.onaddtrack', function (done) {
-		this.timeout(4000);
+	it('MediaStream.onaddtrack :: emit', function (done) {
+		this.timeout(testItemTimeout);
 
 		stream.onaddtrack = function (event) {
 			assert.ok(event, 'Triggers when addTrack() is invoked');
 			done();
 		};
 
-		catchFn(function () {
+		try {
 			stream.polyaddTrack(track);
-		}, done);
+
+		} catch (error) {
+			throw error;
+			done();
+		}
 	});
 
-	it('.onended', function (done) {
-		this.timeout(15000);
+	it('MediaStream.onended :: emit', function (done) {
+		this.timeout(testItemTimeout);
 
 		stream.onended = function (event) {
-			assert.ok(event, 'Triggers when stop() is invoked');
+			var checkEvent = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ?
+				{} : event;
+			assert.ok(checkEvent, 'Triggers when stop() is invoked');
 			done();
 		};
 
-		catchFn(function () {
+		try {
 			stream.polystop();
-		}, done);
+
+		} catch (error) {
+			throw error;
+			done();
+		}
 	});
 });

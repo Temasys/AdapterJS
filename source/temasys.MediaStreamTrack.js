@@ -1,21 +1,6 @@
 // Polyfill all MediaStream objects
 var polyfillMediaStreamTrack = null;
 
-// Return the event payload
-var returnEventPayloadFn = function (track) {
-  return {
-    bubbles: false,
-    cancelBubble: false,
-    cancelable: false,
-    currentTarget: track,
-    defaultPrevented: false,
-    eventPhase: 0,
-    returnValue: true,
-    srcElement: track,
-    target: track,
-    timeStamp: (new Date()).getTime()
-  };
-};
 
 if (navigator.mozGetUserMedia) {
 
@@ -34,7 +19,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    //track.id = track.id || (new Date()).getTime().toString();
+    track.id = track.id || (new Date()).getTime().toString();
 
     /**
      * The MediaStreamTrack object label.
@@ -44,7 +29,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    //track.label = track.label || track.kind + '-' + track.id;
+    track.label = track.label || track.kind + '-' + track.id;
 
     /**
      * The flag that indicates if a MediaStreamTrack object has ended.
@@ -54,7 +39,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    track.ended = false;
+    track.ended = typeof stream.ended === 'boolean' ? stream.ended : false;
 
     /**
      * The flag that indicates if a MediaStreamTrack object is enabled.
@@ -97,7 +82,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    //track.kind = track.kind;
+    track.kind = track.kind;
 
     /**
      * The status if a MediaStreamTrack object is read only and cannot to be overwritten.
@@ -154,17 +139,30 @@ if (navigator.mozGetUserMedia) {
      */
     track.onoverconstrained = null;
 
-    /**
-     * Event triggered when a feature in the MediaStreamTrack is not supported
-     *   but used.
-     * @event onunsupported
-     * @param {String} feature The feature that is not supported. <i>Eg. <code>"stop"</code></i>.
-     * @param {Object} error The error received natively.
-     * @param {String} type The type of event: <code>"unsupported"</code>.
-     * @for MediaStreamTrack
-     * @since 0.10.6
-     */
-    track.onunsupported = null;
+
+    var polyTrackEndedEmitter = function () {
+      // set the ended as true
+      track.ended = true;
+      // set the readyState to 'ended'
+      track.readyState = 'ended';
+
+      // trigger that it has ended
+      if (typeof track.onended === 'function') {
+        track.onended({
+          type: 'ended',
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          currentTarget: track,
+          defaultPrevented: false,
+          eventPhase: 0,
+          returnValue: true,
+          srcElement: track,
+          target: track,
+          timeStamp: (new Date()).getTime()
+        });
+      }
+    };
 
     /**
      * Stops a MediaStreamTrack streaming.
@@ -174,23 +172,9 @@ if (navigator.mozGetUserMedia) {
      */
     track.polystop = function () {
       track.stop();
-      track.ended = true;
 
-      if (typeof track.onended === 'function') {
-        var eventPayload = returnEventPayloadFn(track);
-        eventPayload.type = 'ended';
-        track.onended(eventPayload);
-      }
+      polyTrackEndedEmitter();
     };
-
-
-    setTimeout(function () {
-      if (typeof track.onstarted === 'function') {
-        var eventPayload = returnEventPayloadFn(track);
-        eventPayload.type = 'started';
-        track.onstarted(eventPayload);
-      }
-    }, 1000);
   };
 
 
@@ -224,34 +208,44 @@ if (navigator.mozGetUserMedia) {
 
     track.onoverconstrained = null;
 
-    track.onunsupported = null;
 
-    track.polystop = function () {
-      track.stop();
+    var polyTrackEndedEmitter = function () {
+      // set the ended as true
       track.ended = true;
+      // set the readyState to 'ended'
+      track.readyState = 'ended';
 
+      // trigger that it has ended
       if (typeof track.onended === 'function') {
-        var eventPayload = returnEventPayloadFn(track);
-        eventPayload.type = 'ended';
-        track.onended(eventPayload);
+        track.onended({
+          type: 'ended',
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          currentTarget: track,
+          defaultPrevented: false,
+          eventPhase: 0,
+          returnValue: true,
+          srcElement: track,
+          target: track,
+          timeStamp: (new Date()).getTime()
+        });
       }
     };
 
+    track.polystop = function () {
+      track.stop();
 
-    setTimeout(function () {
-      if (typeof track.onstarted === 'function') {
-        var eventPayload = returnEventPayloadFn(track);
-        eventPayload.type = 'started';
-        track.onstarted(eventPayload);
-      }
-    }, 1000);
+      polyTrackEndedEmitter();
+    };
   };
 
 } else {
 
   polyfillMediaStreamTrack = function (track) {
 
-    //track.id = track.id || (new Date()).getTime().toString();
+    track.id = track.id || (new Date()).getTime().toString();
+
     track.label = typeof track.label === 'undefined' ? track.kind + '-' + track.id : track.label;
 
     track.ended = false;
@@ -262,7 +256,7 @@ if (navigator.mozGetUserMedia) {
 
     track.readyState = typeof track.readyState === 'string' ? track.readyState : 'live';
 
-    //track.kind = track.kind;
+    track.kind = track.kind;
 
     track.readOnly = typeof track.readOnly === 'boolean' ? track.readOnly : false;
 
@@ -276,25 +270,41 @@ if (navigator.mozGetUserMedia) {
 
     track.onoverconstrained = null;
 
-    track.onunsupported = null;
 
-    track.polystop = function () {
-      if (typeof track.onunsupported === 'function') {
-        var eventPayload = returnEventPayloadFn(track);
-        eventPayload.type = 'unsupported';
-        eventPayload.error = error;
-        eventPayload.feature = 'stop';
-        track.onunsupported(eventPayload);
+    var polyTrackEndedEmitter = function () {
+      // set the ended as true
+      track.ended = true;
+      // set the readyState to 'ended'
+      track.readyState = 'ended';
+
+      // trigger that it has ended
+      if (typeof track.onended === 'function') {
+        track.onended({
+          type: 'ended',
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          currentTarget: track,
+          defaultPrevented: false,
+          eventPhase: 0,
+          returnValue: true,
+          srcElement: track,
+          target: track,
+          timeStamp: (new Date()).getTime()
+        });
       }
     };
 
-    setTimeout(function () {
-      if (typeof track.onstarted === 'function') {
-        var eventPayload = returnEventPayloadFn(track);
-        eventPayload.type = 'started';
-        track.onstarted(eventPayload);
+    track.polystop = function () {
+      try {
+        track.stop();
+
+        polyTrackEndedEmitter();
+
+      } catch (error) {
+        throw error;
       }
-    }, 1000);
+    };
 
     return track;
   };
