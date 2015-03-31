@@ -857,9 +857,7 @@ if (navigator.mozGetUserMedia) {
         stream.enableSoundTracks(true);
         streamId = stream.id;
       }
-      var streamId = (stream === null ? '' : stream.id);
 
-      stream.enableSoundTracks(true);
       if (element.nodeName.toLowerCase() !== 'audio') {
         var elementId = element.id.length === 0 ? Math.random().toString(36).slice(2) : element.id;
         if (!element.isWebRTCPlugin || !element.isWebRTCPlugin()) {
