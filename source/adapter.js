@@ -845,11 +845,19 @@ if (navigator.mozGetUserMedia) {
     navigator.getUserMedia = getUserMedia;
 
     attachMediaStream = function (element, stream) {
-
-      var streamId = (stream === null ? '' : stream.id);
       if (!element || !element.parentNode) {
         return;
       }
+
+      var streamId
+      if (stream === null) {
+        streamId = '';
+      }
+      else {
+        stream.enableSoundTracks(true);
+        streamId = stream.id;
+      }
+      var streamId = (stream === null ? '' : stream.id);
 
       stream.enableSoundTracks(true);
       if (element.nodeName.toLowerCase() !== 'audio') {
