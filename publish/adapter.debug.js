@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-02-11 */
+/*! adapterjs - v0.10.6 - 2015-03-31 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -12,7 +12,7 @@ AdapterJS.options = {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.10.5';
+AdapterJS.VERSION = '0.10.6';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or 
@@ -39,7 +39,7 @@ AdapterJS.WebRTCPlugin.pluginInfo = {
   pluginId : 'plugin0',
   type : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0',
-  portalLink : 'http://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins',
+  portalLink : 'http://skylink.io/plugin/',
   downloadLink : null, //set below
   companyName: 'Temasys'
 };
@@ -498,7 +498,9 @@ if (navigator.mozGetUserMedia) {
 
   attachMediaStream = function (element, stream) {
     element.mozSrcObject = stream;
-    element.play();
+    if (stream !== null)
+      element.play();
+
     return element;
   };
 
@@ -601,7 +603,7 @@ if (navigator.mozGetUserMedia) {
     } else if (typeof element.mozSrcObject !== 'undefined') {
       element.mozSrcObject = stream;
     } else if (typeof element.src !== 'undefined') {
-      element.src = URL.createObjectURL(stream);
+      element.src = (stream === null ? '' : URL.createObjectURL(stream));
     } else {
       console.log('Error attaching stream to element.');
     }
@@ -719,6 +721,10 @@ if (navigator.mozGetUserMedia) {
       if (isIE) {
         AdapterJS.WebRTCPlugin.plugin.width = '1px';
         AdapterJS.WebRTCPlugin.plugin.height = '1px';
+      } else { // The size of the plugin on Safari should be 0x0px 
+              // so that the autorisation prompt is at the top
+        AdapterJS.WebRTCPlugin.plugin.width = '0px';
+        AdapterJS.WebRTCPlugin.plugin.height = '0px';
       }
       AdapterJS.WebRTCPlugin.plugin.type = AdapterJS.WebRTCPlugin.pluginInfo.type;
       AdapterJS.WebRTCPlugin.plugin.innerHTML = '<param name="onload" value="' +
@@ -841,38 +847,70 @@ if (navigator.mozGetUserMedia) {
     navigator.getUserMedia = getUserMedia;
 
     attachMediaStream = function (element, stream) {
-      stream.enableSoundTracks(true);
+      if (!element || !element.parentNode) {
+        return;
+      }
+
+      var streamId
+      if (stream === null) {
+        streamId = '';
+      }
+      else {
+        stream.enableSoundTracks(true);
+        streamId = stream.id;
+      }
+
       if (element.nodeName.toLowerCase() !== 'audio') {
         var elementId = element.id.length === 0 ? Math.random().toString(36).slice(2) : element.id;
         if (!element.isWebRTCPlugin || !element.isWebRTCPlugin()) {
           var frag = document.createDocumentFragment();
           var temp = document.createElement('div');
-          var classHTML = (element.className) ? 'class="' + element.className + '" ' : '';
+          var classHTML = '';
+          if (element.className) {
+            classHTML = 'class="' + element.className + '" ';
+          } else if (element.attributes && element.attributes['class']) {
+            classHTML = 'class="' + element.attributes['class'].value + '" ';
+          }
+
           temp.innerHTML = '<object id="' + elementId + '" ' + classHTML +
             'type="' + AdapterJS.WebRTCPlugin.pluginInfo.type + '">' +
             '<param name="pluginId" value="' + elementId + '" /> ' +
             '<param name="pageId" value="' + AdapterJS.WebRTCPlugin.pageId + '" /> ' +
             '<param name="windowless" value="true" /> ' +
-            '<param name="streamId" value="' + stream.id + '" /> ' +
+            '<param name="streamId" value="' + streamId + '" /> ' +
             '</object>';
           while (temp.firstChild) {
             frag.appendChild(temp.firstChild);
           }
-          var rectObject = element.getBoundingClientRect();
+
+          var height = '';
+          var width = '';
+          if (element.getBoundingClientRect) {
+            var rectObject = element.getBoundingClientRect();
+            width = rectObject.width + 'px';
+            height = rectObject.height + 'px';
+          }
+          else if (element.width) {
+            width = element.width;
+            height = element.height;
+          } else {
+            // TODO: What scenario could bring us here?
+          }
+
           element.parentNode.insertBefore(frag, element);
           frag = document.getElementById(elementId);
-          frag.width = rectObject.width + 'px';
-          frag.height = rectObject.height + 'px';
+          frag.width = width;
+          frag.height = height;
           element.parentNode.removeChild(element);
         } else {
           var children = element.children;
           for (var i = 0; i !== children.length; ++i) {
             if (children[i].name === 'streamId') {
-              children[i].value = stream.id;
+              children[i].value = streamId;
               break;
             }
           }
-          element.setStreamId(stream.id);
+          element.setStreamId(streamId);
         }
         var newElement = document.getElementById(elementId);
         newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
@@ -926,12 +964,13 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.injectPlugin();
   };
 
-  AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = function() {
-    AdapterJS.addEvent(document, 
-                      'readystatechange',
-                       AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
-    AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
-  };
+  AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb ||
+    function() {
+      AdapterJS.addEvent(document,
+                        'readystatechange',
+                         AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
+      AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv();
+    };
 
   AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
     if (AdapterJS.options.hidePluginInstallPrompt) {

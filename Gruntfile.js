@@ -5,6 +5,7 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-replace');
 
 	grunt.initConfig({
@@ -35,8 +36,8 @@ module.exports = function (grunt) {
                 	expand: true,
                 	cwd: '<%= production %>/',
                     src: ['**'],
-                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>'+
-                    '<%= pkg.version_minor %>.x'
+                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>.' +
+                        '<%= pkg.version_minor %>.x'
                 }, {
                 	expand: true,
                 	cwd: '<%= production %>/',
@@ -126,7 +127,19 @@ module.exports = function (grunt) {
 					'<%= source %>/*.js'
 				]
 			}
-		}
+		},
+
+        compress: {
+            bamboo: {
+                options: {
+                    mode: 'gzip'
+                },
+                expand: true,
+                cwd: 'bamboo/adapterjs',
+                src: ['**/*.js'],
+                dest: 'bamboo/adapterjsgz/'
+            }
+        }
 	});
 
 
@@ -185,7 +198,10 @@ module.exports = function (grunt) {
     });
 
 	grunt.registerTask('bamboovars', 'Write bamboo variables to file', function() {
-		grunt.file.write('bamboo/vars', 'version=' + grunt.config('pkg.version'));
+		grunt.file.write('bamboo/vars', 'version=' + grunt.config('pkg.version') + '\n' +
+                                        'version_major=' + grunt.config('pkg.version_major') + '\n' +
+                                        'version_minor=' + grunt.config('pkg.version_minor') + '\n' +
+                                        'version_release=' + grunt.config('pkg.version_release'));
 		grunt.log.writeln('bamboo/vars file successfully created');
 	});
 
@@ -201,6 +217,7 @@ module.exports = function (grunt) {
 		'publish',
 		'clean:bamboo',
 		'copy',
+        'compress',
 		'bamboovars'
 	]);
 };
