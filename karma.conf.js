@@ -9,8 +9,10 @@ module.exports = function (config) {
 
     files: [
       'publish/adapter.debug.js',
-      'tests/MediaStream.*.spec.js',
-      'tests/MediaStreamTrack.*.spec.js'
+      'tests/MediaStream.event.spec.js',
+      'tests/MediaStream.prop.spec.js',
+      'tests/MediaStreamTrack.event.spec.js',
+      'tests/MediaStreamTrack.prop.spec.js'
     ],
 
     reporters: ['mocha'],
@@ -25,7 +27,15 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
 
     // set the timeout
-    browserNoActivityTimeout: 100000,
+    //browserNoActivityTimeout: 100000,
+
+    browserDisconnectTimeout: 10000, // default 2000
+
+    browserDisconnectTolerance: 1, // default 0
+
+    browserNoActivityTimeout: 4 * 60 * 1000, //default 10000
+
+    captureTimeout: 4 * 60 * 1000, //default 60000
 
     // you can define custom flags
     customLaunchers: {
@@ -60,7 +70,7 @@ module.exports = function (config) {
     // This should run the Firefox browser. Do not have any open Firefox browsers meanwhile.
 
     // Run each browser manually for automated test
-    browsers: ['SafariUM'], //'FirefoxUM', 'OperaUM', 'SafariUM', 'IEUM'],
+    browsers: ['FirefoxUM'], //'FirefoxUM', 'OperaUM', 'SafariUM', 'IEUM'],
 
 
     plugins: [
