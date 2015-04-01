@@ -1,3 +1,5 @@
+#!/bin/bash
+
 open_new_tab() {
 	pwd=`pwd`
 	osascript -e "tell application \"Terminal\"" \
@@ -7,12 +9,14 @@ open_new_tab() {
 	> /dev/null
 }
 
-grunt dev
+grunt test
 
 # Start instances for auto-clicker (Mac)
-open_new_tab "osascript mac.autorunner.scpt"
+open_new_tab "osascript tests/mac.watcher.scpt"
 
-node_modules/karma/bin/karma start karma.conf.js
+for filename in tests/gen/*.js; do
+  node_modules/karma/bin/karma start $filename
+done
 
 # Kill all existing applescripts (Mac)
 killall -e osascript
