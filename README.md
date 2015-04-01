@@ -47,6 +47,7 @@ Find more information about how to optimize your application for the Temasys Web
 ##### `attachMediaStream(element, stream)`
 
 taken over for compatibility with the original adapter.js from Google. Feeds a MediaStream object into video and audio tags.
+Calling attachMediaStream(element, null) will detach any existing stream from the element. The stream will still be running and available to be attached to any rendering element.
 
 
 ##### `reattachMediaStream(elementFrom, elementTo)`
