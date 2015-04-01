@@ -9,8 +9,14 @@ open_new_tab() {
 
 grunt dev
 
+# Start instances for auto-clicker (Mac)
 open_new_tab "osascript mac.autorunner.scpt"
 
 node_modules/karma/bin/karma start karma.conf.js
 
+# Kill all existing applescripts (Mac)
 killall -e osascript
+
+# Open and kill them all (Mac)
+osascript -e 'open app "Safari"'
+osascript -e 'quit app "Safari"'
