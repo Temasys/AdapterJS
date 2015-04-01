@@ -9,152 +9,200 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     grunt.loadNpmTasks('grunt-replace');
 
+    var replaceTask = {
+      production: {
+        options: {
+          variables: {
+            'version': '<%= pkg.version %>'
+          },
+          prefix: '@@'
+        },
+        files: [{
+          expand: true,
+          flatten: true,
+          src: ['<%= production %>/*.js'],
+          dest: '<%= production %>/'
+        }]
+      }
+    };
+
+    var concatTask = {
+      options: {
+        separator: '\n',
+        stripBanners: false,
+        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+          '<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
+      },
+      production: {
+        src: ['<%= source %>/*.adapter.js', '<%= source %>/temasys.*.js'],
+        dest: '<%= production %>/adapter.debug.js'
+      }
+    };
+
+    var testBrowsers = ['chrome', 'firefox', 'ie', 'safari', 'opera'];
+
+    var testUnits = [
+      //'getUserMedia.constraints.spec.js',
+      //'getUserMedia.error.spec.js',
+      //'getUserMedia.spec.js',
+      'MediaStream.event.spec.js',
+      'MediaStream.prop.spec.js',
+      'MediaStreamTrack.event.spec.js',
+      'MediaStreamTrack.prop.spec.js'
+    ];
+
+    var i, j;
+
+    for (i = 0; i < testBrowsers.length; i += 1) {
+      var browser = testBrowsers[i];
+
+      for (j = 0; j < testUnits.length; j += 1) {
+        var unit = testUnits[j];
+
+        var key = browser + '.' + unit;
+
+        replaceTask[key] = {
+          options: {
+            variables: {
+              'browser': '../browser.' + browser + '.conf.js',
+              'unit': '../unit/' + unit,
+              'port': parseInt('50' + i + j, 10)
+            },
+            prefix: '@@'
+          },
+          files: [{
+            expand: true,
+            flatten: true,
+            src: ['tests/gen/' + key + '.conf.js'],
+            dest: 'tests/gen/'
+          }]
+        };
+
+        concatTask[key] = {
+          src: ['tests/launcher.conf.js'],
+          dest: 'tests/gen/' + key + '.conf.js'
+        };
+      }
+    }
+
     grunt.initConfig({
 
-        pkg: grunt.file.readJSON('package.json'),
+      pkg: grunt.file.readJSON('package.json'),
 
-        base: grunt.config('base') || grunt.option('base') || process.cwd(),
+      base: grunt.config('base') || grunt.option('base') || process.cwd(),
 
-        source: 'source',
+      source: 'source',
 
-        production: 'publish',
+      production: 'publish',
 
-        bamboo: 'bamboo',
+      bamboo: 'bamboo',
 
-        clean: {
-            production: ['<%= production %>/'],
-            bamboo: ['<%= bamboo %>/']
-        },
+      clean: {
+        production: ['<%= production %>/'],
+        bamboo: ['<%= bamboo %>/'],
+        test: ['tests/gen/*', 'tests/chrome.*.js','tests/firefox.*.js','tests/safari.*.js','tests/opera.*.js','tests/ie.*.js']
+      },
 
-        copy: {
-            bamboo: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= production %>/',
-                    src: ['**'],
-                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version %>'
-                }, {
-                    expand: true,
-                    cwd: '<%= production %>/',
-                    src: ['**'],
-                    dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>.' +
-                        '<%= pkg.version_minor %>.x'
-                }, {
-                    expand: true,
-                    cwd: '<%= production %>/',
-                    src: ['**'],
-                    dest: '<%= bamboo %>/adapterjs/latest'
-                }],
-            },
-        },
-
-        concat: {
-            options: {
-                separator: '\n',
-                stripBanners: false,
-                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                    '<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
-            },
-            production: {
-                src: ['<%= source %>/*.adapter.js', '<%= source %>/temasys.*.js'],
-                dest: '<%= production %>/adapter.debug.js'
-            }
-        },
-
-        uglify: {
-            options: {
-                mangle: false,
-                drop_console: true,
-                compress: {
-                    drop_console: true
-                },
-                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                    '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
-            },
-            production: {
-                files: {
-                    '<%= production %>/adapter.min.js': ['<%= production %>/adapter.debug.js']
-                }
-            }
-        },
-
-        replace: {
-            production: {
-                options: {
-                    variables: {
-                        'version': '<%= pkg.version %>'
-                    },
-                    prefix: '@@'
-                },
-                files: [{
-                    expand: true,
-                    flatten: true,
-                    src: [
-                        '<%= production %>/*.js'
-                    ],
-                    dest: '<%= production %>/'
-                }]
-            }
-        },
-
-        jshint: {
-            build: {
-                options: grunt.util._.merge({
-                    node: true
-                }, grunt.file.readJSON('.jshintrc')),
-                src: [
-                    'package.json',
-                    'Gruntfile.js'
-                ]
-            },
-            tests: {
-                options: grunt.util._.merge({
-                    node: true
-                }, grunt.file.readJSON('.jshintrc')),
-                src: [
-                    'tests/*_test.js'
-                ]
-            },
-            app: {
-                options: grunt.util._.merge({
-                    browser: true,
-                    devel: true,
-                    globals: {
-                        require: true,
-                        define: true
-                    }
-                }, grunt.file.readJSON('.jshintrc')),
-                src: [
-                    '<%= source %>/*.js'
-                ]
-            }
-        },
-
-        compress: {
-            bamboo: {
-                options: {
-                    mode: 'gzip'
-                },
-                expand: true,
-                cwd: 'bamboo/adapterjs',
-                src: ['**/*.js'],
-                dest: 'bamboo/adapterjsgz/'
-            }
-        },
-
-        yuidoc: {
-            doc: {
-                name: '<%= pkg.name %>',
-                description: '<%= pkg.description %>',
-                version: '<%= pkg.version %>',
-                url: '<%= pkg.homepage %>',
-                options: {
-                    paths: 'source/',
-                    outdir: 'doc/'
-                    //themedir: 'doc-style'
-                }
-            }
+      copy: {
+        bamboo: {
+          files: [{
+            expand: true,
+            cwd: '<%= production %>/',
+            src: ['**'],
+            dest: '<%= bamboo %>/adapterjs/<%= pkg.version %>'
+          }, {
+            expand: true,
+            cwd: '<%= production %>/',
+            src: ['**'],
+            dest: '<%= bamboo %>/adapterjs/<%= pkg.version_major %>.' +
+                '<%= pkg.version_minor %>.x'
+          }, {
+            expand: true,
+            cwd: '<%= production %>/',
+            src: ['**'],
+            dest: '<%= bamboo %>/adapterjs/latest'
+          }],
         }
+      },
+
+      concat: concatTask,
+
+      uglify: {
+          options: {
+              mangle: false,
+              drop_console: true,
+              compress: {
+                  drop_console: true
+              },
+              banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+                  '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+          },
+          production: {
+              files: {
+                  '<%= production %>/adapter.min.js': ['<%= production %>/adapter.debug.js']
+              }
+          }
+      },
+
+      replace: replaceTask,
+
+      jshint: {
+        build: {
+            options: grunt.util._.merge({
+                node: true
+            }, grunt.file.readJSON('.jshintrc')),
+            src: [
+                'package.json',
+                'Gruntfile.js'
+            ]
+        },
+        tests: {
+            options: grunt.util._.merge({
+                node: true
+            }, grunt.file.readJSON('.jshintrc')),
+            src: [
+                'tests/*_test.js'
+            ]
+        },
+        app: {
+          options: grunt.util._.merge({
+            browser: true,
+            devel: true,
+            globals: {
+              require: true,
+              define: true
+            }
+          }, grunt.file.readJSON('.jshintrc')),
+          src: [
+            '<%= source %>/*.js'
+          ]
+        }
+      },
+
+      compress: {
+        bamboo: {
+          options: {
+              mode: 'gzip'
+          },
+          expand: true,
+          cwd: 'bamboo/adapterjs',
+          src: ['**/*.js'],
+          dest: 'bamboo/adapterjsgz/'
+        }
+      },
+
+      yuidoc: {
+        doc: {
+          name: '<%= pkg.name %>',
+          description: '<%= pkg.description %>',
+          version: '<%= pkg.version %>',
+          url: '<%= pkg.homepage %>',
+          options: {
+            paths: 'source/',
+            outdir: 'doc/'
+          }
+        }
+      }
     });
 
 
@@ -222,6 +270,22 @@ module.exports = function(grunt) {
     grunt.registerTask('dev', [
         'versionise',
         'clean:production',
+        'concat',
+        'replace:production',
+        'uglify'
+    ]);
+
+    grunt.registerTask('copy', [
+        'versionise',
+        'clean:production',
+        'concat',
+        'replace',
+        'uglify'
+    ]);
+
+    grunt.registerTask('test', [
+        'versionise',
+        'clean:test',
         'concat',
         'replace',
         'uglify'
