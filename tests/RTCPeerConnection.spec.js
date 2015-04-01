@@ -5,7 +5,7 @@ var expect = chai.expect;
 var assert = chai.assert;
 var should = chai.should;
 
-var slowTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 5000 : 1;
+var slowTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 10000 : 1;
 
 
 describe('RTCPeerConnection: Properties', function() {

@@ -19,7 +19,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    track.id = track.id || (new Date()).getTime().toString();
+    //track.id = track.id || (new Date()).getTime().toString();
 
     /**
      * The MediaStreamTrack object label.
@@ -29,7 +29,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    track.label = track.label || track.kind + '-' + track.id;
+    //track.label = track.label || track.kind + '-' + track.id;
 
     /**
      * The flag that indicates if a MediaStreamTrack object has ended.
@@ -39,7 +39,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    track.ended = typeof stream.ended === 'boolean' ? stream.ended : false;
+    track.ended = typeof track.ended === 'boolean' ? track.ended : false;
 
     /**
      * The flag that indicates if a MediaStreamTrack object is enabled.
@@ -82,7 +82,7 @@ if (navigator.mozGetUserMedia) {
      * @for MediaStreamTrack
      * @since 0.10.6
      */
-    track.kind = track.kind;
+    //track.kind = track.kind;
 
     /**
      * The status if a MediaStreamTrack object is read only and cannot to be overwritten.

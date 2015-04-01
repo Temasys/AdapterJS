@@ -6,17 +6,17 @@ var assert = chai.assert;
 var should = chai.should;
 
 // Test timeouts
-var testTimeout = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ? 5000 : 1;
+var testTimeout = 25000;
 
 // Get User Media timeout
-var gUMTimeout = 8000;
+var gUMTimeout = 15000;
 
 // Test item timeout
 var testItemTimeout = 4000;
 
 
 describe('MediaStreamTrack | EventHandler', function() {
-	this.slow(testTimeout);
+	this.timeout(testTimeout);
 
 	/* Attributes */
 	var stream = null;
@@ -26,19 +26,32 @@ describe('MediaStreamTrack | EventHandler', function() {
 	before(function (done) {
 		this.timeout(gUMTimeout);
 
-		window.getUserMedia({
-			audio: true,
-			video: true
+		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
+			AdapterJS.onwebrtcreadyDone = true;
+		}
 
-		}, function (data) {
-			stream = data;
-			track = stream.polygetAudioTracks()[0];
-			done();
+		var getMedia = function () {
+			window.getUserMedia({
+				audio: true,
+				video: true
 
-		}, function (error) {
-			throw error;
-			done();
-		});
+			}, function (data) {
+				stream = data;
+				track = stream.polygetAudioTracks()[0];
+				done();
+
+			}, function (error) {
+				throw error;
+				done();
+			});
+		};
+
+		if (!AdapterJS.onwebrtcreadyDone) {
+			AdapterJS.onwebrtcready = getMedia;
+
+		} else {
+			getMedia();
+		}
 	});
 
 	it.skip('MediaStreamTrack.onstarted :: emit', function () {});
