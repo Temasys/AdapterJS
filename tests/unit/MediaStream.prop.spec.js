@@ -145,6 +145,31 @@ describe('MediaStream | Properties', function() {
 		}
 	});
 
+	it('MediaStream.getTracks :: method', function (done) {
+		this.timeout(testItemTimeout);
+
+		assert.typeOf(stream.getTracks, 'function');
+
+		try {
+			var tracks = stream.getTracks(track.id);
+
+			if (tracks instanceof Array) {
+				assert.ok(tracks, 'Received an array of tracks');
+
+			} else {
+				assert.fail(tracks instanceof Array, true, 'Received track type is not an array');
+			}
+
+			tracks.length.should.equal(2);
+
+			done();
+
+		} catch (error) {
+			throw error;
+			done();
+		}
+	});
+
 	it('MediaStream.polystop -> MediaStream.stop :: method', function (done) {
 		this.timeout(testItemTimeout + 1000);
 
