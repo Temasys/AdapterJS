@@ -42,6 +42,16 @@ if (navigator.mozGetUserMedia) {
     track.ended = typeof track.ended === 'boolean' ? track.ended : false;
 
     /**
+     * The flag that indicates if a MediaStreamTrack object is a remote stream.
+     * @attribute remote
+     * @type Boolean
+     * @readOnly
+     * @for MediaStreamTrack
+     * @since 0.10.6
+     */
+    track.remote = typeof track.remote === 'boolean' ? track.remote : false;
+
+    /**
      * The flag that indicates if a MediaStreamTrack object is enabled.
      * - Set it to <code>true</code> for enabled track stream or set it to
      *   <code>false</code> for disable track stream.
@@ -188,6 +198,8 @@ if (navigator.mozGetUserMedia) {
 
     track.ended = false;
 
+    track.remote = typeof track.remote === 'boolean' ? track.remote : false;
+
     track.enabled = true;
 
     track.muted = typeof track.muted === 'boolean' ? track.muted : false;
@@ -250,13 +262,15 @@ if (navigator.mozGetUserMedia) {
 
     track.ended = false;
 
+    track.remote = typeof track.remote === 'boolean' ? track.remote : false;
+
     track.enabled = true;
 
     track.muted = typeof track.muted === 'boolean' ? track.muted : false;
 
     track.readyState = typeof track.readyState === 'string' ? track.readyState : 'live';
 
-    track.kind = track.kind;
+    //track.kind = track.kind;
 
     track.readOnly = typeof track.readOnly === 'boolean' ? track.readOnly : false;
 
