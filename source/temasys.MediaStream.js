@@ -173,6 +173,26 @@ if (navigator.mozGetUserMedia) {
 		};
 
 		/**
+		 * Gets all MediaStreamTracks from a MediaStreamTrack.
+		 * @method polygetTracks
+		 * @for MediaStream
+		 * @since 0.10.6
+		 */
+		stream.polygetTracks = function (trackId) {
+			try {
+				return stream.getTracks();
+
+			} catch (error) {
+				var i, j;
+
+				var audioTracks = stream.getAudioTracks();
+		    var videoTracks = stream.getVideoTracks();
+
+		    return audioTracks.concat(videoTracks);
+		  }
+		};
+
+		/**
 		 * Removes a MediaStreamTrack from an object.
 		 * @method polyremoveTrack
 		 * @for MediaStream
