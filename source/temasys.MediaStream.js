@@ -445,6 +445,20 @@ if (navigator.mozGetUserMedia) {
 		  }
 		};
 
+		stream.polygetTracks = function (trackId) {
+			try {
+				return stream.getTracks();
+
+			} catch (error) {
+				var i, j;
+
+				var audioTracks = stream.getAudioTracks();
+		    var videoTracks = stream.getVideoTracks();
+
+		    return audioTracks.concat(videoTracks);
+		  }
+		};
+
 		stream.polyremoveTrack = function (track) {
 			try {
 				stream.removeTrack(track);
