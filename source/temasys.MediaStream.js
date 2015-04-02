@@ -146,25 +146,30 @@ if (navigator.mozGetUserMedia) {
 		 * @since 0.10.6
 		 */
 		stream.polygetTrackById = function (trackId) {
-			var i, j;
+			try {
+				return stream.getTrackById(trackId);
 
-			var audioTracks = stream.getAudioTracks();
-	    var videoTracks = stream.getVideoTracks();
+			} catch (error) {
+				var i, j;
 
-	    // Check for all tracks if ended
-	    for (i = 0; i < audioTracks.length; i += 1) {
-	      if (audioTracks[i].id === trackId) {
-	      	return audioTracks[i];
-	      }
-	    }
+				var audioTracks = stream.getAudioTracks();
+		    var videoTracks = stream.getVideoTracks();
 
-	    for (j = 0; j < videoTracks.length; j += 1) {
-	      if (videoTracks[i].id === trackId) {
-	      	return videoTracks[i];
-	      }
-	    }
+		    // Check for all tracks if ended
+		    for (i = 0; i < audioTracks.length; i += 1) {
+		      if (audioTracks[i].id === trackId) {
+		      	return audioTracks[i];
+		      }
+		    }
 
-	    return null;
+		    for (j = 0; j < videoTracks.length; j += 1) {
+		      if (videoTracks[i].id === trackId) {
+		      	return videoTracks[i];
+		      }
+		    }
+
+		    return null;
+		  }
 		};
 
 		/**
