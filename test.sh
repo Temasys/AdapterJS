@@ -18,7 +18,7 @@ open_new_tab "osascript tests/mac.watcher.scpt"
 #  node_modules/karma/bin/karma start $filename
 #done
 
-node_modules/karma/bin/karma start "tests/gen/safari.MediaStream.prop.spec.js.conf.js"
+node_modules/karma/bin/karma start "tests/gen/chrome.MediaStream.prop.spec.js.conf.js"
 
 # Kill all existing applescripts (Mac)
 killall -e osascript
