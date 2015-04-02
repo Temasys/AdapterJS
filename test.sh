@@ -14,11 +14,9 @@ grunt test
 # Start instances for auto-clicker (Mac)
 open_new_tab "osascript tests/mac.watcher.scpt"
 
-#for filename in tests/gen/*.js; do
-#  node_modules/karma/bin/karma start $filename
-#done
-
-node_modules/karma/bin/karma start "tests/gen/chrome.MediaStream.prop.spec.js.conf.js"
+for filename in tests/gen/*.js; do
+  node_modules/karma/bin/karma start $filename
+done
 
 # Kill all existing applescripts (Mac)
 killall -e osascript
