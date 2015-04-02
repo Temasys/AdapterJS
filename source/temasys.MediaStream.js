@@ -606,6 +606,13 @@ if (navigator.mozGetUserMedia) {
 		  }
 		};
 
+		stream.polygetTracks = function (trackId) {
+			var outputAudioTracks = polyStoreMediaTracks.audio;
+			var outputVideoTracks = polyStoreMediaTracks.video;
+
+	    return outputAudioTracks.concat(outputVideoTracks);
+		};
+
 		stream.polyremoveTrack = function (track) {
 			try {
 				stream.removeTrack(track);
