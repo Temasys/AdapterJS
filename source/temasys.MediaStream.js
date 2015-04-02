@@ -515,25 +515,33 @@ if (navigator.mozGetUserMedia) {
 		};
 
 		stream.polygetTrackById = function (trackId) {
-			var i, j;
+			try {
+				return stream.getTrackById(trackId);
 
-			var outputAudioTracks = polyStoreMediaTracks.audio;
-			var outputVideoTracks = polyStoreMediaTracks.video;
+			} catch (err) {
 
-	    // Check for all tracks if ended
-	    for (i = 0; i < outputAudioTracks.length; i += 1) {
-	    	if (outputAudioTracks[i].id === trackId) {
-	      	return outputAudioTracks[i];
-	      }
-	    }
+				console.log(err);
 
-	    for (j = 0; j < outputVideoTracks.length; j += 1) {
-	      if (outputVideoTracks[j].id === trackId) {
-	      	return outputVideoTracks[j];
-	      }
-	    }
+				var i, j;
 
-	    return null;
+				var outputAudioTracks = polyStoreMediaTracks.audio;
+				var outputVideoTracks = polyStoreMediaTracks.video;
+
+		    // Check for all tracks if ended
+		    for (i = 0; i < outputAudioTracks.length; i += 1) {
+		    	if (outputAudioTracks[i].id === trackId) {
+		      	return outputAudioTracks[i];
+		      }
+		    }
+
+		    for (j = 0; j < outputVideoTracks.length; j += 1) {
+		      if (outputVideoTracks[j].id === trackId) {
+		      	return outputVideoTracks[j];
+		      }
+		    }
+
+		    return null;
+		  }
 		};
 
 		stream.polyremoveTrack = function (track) {
