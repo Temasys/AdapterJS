@@ -543,29 +543,6 @@ if (navigator.mozGetUserMedia) {
 			video: []
 		};
 
-		var polyTrackEndedEmitter = function (track) {
-			// set the ended as true
-			track.ended = true;
-
-			// trigger that it has ended
-      if (typeof track.onended === 'function') {
-        track.onended({
-        	type: 'ended',
-			  	bubbles: false,
-			  	cancelBubble: false,
-			  	cancelable: false,
-			  	currentTarget: track,
-			  	defaultPrevented: false,
-			  	eventPhase: 0,
-			  	returnValue: true,
-			  	srcElement: track,
-			  	target: track,
-			  	timeStamp: (new Date()).getTime()
-			  });
-      }
-		};
-
-
 		(function () {
 			var i, j;
 
@@ -600,11 +577,11 @@ if (navigator.mozGetUserMedia) {
 
 	    // Check for all tracks if ended
 	    for (i = 0; i < outputAudioTracks.length; i += 1) {
-	    	polyTrackEndedEmitter( outputAudioTracks[i] );
+	    	outputAudioTracks[i].ended = true;
 	    }
 
 	    for (j = 0; j < outputVideoTracks.length; j += 1) {
-	      polyTrackEndedEmitter( outputVideoTracks[j] );
+	      outputVideoTracks[j].ended = true;
 	    }
 		};
 
