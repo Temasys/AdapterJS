@@ -443,7 +443,26 @@ if (navigator.mozGetUserMedia) {
 	    }
 		})();
 
-		stream.polystop = stream.stop;
+		stream.polystop = function () {
+			try {
+				stream.stop();
+
+			} catch (error) {
+				var i, j;
+
+				var audioTracks = stream.getAudioTracks();
+		    var videoTracks = stream.getVideoTracks();
+
+		    // Check for all tracks if ended
+		    for (i = 0; i < audioTracks.length; i += 1) {
+		      audioTracks[i].polystop();
+		    }
+
+		    for (j = 0; j < videoTracks.length; j += 1) {
+		      videoTracks[j].polystop();
+		    }
+			}
+		};
 
 		stream.polyaddTrack = function (track) {
 			try {

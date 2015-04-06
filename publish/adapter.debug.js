@@ -1677,7 +1677,26 @@ if (navigator.mozGetUserMedia) {
 	    }
 		})();
 
-		stream.polystop = stream.stop;
+		stream.polystop = function () {
+			try {
+				stream.stop();
+
+			} catch (error) {
+				var i, j;
+
+				var audioTracks = stream.getAudioTracks();
+		    var videoTracks = stream.getVideoTracks();
+
+		    // Check for all tracks if ended
+		    for (i = 0; i < audioTracks.length; i += 1) {
+		      audioTracks[i].polystop();
+		    }
+
+		    for (j = 0; j < videoTracks.length; j += 1) {
+		      videoTracks[j].polystop();
+		    }
+			}
+		};
 
 		stream.polyaddTrack = function (track) {
 			try {
@@ -2126,35 +2145,16 @@ if (navigator.mozGetUserMedia) {
 
     track.onoverconstrained = null;
 
-
-    var polyTrackEndedEmitter = function () {
-      // set the ended as true
-      track.ended = true;
-      // set the readyState to 'ended'
-      track.readyState = 'ended';
-
-      // trigger that it has ended
-      if (typeof track.onended === 'function') {
-        track.onended({
-          type: 'ended',
-          bubbles: false,
-          cancelBubble: false,
-          cancelable: false,
-          currentTarget: track,
-          defaultPrevented: false,
-          eventPhase: 0,
-          returnValue: true,
-          srcElement: track,
-          target: track,
-          timeStamp: (new Date()).getTime()
-        });
-      }
-    };
-
     track.polystop = function () {
-      track.stop();
+      try {
+        track.stop();
 
-      polyTrackEndedEmitter();
+        // set the ended state to true
+        track.ended = true;
+
+      } catch (error) {
+        throw error;
+      }
     };
   };
 
