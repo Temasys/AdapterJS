@@ -348,15 +348,17 @@ if (navigator.mozGetUserMedia) {
 		}
 	};
 
-	window.getUserMedia = function (constraints, successCb, failureCb) {
+	window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
 
-		navigator.mozGetUserMedia(constraints, function (stream) {
+		window.navigator.mozGetUserMedia(constraints, function (stream) {
 			polyfillMediaStream(stream);
 
 			successCb(stream);
 
 		}, failureCb);
 	};
+
+	window.getUserMedia = window.navigator.getUserMedia;
 
 	window.attachMediaStream = function (element, stream) {
     // If there's an element used for checking stream stop
@@ -625,12 +627,16 @@ if (navigator.mozGetUserMedia) {
 		};
 	};
 
-	window.getUserMedia = function (constraints, successCb, failureCb) {
-		navigator.getUserMedia(constraints, function(stream) {
+	var originalGUM = navigator.getUserMedia;
+
+	window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
+		originalGUM(constraints, function(stream) {
 
       polyfillMediaStream(stream);
 
      	successCb(stream);
     }, failureCb);
   };
+
+  window.getUserMedia = window.navigator.getUserMedia;
 }
