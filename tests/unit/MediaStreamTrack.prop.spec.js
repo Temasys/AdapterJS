@@ -31,7 +31,7 @@ describe('MediaStreamTrack | Properties', function() {
 		}
 
 		var getMedia = function () {
-			window.getUserMedia({
+			window.navigator.getUserMedia({
 				audio: true,
 				video: true
 
