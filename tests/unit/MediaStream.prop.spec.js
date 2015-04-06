@@ -145,13 +145,13 @@ describe('MediaStream | Properties', function() {
 		}
 	});
 
-	it('MediaStream.getTracks :: method', function (done) {
+	it('MediaStream.polygetTracks -> MediaStream.getTracks :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.getTracks, 'function');
+		assert.typeOf(stream.polygetTracks, 'function');
 
 		try {
-			var tracks = stream.getTracks(track.id);
+			var tracks = stream.polygetTracks(track.id);
 
 			if (tracks instanceof Array) {
 				assert.ok(tracks, 'Received an array of tracks');
