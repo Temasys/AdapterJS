@@ -474,7 +474,7 @@ if (navigator.mozGetUserMedia) {
 		stream.polygetVideoTracks = stream.getVideoTracks;
 	};
 
-	window.getUserMedia = function (constraints, successCb, failureCb) {
+	window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
 		navigator.webkitGetUserMedia(constraints, function (stream) {
 
 			polyfillMediaStream(stream);
@@ -483,6 +483,8 @@ if (navigator.mozGetUserMedia) {
 		}, failureCb);
 
 	};
+
+	window.getUserMedia = window.navigator.getUserMedia;
 
 // Safari MediaStream
 } else {
