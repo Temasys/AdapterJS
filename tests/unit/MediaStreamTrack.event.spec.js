@@ -62,7 +62,7 @@ describe('MediaStreamTrack | EventHandler', function() {
 
 	it.skip('MediaStreamTrack.onoverconstrained :: emit', function () {});
 
-	it('MediaStreamTrack.onended :: emit', function (done) {
+	it('MediaStreamTrack.onended :: emit < When > MediaStreamTrack.polystop()', function (done) {
 		this.timeout(testItemTimeout);
 
 		track.onended = function (event) {
@@ -78,5 +78,52 @@ describe('MediaStreamTrack | EventHandler', function() {
 			throw error;
 			done();
 		}
+	});
+
+	it('MediaStreamTrack.onended :: emit < When > MediaStream.polystop()', function (done) {
+		this.timeout(gUMTimeout + testItemTimeout + 8000);
+
+		window.navigator.getUserMedia({
+			audio: true,
+			video: true
+
+		}, function (data) {
+			stream = data;
+
+			var i, j;
+
+			var audioEndedTriggered = 0;
+			var videoEndedTriggered = 0;
+
+			var audioTracks = stream.polygetAudioTracks();
+			var videoTracks = stream.polygetVideoTracks();
+
+			for (i = 0; i < audioTracks.length; i += 1) {
+				audioTracks[i].onended = function () {
+					audioEndedTriggered += 1;
+				};
+			}
+
+			for (j = 0; j < videoTracks.length; j += 1) {
+				videoTracks[j].onended = function () {
+					videoEndedTriggered += 1;
+				};
+			}
+
+			stream.polystop();
+
+			setTimeout(function () {
+
+				(audioEndedTriggered + videoEndedTriggered).should.equal(audioTracks.length + videoTracks.length);
+
+				done();
+
+			}, 8000);
+
+		}, function (error) {
+			throw error;
+			done();
+		});
+
 	});
 });
