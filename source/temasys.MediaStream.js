@@ -137,11 +137,11 @@ if (navigator.mozGetUserMedia) {
 
 		    // Check for all tracks if ended
 		    for (i = 0; i < outputAudioTracks.length; i += 1) {
-		    	polyTrackEndedEmitter( outputAudioTracks[i] );
+		    	outputAudioTracks[i].ended = true;
 		    }
 
 		    for (j = 0; j < outputVideoTracks.length; j += 1) {
-		      polyTrackEndedEmitter( outputVideoTracks[j] );
+		      outputVideoTracks[j].ended = true;
 		    }
 
 			} else {
