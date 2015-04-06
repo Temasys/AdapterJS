@@ -15,13 +15,21 @@
 		getUserMedia({ audio: true, video: true }, function (stream) {
 			data = stream;
 
-			data.polygetVideoTracks()[0].onended = function () {
-				console.log('I am called', data.polygetVideoTracks()[0].ended);
+			window.audioTrack = data.polygetVideoTracks()[0];
+
+			audioTrack.onended = function () {
+				console.log('Audio Track has ended:', data.polygetVideoTracks()[0].ended);
 			};
 
-			data.polygetAudioTracks()[0].onended = function () {
-				console.log('I am called 2', data.polygetAudioTracks()[0].ended);
+			window.videoTrack = data.polygetAudioTracks()[0];
+
+			videoTrack.onended = function () {
+				console.log('Video Track has ended:', data.polygetAudioTracks()[0].ended);
 			};
+
+			data.onended = function () {
+				console.log('Stream has ended', data.ended);
+			}
 
 			//attachMediaStream(video, data);
 
