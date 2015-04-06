@@ -1804,6 +1804,8 @@ if (navigator.mozGetUserMedia) {
 		stream.polystop = function () {
 			stream.stop();
 
+			stream.ended = true;
+
 			var i, j;
 
 			var outputAudioTracks = polyStoreMediaTracks.audio;
