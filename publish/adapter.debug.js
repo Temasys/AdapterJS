@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-04-02 */
+/*! adapterjs - v0.10.5 - 2015-04-06 */
 
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
@@ -1811,33 +1811,28 @@ if (navigator.mozGetUserMedia) {
 		};
 
 		stream.polygetTrackById = function (trackId) {
-			try {
-				return stream.getTrackById(trackId);
+			// return stream.getTrackById(trackId);
+			// for right now, because MediaStreamTrack does not allow overwrites,
+			// we shall implement the polyfill to return the overwrite-able track.
+			var i, j;
 
-			} catch (err) {
+			var outputAudioTracks = polyStoreMediaTracks.audio;
+			var outputVideoTracks = polyStoreMediaTracks.video;
 
-				console.log(err);
+	    // Check for all tracks if ended
+	    for (i = 0; i < outputAudioTracks.length; i += 1) {
+	    	if (outputAudioTracks[i].id === trackId) {
+	      	return outputAudioTracks[i];
+	      }
+	    }
 
-				var i, j;
+	    for (j = 0; j < outputVideoTracks.length; j += 1) {
+	      if (outputVideoTracks[j].id === trackId) {
+	      	return outputVideoTracks[j];
+	      }
+	    }
 
-				var outputAudioTracks = polyStoreMediaTracks.audio;
-				var outputVideoTracks = polyStoreMediaTracks.video;
-
-		    // Check for all tracks if ended
-		    for (i = 0; i < outputAudioTracks.length; i += 1) {
-		    	if (outputAudioTracks[i].id === trackId) {
-		      	return outputAudioTracks[i];
-		      }
-		    }
-
-		    for (j = 0; j < outputVideoTracks.length; j += 1) {
-		      if (outputVideoTracks[j].id === trackId) {
-		      	return outputVideoTracks[j];
-		      }
-		    }
-
-		    return null;
-		  }
+	    return null;
 		};
 
 		stream.polygetTracks = function (trackId) {
@@ -2589,7 +2584,7 @@ if (navigator.mozGetUserMedia) {
 // Chrome / Opera MediaStream
 } else if (navigator.webkitGetUserMedia) {
 
-	polyfillMediaStream = function (stream) {
+	polyfillRTCPeerConnection = function (stream) {
 
 		stream.onended = null;
 
@@ -2670,7 +2665,7 @@ if (navigator.mozGetUserMedia) {
 // Safari MediaStream
 } else {
 
-	polyfillMediaStream = function (stream) {
+	polyfillRTCPeerConnection = function (stream) {
 
 		/**
 		 * Stores the store Id to store MediaStreamTrack functions.

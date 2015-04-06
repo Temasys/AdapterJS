@@ -577,33 +577,28 @@ if (navigator.mozGetUserMedia) {
 		};
 
 		stream.polygetTrackById = function (trackId) {
-			try {
-				return stream.getTrackById(trackId);
+			// return stream.getTrackById(trackId);
+			// for right now, because MediaStreamTrack does not allow overwrites,
+			// we shall implement the polyfill to return the overwrite-able track.
+			var i, j;
 
-			} catch (err) {
+			var outputAudioTracks = polyStoreMediaTracks.audio;
+			var outputVideoTracks = polyStoreMediaTracks.video;
 
-				console.log(err);
+	    // Check for all tracks if ended
+	    for (i = 0; i < outputAudioTracks.length; i += 1) {
+	    	if (outputAudioTracks[i].id === trackId) {
+	      	return outputAudioTracks[i];
+	      }
+	    }
 
-				var i, j;
+	    for (j = 0; j < outputVideoTracks.length; j += 1) {
+	      if (outputVideoTracks[j].id === trackId) {
+	      	return outputVideoTracks[j];
+	      }
+	    }
 
-				var outputAudioTracks = polyStoreMediaTracks.audio;
-				var outputVideoTracks = polyStoreMediaTracks.video;
-
-		    // Check for all tracks if ended
-		    for (i = 0; i < outputAudioTracks.length; i += 1) {
-		    	if (outputAudioTracks[i].id === trackId) {
-		      	return outputAudioTracks[i];
-		      }
-		    }
-
-		    for (j = 0; j < outputVideoTracks.length; j += 1) {
-		      if (outputVideoTracks[j].id === trackId) {
-		      	return outputVideoTracks[j];
-		      }
-		    }
-
-		    return null;
-		  }
+	    return null;
 		};
 
 		stream.polygetTracks = function (trackId) {
