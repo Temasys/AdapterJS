@@ -81,6 +81,28 @@ if (navigator.mozGetUserMedia) {
       }
 		};
 
+		var polyTrackEndedEmitter = function (track) {
+			// set the ended as true
+			track.ended = true;
+
+			// trigger that it has ended
+      if (typeof track.onended === 'function') {
+        track.onended({
+        	type: 'ended',
+			  	bubbles: false,
+			  	cancelBubble: false,
+			  	cancelable: false,
+			  	currentTarget: track,
+			  	defaultPrevented: false,
+			  	eventPhase: 0,
+			  	returnValue: true,
+			  	srcElement: track,
+			  	target: track,
+			  	timeStamp: stream.currentTime || (new Date()).getTime()
+			  });
+      }
+		};
+
 
 		(function () {
 			var i, j;
@@ -107,6 +129,20 @@ if (navigator.mozGetUserMedia) {
 		stream.polystop = function () {
 			if (stream instanceof LocalMediaStream) {
 				stream.stop();
+
+				var i, j;
+
+				var outputAudioTracks = stream.polygetAudioTracks();
+				var outputVideoTracks = stream.polygetVideoTracks();
+
+		    // Check for all tracks if ended
+		    for (i = 0; i < outputAudioTracks.length; i += 1) {
+		    	polyTrackEndedEmitter( outputAudioTracks[i] );
+		    }
+
+		    for (j = 0; j < outputVideoTracks.length; j += 1) {
+		      polyTrackEndedEmitter( outputVideoTracks[j] );
+		    }
 
 			} else {
 				var i, j;
