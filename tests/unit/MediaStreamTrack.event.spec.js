@@ -81,22 +81,22 @@ describe('MediaStreamTrack | EventHandler', function() {
 	});
 
 	it('MediaStreamTrack.onended :: emit < When > MediaStream.polystop()', function (done) {
-		this.timeout(gUMTimeout + testItemTimeout + 8000);
+		this.timeout(gUMTimeout + testItemTimeout + 14000);
 
 		window.navigator.getUserMedia({
 			audio: true,
 			video: true
 
 		}, function (data) {
-			stream = data;
+			var ucStream = data;
 
 			var i, j;
 
 			var audioEndedTriggered = 0;
 			var videoEndedTriggered = 0;
 
-			var audioTracks = stream.polygetAudioTracks();
-			var videoTracks = stream.polygetVideoTracks();
+			var audioTracks = ucStream.polygetAudioTracks();
+			var videoTracks = ucStream.polygetVideoTracks();
 
 			for (i = 0; i < audioTracks.length; i += 1) {
 				audioTracks[i].onended = function () {
@@ -110,7 +110,7 @@ describe('MediaStreamTrack | EventHandler', function() {
 				};
 			}
 
-			stream.polystop();
+			ucStream.polystop();
 
 			setTimeout(function () {
 
@@ -118,7 +118,7 @@ describe('MediaStreamTrack | EventHandler', function() {
 
 				done();
 
-			}, 8000);
+			}, 14000);
 
 		}, function (error) {
 			throw error;

@@ -58,7 +58,7 @@ describe('MediaStream | EventHandler', function() {
 		this.timeout(testItemTimeout);
 
 		stream.onremovetrack = function (event) {
-			assert.ok(event, 'Triggers when removeTrack() is invoked');
+			assert.ok(event, 'Triggers when polyremoveTrack() is invoked');
 			done();
 		};
 
@@ -75,7 +75,7 @@ describe('MediaStream | EventHandler', function() {
 		this.timeout(testItemTimeout);
 
 		stream.onaddtrack = function (event) {
-			assert.ok(event, 'Triggers when addTrack() is invoked');
+			assert.ok(event, 'Triggers when polyaddTrack() is invoked');
 			done();
 		};
 
@@ -88,26 +88,64 @@ describe('MediaStream | EventHandler', function() {
 		}
 	});
 
-	it('MediaStream.onended :: emit', function (done) {
+	it('MediaStream.onended :: emit < When > MediaStream.polystop()', function (done) {
 		this.timeout(testItemTimeout);
 
 		stream.onended = function (event) {
 			var checkEvent = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ?
 				{} : event;
-			assert.ok(checkEvent, 'Triggers when stop() is invoked');
+			assert.ok(checkEvent, 'Triggers when polystop() is invoked');
 			done();
 		};
 
 		try {
 			stream.polystop();
 
-			setTimeout(function () {
-				done();
-			}, 2000);
-
 		} catch (error) {
 			throw error;
 			done();
 		}
+	});
+
+	it('MediaStream.onended :: emit < When > for MediaStreamTrack in MediaStream >> MediaStreamTrack.polystop()', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout + 4000);
+
+		window.navigator.getUserMedia({
+			audio: true,
+			video: true
+
+		}, function (data) {
+			var ucStream = data;
+
+			ucStream.onended = function (event) {
+				var checkEvent = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ?
+					{} : event;
+				assert.ok(checkEvent, 'Triggers when all MediaStreamTracks polystop() is invoked');
+				done();
+			};
+
+			try {
+				var i, j;
+
+				var audioTracks = ucStream.polygetAudioTracks();
+				var videoTracks = ucStream.polygetVideoTracks();
+
+				for (i = 0; i < audioTracks.length; i += 1) {
+					audioTracks[i].polystop();
+				}
+
+				for (j = 0; j < videoTracks.length; j += 1) {
+					videoTracks[j].polystop();
+				}
+
+			} catch (error) {
+				throw error;
+				done();
+			}
+
+		}, function (error) {
+			throw error;
+			done();
+		});
 	});
 });
