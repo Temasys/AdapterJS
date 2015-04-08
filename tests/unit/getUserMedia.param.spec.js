@@ -15,9 +15,8 @@ var gUMTimeout = 25000;
 var testItemTimeout = 4000;
 
 
-describe('getUserMedia | MediaStreamError', function() {
+describe('getUserMedia | Parameters', function() {
 	this.timeout(testTimeout);
-
 
 	/* Get User Media */
 	before(function (done) {
@@ -37,19 +36,30 @@ describe('getUserMedia | MediaStreamError', function() {
 		}
 	});
 
-	it('MediaStreamError.name === MANDATORY_UNSATISFIED_ERROR', function (done) {
+	it('Expects 3 parameters when 2 is only provided', function () {
 		this.timeout(testItemTimeout);
 
-		window.getUserMedia({}, function (stream) {
-			throw new Error('Invalid constraints passed still triggers a success callback');
-
-		}, function (error) {
-			expect(error.name).to.equal('MANDATORY_UNSATISFIED_ERROR');
-			done();
-		});
+		expect(function () {
+			window.getUserMedia({
+				audio: true,
+				video: true
+			}, function () {});
+		}).to.throw(TypeError);
 	});
 
-	it.skip('MediaStreamError.name === PERMISSION_DENIED', function () {});
+	it('Expects 3 parameters should pass', function (done) {
+		this.timeout(testItemTimeout);
 
-	it.skip('MediaStreamError.name === NOT_SUPPORTED_ERROR', function () {});
+		window.getUserMedia({
+			audio: true,
+			video: true
+
+		}, function (stream) {
+			assert.typeOf(stream, 'object');
+			done();
+
+		}, function (error) {
+			throw error;
+		});
+	});
 });

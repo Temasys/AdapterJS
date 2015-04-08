@@ -42,9 +42,9 @@ module.exports = function(grunt) {
     var testBrowsers = ['chrome', 'firefox', 'ie', 'safari', 'opera'];
 
     var testUnits = [
-      //'getUserMedia.constraints.spec.js',
-      //'getUserMedia.error.spec.js',
-      //'getUserMedia.spec.js',
+      'getUserMedia.constraints.spec.js',
+      'getUserMedia.error.spec.js',
+      'getUserMedia.spec.js',
       'MediaStream.event.spec.js',
       'MediaStream.prop.spec.js',
       'MediaStreamTrack.event.spec.js',
