@@ -38,12 +38,6 @@ describe('MediaStream | EventHandler', function() {
 
 			}, function (data) {
 
-				if (stream !== null) {
-					delete stream;
-					delete track;
-					console.log('Removed reference');
-				}
-
 				stream = data;
 				track = data.polygetAudioTracks()[0];
 				done();
@@ -61,7 +55,7 @@ describe('MediaStream | EventHandler', function() {
 		}
 	});
 
-	/*it('MediaStream.onremovetrack :: emit', function (done) {
+	it('MediaStream.onremovetrack :: emit', function (done) {
 		this.timeout(testItemTimeout);
 
 		stream.onremovetrack = function () {
@@ -79,7 +73,7 @@ describe('MediaStream | EventHandler', function() {
 		};
 
 		stream.polyaddTrack(track);
-	});*/
+	});
 
 	it('MediaStream.onended :: emit < When > MediaStream.polystop()', function (done) {
 		this.timeout(testItemTimeout);
