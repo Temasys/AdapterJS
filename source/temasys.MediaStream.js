@@ -444,16 +444,30 @@ if (navigator.mozGetUserMedia) {
 		})();
 
 		stream.polystop = function () {
+			var i, j;
+
+			var audioTracks = stream.getAudioTracks();
+		  var videoTracks = stream.getVideoTracks();
+
 			try {
 				stream.stop();
 
-			} catch (error) {
-				var i, j;
-
-				var audioTracks = stream.getAudioTracks();
-		    var videoTracks = stream.getVideoTracks();
-
 		    // Check for all tracks if ended
+		    for (i = 0; i < audioTracks.length; i += 1) {
+		    	if (audioTracks[i].readyState !== 'ended') {
+		    		audioTracks[i].polystop();
+		    	}
+		    }
+
+		    for (j = 0; j < videoTracks.length; j += 1) {
+		      if (videoTracks[j].readyState !== 'ended') {
+		    		videoTracks[j].polystop();
+		    	}
+		    }
+
+			} catch (error) {
+
+				// Check for all tracks if ended
 		    for (i = 0; i < audioTracks.length; i += 1) {
 		      audioTracks[i].polystop();
 		    }
