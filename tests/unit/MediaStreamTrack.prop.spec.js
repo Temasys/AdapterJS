@@ -59,16 +59,10 @@ describe('MediaStreamTrack | Properties', function() {
 
 		assert.typeOf(MediaStreamTrack.getSources, 'function');
 
-		try {
-			MediaStreamTrack.getSources(function (sources) {
-				sources.length.should.least(1);
-				done();
-			});
-
-		} catch (error) {
-			throw error;
+		MediaStreamTrack.getSources(function (sources) {
+			expect(sources.length).to.be.at.least(1);
 			done();
-		}
+		});
 	});
 
 	it('MediaStreamTrack.id :: string', function () {
@@ -93,30 +87,30 @@ describe('MediaStreamTrack | Properties', function() {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.readyState, 'string');
-		track.readyState.should.equal('live');
+		expect(track.readyState).to.equal('live');
 	});
 
 	it('MediaStreamTrack.enabled :: boolean', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.enabled, 'boolean');
-		track.enabled.should.equal(true);
+		expect(track.enabled).to.equal(true);
 	});
 
 	it('MediaStreamTrack.muted :: boolean', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.muted, 'boolean');
-		track.muted.should.equal(false);
+		expect(track.muted).to.equal(false);
 	});
 
 	it('MediaStreamTrack.kind :: string', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.kind, 'string');
-		track.kind.should.equal('video');
+		expect(track.kind).to.equal('video');
 		// get audio
-		stream.polygetAudioTracks()[0].kind.should.equal('audio');
+		expect(stream.polygetAudioTracks()[0].kind).to.equal('audio');
 	});
 
 	it('MediaStreamTrack.readOnly :: boolean', function () {
@@ -129,23 +123,16 @@ describe('MediaStreamTrack | Properties', function() {
 		assert.typeOf(track.label, 'string');
 	});
 
-	it('MediaStreamTrack.getConstraints :: method', function (done) {
+	it('MediaStreamTrack.getConstraints :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.getConstraints, 'function');
 
-		try {
-			var data = track.getConstraints();
-			assert.typeOf(data, 'object');
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		var data = track.getConstraints();
+		assert.typeOf(data, 'object');
 	});
 
-	it('MediaStreamTrack.applyConstraints :: method', function (done) {
+	it('MediaStreamTrack.applyConstraints :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.applyConstraints, 'function');
@@ -156,63 +143,35 @@ describe('MediaStreamTrack | Properties', function() {
 			}
 		};
 
-		try {
-			track.applyConstraints(newConstraints);
-			track.getConstraints().should.equal(newConstraints);
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		track.applyConstraints(newConstraints);
+		expect(track.getConstraints()).to.equal(newConstraints);
 	});
 
-	it('MediaStreamTrack.getSettings :: method', function (done) {
+	it('MediaStreamTrack.getSettings :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.getSettings, 'function');
 
-		try {
-			var check = track.getSettings();
-			assert.typeOf(check.facing, 'string');
-			assert.typeOf(check.frameRate, 'number');
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		var check = track.getSettings();
+		assert.typeOf(check.facing, 'string');
+		assert.typeOf(check.frameRate, 'number');
 	});
 
-	it('MediaStreamTrack.states :: method', function (done) {
+	it('MediaStreamTrack.states :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.states, 'function');
 
-		try {
-			assert.typeOf(track.states(), 'object');
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		assert.typeOf(track.states(), 'object');
 	});
 
-	it('MediaStreamTrack.clone :: method', function (done) {
+	it('MediaStreamTrack.clone :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(track.clone, 'function');
 
-		try {
-			var clone = track.clone();
-			assert.typeOf(clone, 'object');
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		var clone = track.clone();
+		assert.typeOf(clone, 'object');
 	});
 
 	it('MediaStreamTrack.polystop -> MediaStreamTrack.stop :: method', function (done) {
@@ -220,17 +179,11 @@ describe('MediaStreamTrack | Properties', function() {
 
 		assert.typeOf(track.polystop, 'function');
 
-		try {
-			track.polystop();
+		track.polystop();
 
-			setTimeout(function () {
-				track.ended.should.equal(true);
-				done();
-			}, 1500);
-
-		} catch (error) {
-			throw error;
+		setTimeout(function () {
+			expect(track.ended).to.equal(true);
 			done();
-		}
+		}, 1500);
 	});
 });

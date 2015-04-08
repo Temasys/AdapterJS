@@ -6,10 +6,10 @@ var assert = chai.assert;
 var should = chai.should;
 
 // Test timeouts
-var testTimeout = 25000;
+var testTimeout = 35000;
 
 // Get User Media timeout
-var gUMTimeout = 15000;
+var gUMTimeout = 25000;
 
 // Test item timeout
 var testItemTimeout = 4000;
@@ -23,8 +23,9 @@ describe('MediaStream | EventHandler', function() {
 	var track = null;
 
 	/* Get User Media */
-	before(function (done) {
-		this.timeout(gUMTimeout);
+	beforeEach(function (done) {
+		this.slow(1000);
+		this.timeout(gUMTimeout + 1000);
 
 		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
 			AdapterJS.onwebrtcreadyDone = true;
@@ -36,13 +37,19 @@ describe('MediaStream | EventHandler', function() {
 				video: true
 
 			}, function (data) {
+
+				if (stream !== null) {
+					delete stream;
+					delete track;
+					console.log('Removed reference');
+				}
+
 				stream = data;
-				track = stream.polygetAudioTracks()[0];
+				track = data.polygetAudioTracks()[0];
 				done();
 
 			}, function (error) {
 				throw error;
-				done();
 			});
 		};
 
@@ -54,98 +61,56 @@ describe('MediaStream | EventHandler', function() {
 		}
 	});
 
-	it('MediaStream.onremovetrack :: emit', function (done) {
+	/*it('MediaStream.onremovetrack :: emit', function (done) {
 		this.timeout(testItemTimeout);
 
-		stream.onremovetrack = function (event) {
-			assert.ok(event, 'Triggers when polyremoveTrack() is invoked');
-			done();
+		stream.onremovetrack = function () {
+		  done();
 		};
 
-		try {
-			stream.polyremoveTrack(track);
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		stream.polyremoveTrack(track);
 	});
 
 	it('MediaStream.onaddtrack :: emit', function (done) {
 		this.timeout(testItemTimeout);
 
-		stream.onaddtrack = function (event) {
-			assert.ok(event, 'Triggers when polyaddTrack() is invoked');
-			done();
+		stream.onaddtrack = function () {
+		  done();
 		};
 
-		try {
-			stream.polyaddTrack(track);
-
-		} catch (error) {
-			throw error;
-			done();
-		}
-	});
+		stream.polyaddTrack(track);
+	});*/
 
 	it('MediaStream.onended :: emit < When > MediaStream.polystop()', function (done) {
 		this.timeout(testItemTimeout);
 
-		stream.onended = function (event) {
-			var checkEvent = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ?
-				{} : event;
-			assert.ok(checkEvent, 'Triggers when polystop() is invoked');
-			done();
+		stream.onended = function () {
+		  done();
 		};
 
-		try {
-			stream.polystop();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		stream.polystop();
 	});
 
 	it('MediaStream.onended :: emit < When > for MediaStreamTrack in MediaStream >> MediaStreamTrack.polystop()', function (done) {
-		this.timeout(testItemTimeout + gUMTimeout + 4000);
+		this.timeout(testItemTimeout);
 
-		window.navigator.getUserMedia({
-			audio: true,
-			video: true
+		stream.onended = function () {
+		  done();
+		};
 
-		}, function (data) {
-			var ucStream = data;
+		console.log('hey there');
 
-			ucStream.onended = function (event) {
-				var checkEvent = window.webrtcDetectedBrowser === 'safari' || window.webrtcDetectedBrowser === 'IE' ?
-					{} : event;
-				assert.ok(checkEvent, 'Triggers when all MediaStreamTracks polystop() is invoked');
-				done();
-			};
+		var i, j;
 
-			try {
-				var i, j;
+		var audioTracks = stream.polygetAudioTracks();
+		var videoTracks = stream.polygetVideoTracks();
 
-				var audioTracks = ucStream.polygetAudioTracks();
-				var videoTracks = ucStream.polygetVideoTracks();
+		for (i = 0; i < audioTracks.length; i += 1) {
+			audioTracks[i].polystop();
+		}
 
-				for (i = 0; i < audioTracks.length; i += 1) {
-					audioTracks[i].polystop();
-				}
-
-				for (j = 0; j < videoTracks.length; j += 1) {
-					videoTracks[j].polystop();
-				}
-
-			} catch (error) {
-				throw error;
-				done();
-			}
-
-		}, function (error) {
-			throw error;
-			done();
-		});
+		for (j = 0; j < videoTracks.length; j += 1) {
+			videoTracks[j].polystop();
+		}
 	});
 });

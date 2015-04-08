@@ -39,12 +39,11 @@ describe('MediaStream | Properties', function() {
 
 			}, function (data) {
 				stream = data;
-				track = stream.polygetAudioTracks()[0];
+				track = data.polygetAudioTracks()[0];
 				done();
 
 			}, function (error) {
 				throw error;
-				done();
 			});
 		};
 
@@ -68,124 +67,75 @@ describe('MediaStream | Properties', function() {
 		assert.typeOf(stream.ended, 'boolean')
 	});
 
-	it('MediaStream.clone :: method', function (done) {
+	it('MediaStream.clone :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.clone, 'function');
 
-		try {
-			var clone = stream.clone();
-			assert.typeOf(clone, 'object');
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		var clone = stream.clone();
+		assert.typeOf(clone, 'object');
 	});
 
-	it('MediaStream.polyremoveTrack -> MediaStream.removeTrack :: method', function (done) {
+	it('MediaStream.polyremoveTrack -> MediaStream.removeTrack :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.polyremoveTrack, 'function');
 
-		try {
-			stream.polyremoveTrack(track);
-			checkRemoveTrackSuccess = stream.getAudioTracks().length === 0;
+		stream.polyremoveTrack(track);
 
-			stream.getAudioTracks().length.should.equal(0);
-			done();
+		checkRemoveTrackSuccess = stream.getAudioTracks().length === 0;
 
-		} catch (error) {
-			throw error;
-			done();
-		}
+		expect(stream.getAudioTracks().length).to.equal(0);
 	});
 
-	it('MediaStream.polyaddTrack -> MediaStream.addTrack :: method', function (done) {
+	it('MediaStream.polyaddTrack -> MediaStream.addTrack :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.polyaddTrack, 'function');
 
-		try {
-			stream.polyaddTrack(track);
+		stream.polyaddTrack(track);
 
-			if (checkRemoveTrackSuccess) {
-				stream.getAudioTracks().length.should.equal(1);
-			} else {
-				assert.fail(checkRemoveTrackSuccess, true, 'Remove track failed. Unable to proceed checking of addTrack');
-			}
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
+		if (!checkRemoveTrackSuccess) {
+			throw new Error('Remove track failed. Unable to proceed checking of addTrack');
 		}
+
+		expect(stream.getAudioTracks().length).to.equal(1);
 	});
 
-	it('MediaStream.polygetTrackById -> MediaStream.getTrackById :: method', function (done) {
+	it('MediaStream.polygetTrackById -> MediaStream.getTrackById :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.polygetTrackById, 'function');
 
-		try {
-			var check = stream.polygetTrackById(track.id);
+		var check = stream.polygetTrackById(track.id);
 
-			if (check === track) {
-				assert.ok(check, 'Track received is correct');
-			} else {
-				assert.fail(check, track, 'Track received is incorrect');
-			}
-
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		expect(check).to.equal(track);
 	});
 
-	it('MediaStream.polygetTracks -> MediaStream.getTracks :: method', function (done) {
+	it('MediaStream.polygetTracks -> MediaStream.getTracks :: method', function () {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.polygetTracks, 'function');
 
-		try {
-			var tracks = stream.polygetTracks(track.id);
+		var tracks = stream.polygetTracks(track.id);
 
-			if (tracks instanceof Array) {
-				assert.ok(tracks, 'Received an array of tracks');
-
-			} else {
-				assert.fail(tracks instanceof Array, true, 'Received track type is not an array');
-			}
-
-			tracks.length.should.equal(2);
-
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
+		if (!(tracks instanceof Array)) {
+			throw new Error('Received track type is not an array');
 		}
+
+		expect(tracks.length).to.equal(2);
 	});
 
 	it('MediaStream.polystop -> MediaStream.stop :: method', function (done) {
-		this.timeout(testItemTimeout + 1000);
+		this.timeout(testItemTimeout + 2500);
 
 		assert.typeOf(stream.polystop, 'function');
 
-		try {
-			stream.polystop();
+		stream.polystop();
 
-			setTimeout(function () {
-				stream.ended.should.equal(true);
-				done();
-			}, 2500);
-
-		} catch (error) {
-			throw error;
+		setTimeout(function () {
+			expect(stream.ended).to.equal(true);
 			done();
-		}
+		}, 2500);
 	});
 });

@@ -6,13 +6,13 @@ var assert = chai.assert;
 var should = chai.should;
 
 // Test timeouts
-var testTimeout = 25000;
+var testTimeout = 35000;
 
 // Get User Media timeout
-var gUMTimeout = 15000;
+var gUMTimeout = 25000;
 
 // Test item timeout
-var testItemTimeout = 4000;
+var testItemTimeout = 2000;
 
 
 describe('MediaStreamTrack | EventHandler', function() {
@@ -22,27 +22,29 @@ describe('MediaStreamTrack | EventHandler', function() {
 	var stream = null;
 	var track = null;
 
+
 	/* Get User Media */
-	before(function (done) {
-		this.timeout(gUMTimeout);
+	beforeEach(function (done) {
+		this.slow(1000);
+		this.timeout(gUMTimeout + 1000);
 
 		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
 			AdapterJS.onwebrtcreadyDone = true;
 		}
 
 		var getMedia = function () {
-			window.navigator.getUserMedia({
+			window.getUserMedia({
 				audio: true,
 				video: true
 
 			}, function (data) {
 				stream = data;
-				track = stream.polygetAudioTracks()[0];
+				track = data.polygetAudioTracks()[0];
+
 				done();
 
 			}, function (error) {
 				throw error;
-				done();
 			});
 		};
 
@@ -65,65 +67,48 @@ describe('MediaStreamTrack | EventHandler', function() {
 	it('MediaStreamTrack.onended :: emit < When > MediaStreamTrack.polystop()', function (done) {
 		this.timeout(testItemTimeout);
 
-		track.onended = function (event) {
-			assert.ok(event, 'Triggers when stop() is invoked');
-			done();
+		var hasTriggered = false;
+
+		track.onended = function () {
+		  done();
 		};
 
-		try {
-			track.polystop();
-			done();
-
-		} catch (error) {
-			throw error;
-			done();
-		}
+		track.polystop();
 	});
 
 	it('MediaStreamTrack.onended :: emit < When > MediaStream.polystop()', function (done) {
-		this.timeout(gUMTimeout + testItemTimeout + 14000);
+		this.timeout(testItemTimeout);
 
-		window.navigator.getUserMedia({
-			audio: true,
-			video: true
+		var i, j;
 
-		}, function (data) {
-			var ucStream = data;
+		var audioEndedTriggered = 0;
+		var videoEndedTriggered = 0;
 
-			var i, j;
+		var audioTracks = stream.polygetAudioTracks();
+		var videoTracks = stream.polygetVideoTracks();
 
-			var audioEndedTriggered = 0;
-			var videoEndedTriggered = 0;
+		var audioTriggeredFn = function () {
+			audioEndedTriggered += 1;
+		};
 
-			var audioTracks = ucStream.polygetAudioTracks();
-			var videoTracks = ucStream.polygetVideoTracks();
+		var videoTriggeredFn = function () {
+			videoEndedTriggered += 1;
+		};
 
-			for (i = 0; i < audioTracks.length; i += 1) {
-				audioTracks[i].onended = function () {
-					audioEndedTriggered += 1;
-				};
-			}
+		for (i = 0; i < audioTracks.length; i += 1) {
+			audioTracks[i].onended = audioTriggeredFn;
+		}
 
-			for (j = 0; j < videoTracks.length; j += 1) {
-				videoTracks[j].onended = function () {
-					videoEndedTriggered += 1;
-				};
-			}
+		for (j = 0; j < videoTracks.length; j += 1) {
+			videoTracks[j].onended = videoTriggeredFn;
+		}
 
-			ucStream.polystop();
+		stream.polystop();
 
-			setTimeout(function () {
-
-				(audioEndedTriggered + videoEndedTriggered).should.equal(audioTracks.length + videoTracks.length);
-
-				done();
-
-			}, 14000);
-
-		}, function (error) {
-			throw error;
+		setTimeout(function () {
+			expect(audioEndedTriggered).to.equal(audioTracks.length);
+			expect(videoEndedTriggered).to.equal(videoTracks.length);
 			done();
-		});
-
+		}, 1000);
 	});
 });
