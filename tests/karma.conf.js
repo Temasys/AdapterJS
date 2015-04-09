@@ -17,7 +17,7 @@ module.exports = function (config) {
 
     autoWatch: false,
 
-    singleRun: true,
+    singleRun: false,
 
     // Levels: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_INFO,

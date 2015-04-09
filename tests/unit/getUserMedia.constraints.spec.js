@@ -15,10 +15,33 @@ var gUMTimeout = 25000;
 var testItemTimeout = 4000;
 
 // Shared functions
+// Checking the bytes of the canvas
+var checkCanvas = function (ctx, width, height) {
+	var nimg = ctx.getImageData(0, 0, width, height);
+
+  var d = nimg.data;
+
+  var i;
+
+  for (i = 0; i < d.length; i += 4) {
+    var r = d[i];
+    var g = d[i + 1];
+    var b = d[i + 2];
+
+    if (r !== 0 || g !== 0 || b !== 0) {
+    	return true;
+    }
+  }
+
+  return false;
+};
+
 // Drawing into a canvas using video
 var drawCanvas = function (v, callback) {
 	var draw = function (v,c,w,h) {
-    if(v.paused || v.ended) return false;
+    if(v.paused || v.ended) {
+    	return false;
+    }
     c.drawImage(v,0,0,w,h);
     setTimeout(draw,20,v,c,w,h);
 	};
@@ -47,29 +70,8 @@ var drawCanvas = function (v, callback) {
  }, 50);
 };
 
-// Checking the bytes of the canvas
-var checkCanvas = function (ctx, width, height) {
-	var nimg = ctx.getImageData(0, 0, width, height);
-
-  var d = nimg.data;
-
-  var i;
-
-  for (i = 0; i < d.length; i += 4) {
-    var r = d[i];
-    var g = d[i + 1];
-    var b = d[i + 2];
-
-    if (r !== 0 || g !== 0 || b !== 0) {
-    	return true;
-    }
-  }
-
-  return false;
-};
-
 // Parse the constraints of getUserMedia
-var parseConstraints = function (obj, spaces) {
+var printJSON = function (obj, spaces) {
 	spaces = typeof spaces !== 'number' ? 2 : spaces;
 
 	// make indentation
@@ -103,7 +105,7 @@ var parseConstraints = function (obj, spaces) {
 			var val = obj[key];
 
 			if (typeof val === 'object') {
-				outputStr += parseConstraints(val, spaces + 2);
+				outputStr += printJSON(val, spaces + 2);
 
 			} else if (typeof val === 'string') {
 				outputStr += '"' + val + '"';
@@ -214,17 +216,25 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			AdapterJS.onwebrtcreadyDone = true;
 		}
 
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = function () {
+		var checkReady = function () {
+			if (document.readyState !== 'complete') {
+				document.onload = function () {
+					done();
+				};
+			} else {
 				done();
-			};
+			}
+		};
+
+		if (!AdapterJS.onwebrtcreadyDone) {
+			AdapterJS.onwebrtcready = checkReady;
 
 		} else {
-			done();
+			checkReady();
 		}
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc1Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc1Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		window.getUserMedia(tc1Constraints, function (stream) {
@@ -237,7 +247,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		});
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc2Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc2Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		window.getUserMedia(tc2Constraints, function (stream) {
@@ -250,7 +260,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		});
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc3Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc3Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		window.getUserMedia(tc3Constraints, function (stream) {
@@ -263,7 +273,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		});
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc4Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc4Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		window.getUserMedia(tc4Constraints, function (stream) {
@@ -276,7 +286,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		});
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc5Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc5Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		window.getUserMedia(tc4Constraints, function (stream) {
@@ -289,7 +299,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		});
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc6Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc6Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		var isInvoked = false;
@@ -315,191 +325,141 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		}, 2000);
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc7Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc7Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-		var isInvoked = false;
 
 		var video = document.createElement('video');
 		video.autoplay = 'autoplay';
 
+		video.onplay = function () {
+			expect(video.offsetWidth).to.be.at.least(357);
+			expect(video.offsetHeight).to.be.at.least(55);
+			done();
+		};
+
 		document.body.appendChild(video);
 
-		window.getUserMedia(tc7Constraints, function () {
-			isInvoked = true;
+		window.getUserMedia(tc7Constraints, function (stream) {
 
 			attachMediaStream(video, stream);
 
-			setTimeout(function () {
-				expect(video.offsetWidth).to.be.at.least(357);
-				expect(video.offsetHeight).to.be.at.least(55);
+		}, function (error) {
+			throw error;
+		});
+	});
+
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc8Constraints) + ')', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout + 5000);
+
+		var video = document.createElement('video');
+		video.autoplay = 'autoplay';
+
+		video.onplay = function () {
+			expect(video.offsetWidth).to.be.at.most(1357);
+			expect(video.offsetHeight).to.be.at.most(135);
+			done();
+		};
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc8Constraints, function (stream) {
+
+			attachMediaStream(video, stream);
+
+		}, function (error) {
+			throw error;
+		});
+	});
+
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc9Constraints) + ')', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout + 5000);
+
+		var video = document.createElement('video');
+		video.autoplay = 'autoplay';
+
+		video.onplay = function () {
+			drawCanvas(video, function (isEmpty) {
+				expect(isEmpty).to.equal(false);
 				done();
-			}, 5000);
+			});
+		};
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc9Constraints, function (stream) {
+
+			attachMediaStream(video, stream);
 
 		}, function (error) {
 			throw error;
 		});
-
-		setTimeout(function () {
-			if (!isInvoked) {
-				throw new Error('Does get MediaStream at all');
-			}
-		}, 2000);
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc8Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc10Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-		var isInvoked = false;
 
 		var video = document.createElement('video');
 		video.autoplay = 'autoplay';
 
-		document.body.appendChild(video);
-
-		window.getUserMedia(tc8Constraints, function () {
-			isInvoked = true;
-
-			attachMediaStream(video, stream);
-
-			setTimeout(function () {
-				expect(video.offsetWidth).to.be.at.most(1357);
-				expect(video.offsetHeight).to.be.at.most(135);
+		video.onplay = function () {
+			drawCanvas(video, function (isEmpty) {
+				expect(isEmpty).to.equal(false);
 				done();
-			}, 5000);
+			});
+		};
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc10Constraints, function (stream) {
+
+			attachMediaStream(video, stream);
 
 		}, function (error) {
 			throw error;
 		});
-
-		setTimeout(function () {
-			if (!isInvoked) {
-				throw new Error('Does get MediaStream at all');
-			}
-		}, 2000);
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc9Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc11Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-		var isInvoked = false;
 
 		var video = document.createElement('video');
 		video.autoplay = 'autoplay';
 
-		document.body.appendChild(video);
-
-		window.getUserMedia(tc9Constraints, function () {
-			isInvoked = true;
-
-			attachMediaStream(video, stream);
-
-			setTimeout(function () {
-				drawCanvas(video, function (isEmpty) {
-					expect(isEmpty).to.equal(false);
-					done();
-				});
-			}, 5000);
-
-		}, function (error) {
-			throw error;
-		});
-
-		setTimeout(function () {
-			if (!isInvoked) {
-				throw new Error('Does get MediaStream at all');
-			}
-		}, 2000);
-	});
-
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc10Constraints) + ')', function (done) {
-		this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-		var isInvoked = false;
-
-		var video = document.createElement('video');
-		video.autoplay = 'autoplay';
-
-		document.body.appendChild(video);
-
-		window.getUserMedia(tc10Constraints, function () {
-			isInvoked = true;
-
-			attachMediaStream(video, stream);
-
-			setTimeout(function () {
-				drawCanvas(video, function (isEmpty) {
-					expect(isEmpty).to.equal(false);
-					done();
-				});
-			}, 5000);
-
-		}, function (error) {
-			throw error;
-		});
-
-		setTimeout(function () {
-			if (!isInvoked) {
-				throw new Error('Does get MediaStream at all');
-			}
-		}, 2000);
-	});
-
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc11Constraints) + ')', function (done) {
-		this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-		var isInvoked = false;
-
-		var video = document.createElement('video');
-		video.autoplay = 'autoplay';
-
-		document.body.appendChild(video);
-
-		window.getUserMedia(tc11Constraints, function () {
-			isInvoked = true;
-
-			attachMediaStream(video, stream);
+		video.onplay = function () {
 			expect(video.offsetWidth / video.offsetHeight).to.be.at.least(16 / 10);
-			clearInterval(checkerFn);
 			done();
+		};
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc11Constraints, function (stream) {
+
+			attachMediaStream(video, stream);
 
 		}, function (error) {
 			throw error;
 		});
-
-		setTimeout(function () {
-			if (!isInvoked) {
-				throw new Error('Does get MediaStream at all');
-			}
-		}, 2000);
 	});
 
-	it('getUserMedia(MediaStreamConstraints = ' + parseConstraints(tc12Constraints) + ')', function (done) {
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc12Constraints) + ')', function (done) {
 		this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-		var isInvoked = false;
 
 		var video = document.createElement('video');
 		video.autoplay = 'autoplay';
 
+		video.onplay = function () {
+			expect(video.offsetWidth / video.offsetHeight).to.be.at.most(21 / 9);
+			done();
+		};
+
 		document.body.appendChild(video);
 
-		window.getUserMedia(tc12Constraints, function () {
-			isInvoked = true;
+		window.getUserMedia(tc12Constraints, function (stream) {
 
 			attachMediaStream(video, stream);
-			expect(video.offsetWidth / video.offsetHeight).to.be.at.most(21 / 9);
-			clearInterval(checkerFn);
-			done();
 
 		}, function (error) {
 			throw error;
 		});
-
-		setTimeout(function () {
-			if (!isInvoked) {
-				throw new Error('Does get MediaStream at all');
-			}
-		}, 2000);
 	});
 });

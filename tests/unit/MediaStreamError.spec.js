@@ -15,7 +15,7 @@ var gUMTimeout = 25000;
 var testItemTimeout = 4000;
 
 
-describe('getUserMedia | MediaStreamError', function() {
+describe('MediaStreamError', function() {
 	this.timeout(testTimeout);
 
 
@@ -37,19 +37,27 @@ describe('getUserMedia | MediaStreamError', function() {
 		}
 	});
 
-	it('MediaStreamError.name === MANDATORY_UNSATISFIED_ERROR', function (done) {
+	it('MediaStreamError.name === "NotSupportedError"', function (done) {
 		this.timeout(testItemTimeout);
 
 		window.getUserMedia({}, function (stream) {
 			throw new Error('Invalid constraints passed still triggers a success callback');
 
 		}, function (error) {
-			expect(error.name).to.equal('MANDATORY_UNSATISFIED_ERROR');
-			done();
+			expect(error.name).to.equal('NotSupportedError');
 		});
 	});
 
-	it.skip('MediaStreamError.name === PERMISSION_DENIED', function () {});
+	it.skip('MediaStreamError.name === "PermissionDeniedError"', function () {});
 
-	it.skip('MediaStreamError.name === NOT_SUPPORTED_ERROR', function () {});
+	it.skip('MediaStreamError.name === "ConstraintNotSatisfiedError"', function () {});
+
+	it.skip('MediaStreamError.name === "OverconstrainedError"', function () {});
+
+	it.skip('MediaStreamError.name === "NotFoundError"', function () {});
+
+	it.skip('MediaStreamError.name === "AbortError"', function () {});
+
+	it.skip('MediaStreamError.name === "SourceUnavailableError"', function () {});
+
 });

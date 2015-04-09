@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-04-08 */
+/*! adapterjs - v0.10.5 - 2015-04-09 */
 
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.

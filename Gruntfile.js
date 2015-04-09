@@ -44,7 +44,7 @@ module.exports = function(grunt) {
     var testUnits = [
       'getUserMedia.constraints.spec.js',
       'getUserMedia.error.spec.js',
-      'getUserMedia.spec.js',
+      'getUserMedia.param.spec.js',
       'MediaStream.event.spec.js',
       'MediaStream.prop.spec.js',
       'MediaStreamTrack.event.spec.js',
