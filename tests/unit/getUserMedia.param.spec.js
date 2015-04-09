@@ -36,7 +36,18 @@ describe('getUserMedia | Parameters', function() {
 		}
 	});
 
-	it('Expects 3 parameters when 2 is only provided', function () {
+	it('getUserMedia(constraints) -> Error', function () {
+		this.timeout(testItemTimeout);
+
+		expect(function () {
+			window.getUserMedia({
+				audio: true,
+				video: true
+			});
+		}).to.throw(TypeError);
+	});
+
+	it('getUserMedia(constraints, successCallback) -> Error', function () {
 		this.timeout(testItemTimeout);
 
 		expect(function () {
@@ -47,7 +58,7 @@ describe('getUserMedia | Parameters', function() {
 		}).to.throw(TypeError);
 	});
 
-	it('Expects 3 parameters should pass', function (done) {
+	it('getUserMedia(constraints, successCallback :: emit -> MediaStream, failureCallback)', function (done) {
 		this.timeout(testItemTimeout);
 
 		window.getUserMedia({

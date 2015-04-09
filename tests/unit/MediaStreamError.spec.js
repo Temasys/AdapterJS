@@ -37,20 +37,61 @@ describe('MediaStreamError', function() {
 		}
 	});
 
-	it('MediaStreamError.name === "NotSupportedError"', function (done) {
+	it('MediaStreamError.name === "NotSupportedError" < When > MediaStreamConstraints === {}', function (done) {
 		this.timeout(testItemTimeout);
 
-		window.getUserMedia({}, function (stream) {
-			throw new Error('Invalid constraints passed still triggers a success callback');
+		try {
+			window.getUserMedia({}, function (stream) {
+				throw new Error('Invalid constraints passed still triggers a success callback');
 
-		}, function (error) {
+			}, function (error) {
+				throw error;
+			});
+		} catch (error) {
 			expect(error.name).to.equal('NotSupportedError');
-		});
+		}
+	});
+
+	it('MediaStreamError.name === "NotSupportedError" < When > MediaStreamConstraints === { doesnotexist: true }', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout);
+
+		var isInvoked = false;
+
+		try {
+			window.getUserMedia({
+				doesnotexist: true
+
+			}, function (stream) {
+				isInvoked = true;
+				throw new Error('Stream should not be retrieved');
+
+			}, function (error) {
+				isInvoked = true;
+				throw error;
+			});
+		} catch (error) {
+			expect(error.name).to.equal('NotSupportedError');
+		}
 	});
 
 	it.skip('MediaStreamError.name === "PermissionDeniedError"', function () {});
 
-	it.skip('MediaStreamError.name === "ConstraintNotSatisfiedError"', function () {});
+	it('MediaStreamError.name === "ConstraintNotSatisfiedError"', function () {
+		this.timeout(testItemTimeout);
+
+		window.getUserMedia({
+			video: {
+				minWidth: Infinity
+			}
+		}, function (stream) {
+			throw new Error('Invalid constraints passed still triggers a success callback');
+
+		}, function (error) {
+			expect(error.name).to.equal('ConstraintNotSatisfiedError');
+    	expect(error.constraintName).to.equal('minWidth');
+    	done();
+		});
+	});
 
 	it.skip('MediaStreamError.name === "OverconstrainedError"', function () {});
 

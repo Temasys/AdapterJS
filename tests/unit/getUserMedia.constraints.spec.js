@@ -208,6 +208,41 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		}
 	};
 
+	var tc13Constraints = {
+		video: {
+			optional: [{
+				minWidth: 1024,
+				maxWidth: 800
+			}]
+		}
+	};
+
+	var tc14Constraints = {
+		video: {
+			mandatory: {
+				width: {
+					min: 358
+				},
+				height: {
+					min: 59
+				}
+			}
+		}
+	};
+
+	var tc15Constraints = {
+		video: {
+			mandatory: {
+				width: {
+					max: 1310
+				},
+				height: {
+					max: 120
+				}
+			}
+		}
+	};
+
 	/* Get User Media */
 	before(function (done) {
 		this.timeout(testItemTimeout);
@@ -462,4 +497,68 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			throw error;
 		});
 	});
+
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc13Constraints) + ')', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout + 5000);
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc13Constraints, function (stream) {
+
+			assert.typeOf(stream, 'object');
+
+			done();
+
+		}, function (error) {
+			throw new Error('Optional constraint should not affect the retrieval of getUserMedia');
+		});
+	});
+
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc14Constraints) + ')', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout + 5000);
+
+		var video = document.createElement('video');
+		video.autoplay = 'autoplay';
+
+		video.onplay = function () {
+			expect(video.offsetWidth).to.be.at.least(358);
+			expect(video.offsetHeight).to.be.at.least(59);
+			done();
+		};
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc14Constraints, function (stream) {
+
+			attachMediaStream(video, stream);
+
+		}, function (error) {
+			throw error;
+		});
+	});
+
+	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc15Constraints) + ')', function (done) {
+		this.timeout(testItemTimeout + gUMTimeout + 5000);
+
+		var video = document.createElement('video');
+		video.autoplay = 'autoplay';
+
+		video.onplay = function () {
+			expect(video.offsetWidth).to.be.at.most(1310);
+			expect(video.offsetHeight).to.be.at.most(120);
+			done();
+		};
+
+		document.body.appendChild(video);
+
+		window.getUserMedia(tc15Constraints, function (stream) {
+
+			attachMediaStream(video, stream);
+
+		}, function (error) {
+			throw error;
+		});
+	});
+
+
 });
