@@ -82,7 +82,7 @@ describe('MediaStreamTrack | Properties', function() {
 				var checkTrack = source1.kind === 'audio' ? checkStream.polygetAudioTracks()[0] :
 					checkStream.polygetVideoTracks()[0];
 
-				expect(track.id).to.equal(checkTrack.id);
+				expect(checkTrack.id).to.equal(source1.id);
 				done();
 
 			}, function (error) {
@@ -162,7 +162,7 @@ describe('MediaStreamTrack | Properties', function() {
 		assert.typeOf(audioTrack.kind, 'string');
 		assert.typeOf(videoTrack.kind, 'string');
 
-		expect(audioTrack.kind).to.equal('video');
+		expect(audioTrack.kind).to.equal('audio');
 		expect(videoTrack.kind).to.equal('video');
 	});
 
