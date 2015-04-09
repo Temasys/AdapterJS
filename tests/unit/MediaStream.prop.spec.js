@@ -59,6 +59,11 @@ describe('MediaStream | Properties', function() {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.id, 'string');
+
+		var regex = /^[\u0021\u0023-\u0027\u002A-\u002B\u002D-\u002E\u0030-\u0039\u0041-\u005A\u005E-\u007E]*$/;
+
+		expect(stream.id).to.have.length(36);
+		expect(stream.id).to.match(regex);
 	});
 
 	it('MediaStream.ended :: boolean', function () {
@@ -85,7 +90,7 @@ describe('MediaStream | Properties', function() {
 
 		checkRemoveTrackSuccess = stream.getAudioTracks().length === 0;
 
-		expect(stream.getAudioTracks().length).to.equal(0);
+		expect(stream.getAudioTracks()).to.have.length(0);
 	});
 
 	it('MediaStream.polyaddTrack -> MediaStream.addTrack :: method', function () {
@@ -99,7 +104,7 @@ describe('MediaStream | Properties', function() {
 			throw new Error('Remove track failed. Unable to proceed checking of addTrack');
 		}
 
-		expect(stream.getAudioTracks().length).to.equal(1);
+		expect(stream.getAudioTracks()).to.have.length(1);
 	});
 
 	it('MediaStream.polygetTrackById -> MediaStream.getTrackById :: method', function () {
@@ -123,7 +128,7 @@ describe('MediaStream | Properties', function() {
 			throw new Error('Received track type is not an array');
 		}
 
-		expect(tracks.length).to.equal(2);
+		expect(tracks).to.have.length(2);
 	});
 
 	it('MediaStream.polystop -> MediaStream.stop :: method', function (done) {
@@ -137,5 +142,17 @@ describe('MediaStream | Properties', function() {
 			expect(stream.ended).to.equal(true);
 			done();
 		}, 2500);
+	});
+
+	it('MediaStream.addTrack && MediaStream.removeTrack -> Error < When > MediaStream.ended === true', function () {
+		this.timeout(testItemTimeout);
+
+		expect(function () {
+			stream.polyaddTrack(track);
+		}).to.throw(Error);
+
+		expect(function () {
+			stream.polyremoveTrack(track);
+		}).to.throw(Error);
 	});
 });

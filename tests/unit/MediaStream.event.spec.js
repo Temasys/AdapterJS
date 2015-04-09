@@ -92,8 +92,6 @@ describe('MediaStream | EventHandler', function() {
 		  done();
 		};
 
-		console.log('hey there');
-
 		var i, j;
 
 		var audioTracks = stream.polygetAudioTracks();
