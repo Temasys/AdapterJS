@@ -20,7 +20,8 @@ describe('MediaStreamTrack | Properties', function() {
 
 	/* Attributes */
 	var stream = null;
-	var track = null;
+	var audioTrack = null;
+	var videoTrack = null;
 
 	/* Get User Media */
 	before(function (done) {
@@ -37,7 +38,8 @@ describe('MediaStreamTrack | Properties', function() {
 
 			}, function (data) {
 				stream = data;
-				track = stream.polygetVideoTracks()[0];
+				videoTrack = stream.polygetVideoTracks()[0];
+				audioTrack = stream.polygetAudioTracks()[0];
 				done();
 
 			}, function (error) {
@@ -61,81 +63,139 @@ describe('MediaStreamTrack | Properties', function() {
 
 		MediaStreamTrack.getSources(function (sources) {
 			expect(sources.length).to.be.at.least(1);
-			done();
+
+			var source1 = sources[0];
+
+			assert.typeOf(source1.id, 'string');
+			assert.typeOf(source1.kind, 'string');
+			assert.typeOf(source1.facing, 'string');
+			assert.typeOf(source1.label, 'string');
+
+			var constraints = {};
+
+			constraints[source1.kind] = {
+				optional: [{ sourceId: source1.id }]
+			};
+
+			window.navigator.getUserMedia(constraints, function (checkStream) {
+
+				var checkTrack = source1.kind === 'audio' ? checkStream.polygetAudioTracks()[0] :
+					checkStream.polygetVideoTracks()[0];
+
+				expect(track.id).to.equal(checkTrack.id);
+				done();
+
+			}, function (error) {
+				throw error;
+			});
 		});
 	});
 
 	it('MediaStreamTrack.id :: string', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.id, 'string');
+		assert.typeOf(audioTrack.id, 'string');
+		assert.typeOf(videoTrack.id, 'string');
+
+		expect(audioTrack.id).to.not.equal(videoTrack.id);
 	});
 
 	it('MediaStreamTrack.ended :: boolean', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.ended, 'boolean')
+		assert.typeOf(audioTrack.ended, 'boolean');
+		assert.typeOf(videoTrack.ended, 'boolean');
+
+		expect(audioTrack.ended).to.equal(false);
+		expect(videoTrack.ended).to.equal(false);
 	});
 
 	it('MediaStreamTrack.remote :: boolean', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.remote, 'boolean')
+		assert.typeOf(audioTrack.remote, 'boolean');
+		assert.typeOf(videoTrack.remote, 'boolean');
+
+		expect(audioTrack.remote).to.equal(false);
+		expect(videoTrack.remote).to.equal(false);
 	});
 
 	it('MediaStreamTrack.readyState :: string', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.readyState, 'string');
-		expect(track.readyState).to.equal('live');
+		assert.typeOf(audioTrack.readyState, 'string');
+		assert.typeOf(videoTrack.readyState, 'string');
+
+		expect(audioTrack.readyState).to.equal('live');
+		expect(videoTrack.readyState).to.equal('live');
 	});
 
 	it('MediaStreamTrack.enabled :: boolean', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.enabled, 'boolean');
-		expect(track.enabled).to.equal(true);
+		assert.typeOf(audioTrack.enabled, 'boolean');
+		assert.typeOf(videoTrack.enabled, 'boolean');
+
+		expect(audioTrack.enabled).to.equal(true);
+		expect(videoTrack.enabled).to.equal(true);
+
+		audioTrack.enabled = false;
+		videoTrack.enabled = false;
+
+		expect(audioTrack.enabled).to.equal(false);
+		expect(videoTrack.enabled).to.equal(false);
 	});
 
 	it('MediaStreamTrack.muted :: boolean', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.muted, 'boolean');
-		expect(track.muted).to.equal(false);
+		assert.typeOf(audioTrack.muted, 'boolean');
+		assert.typeOf(videoTrack.muted, 'boolean');
+
+		expect(audioTrack.muted).to.equal(false);
+		expect(videoTrack.muted).to.equal(false);
 	});
 
 	it('MediaStreamTrack.kind :: string', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.kind, 'string');
-		expect(track.kind).to.equal('video');
-		// get audio
-		expect(stream.polygetAudioTracks()[0].kind).to.equal('audio');
+		assert.typeOf(audioTrack.kind, 'string');
+		assert.typeOf(videoTrack.kind, 'string');
+
+		expect(audioTrack.kind).to.equal('video');
+		expect(videoTrack.kind).to.equal('video');
 	});
 
 	it('MediaStreamTrack.readOnly :: boolean', function () {
-		assert.typeOf(track.readOnly, 'boolean');
+		this.timeout(testItemTimeout);
+
+		assert.typeOf(audioTrack.readOnly, 'boolean');
+		assert.typeOf(videoTrack.readOnly, 'boolean');
 	});
 
 	it('MediaStreamTrack.label :: string', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.label, 'string');
+		assert.typeOf(audioTrack.label, 'string');
+		assert.typeOf(videoTrack.label, 'string');
+
+		expect(audioTrack.label).to.not.equal('');
+		expect(videoTrack.label).to.not.equal('');
 	});
 
 	it('MediaStreamTrack.getConstraints :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.getConstraints, 'function');
+		assert.typeOf(videoTrack.getConstraints, 'function');
 
-		var data = track.getConstraints();
+		var data = videoTrack.getConstraints();
 		assert.typeOf(data, 'object');
 	});
 
 	it('MediaStreamTrack.applyConstraints :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.applyConstraints, 'function');
+		assert.typeOf(videoTrack.applyConstraints, 'function');
 
 		var newConstraints = {
 			mandantory: {
@@ -143,8 +203,8 @@ describe('MediaStreamTrack | Properties', function() {
 			}
 		};
 
-		track.applyConstraints(newConstraints);
-		expect(track.getConstraints()).to.equal(newConstraints);
+		videoTrack.applyConstraints(newConstraints);
+		expect(videoTrack.getConstraints()).to.equal(newConstraints);
 	});
 
 	it('MediaStreamTrack.getSettings :: method', function () {
@@ -152,7 +212,7 @@ describe('MediaStreamTrack | Properties', function() {
 
 		assert.typeOf(track.getSettings, 'function');
 
-		var check = track.getSettings();
+		var check = videoTrack.getSettings();
 		assert.typeOf(check.facing, 'string');
 		assert.typeOf(check.frameRate, 'number');
 	});
@@ -160,29 +220,42 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.states :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.states, 'function');
+		assert.typeOf(videoTrack.states, 'function');
+		assert.typeOf(audioTrack.states, 'function');
 
-		assert.typeOf(track.states(), 'object');
+		assert.typeOf(videoTrack.states(), 'object');
+		assert.typeOf(audioTrack.states(), 'object');
 	});
 
 	it('MediaStreamTrack.clone :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.clone, 'function');
+		assert.typeOf(audioTrack.clone, 'function');
+		assert.typeOf(videoTrack.clone, 'function');
 
-		var clone = track.clone();
+		var clone = audioTrack.clone();
 		assert.typeOf(clone, 'object');
+
+		expect(audioTrack.id).to.not.equal(clone.id);
+		expect(audioTrack.kind).to.equal(clone.kind);
+		expect(audioTrack.label).to.equal(clone.label);
 	});
 
 	it('MediaStreamTrack.polystop -> MediaStreamTrack.stop :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.polystop, 'function');
+		assert.typeOf(audioTrack.polystop, 'function');
+		assert.typeOf(videoTrack.polystop, 'function');
 
-		track.polystop();
+		audioTrack.polystop();
+		videoTrack.polystop();
 
 		setTimeout(function () {
-			expect(track.ended).to.equal(true);
+			expect(audioTrack.ended).to.equal(true);
+			expect(videoTrack.ended).to.equal(true);
+
+			expect(audioTrack.readyState).to.equal('ended');
+			expect(videoTrack.readyState).to.equal('ended');
 			done();
 		}, 1500);
 	});
