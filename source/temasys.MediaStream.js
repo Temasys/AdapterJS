@@ -19,7 +19,11 @@ if (navigator.mozGetUserMedia) {
 		 * @for MediaStream
 		 * @since 0.10.6
 		 */
-		stream.id = stream.id || (new Date()).getTime().toString();
+		try {
+			stream.id = stream.id || (new Date()).getTime().toString();
+		} catch (error) {
+			console.warn('Unable to polyfill MediaStream.id');
+		}
 
 		/**
 		 * The flag that indicates if a MediaStream object has ended.

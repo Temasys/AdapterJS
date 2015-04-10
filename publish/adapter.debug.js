@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-04-09 */
+/*! adapterjs - v0.10.5 - 2015-04-10 */
 
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
@@ -1253,7 +1253,11 @@ if (navigator.mozGetUserMedia) {
 		 * @for MediaStream
 		 * @since 0.10.6
 		 */
-		stream.id = stream.id || (new Date()).getTime().toString();
+		try {
+			stream.id = stream.id || (new Date()).getTime().toString();
+		} catch (error) {
+			console.warn('Unable to polyfill MediaStream.id');
+		}
 
 		/**
 		 * The flag that indicates if a MediaStream object has ended.

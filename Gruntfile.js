@@ -42,6 +42,8 @@ module.exports = function(grunt) {
     var testBrowsers = ['chrome', 'firefox', 'ie', 'safari', 'opera'];
 
     var testUnits = [
+      'RTCPeerConnection.constraints.spec.js',
+      'RTCPeerConnection.param.spec.js',
       'getUserMedia.constraints.spec.js',
       'getUserMedia.param.spec.js',
       'MediaStreamError.spec.js',
