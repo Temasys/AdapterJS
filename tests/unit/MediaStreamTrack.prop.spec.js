@@ -23,37 +23,42 @@ describe('MediaStreamTrack | Properties', function() {
 	var audioTrack = null;
 	var videoTrack = null;
 
-	/* Get User Media */
+	/* WebRTC Object should be initialized in Safari/IE Plugin */
 	before(function (done) {
-		this.timeout(gUMTimeout);
+		this.timeout(testItemTimeout);
 
 		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
 			AdapterJS.onwebrtcreadyDone = true;
 		}
 
-		var getMedia = function () {
-			window.navigator.getUserMedia({
-				audio: true,
-				video: true
-
-			}, function (data) {
-				stream = data;
-				videoTrack = stream.polygetVideoTracks()[0];
-				audioTrack = stream.polygetAudioTracks()[0];
-				done();
-
-			}, function (error) {
-				throw error;
-				done();
-			});
-		};
-
 		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = getMedia;
+			AdapterJS.onwebrtcready = function () {
+				done();
+			};
 
 		} else {
-			getMedia();
+			done();
 		}
+	});
+
+	/* Get User Media */
+	before(function (done) {
+		this.timeout(gUMTimeout);
+
+		window.navigator.getUserMedia({
+			audio: true,
+			video: true
+
+		}, function (data) {
+			stream = data;
+			videoTrack = stream.polygetVideoTracks()[0];
+			audioTrack = stream.polygetAudioTracks()[0];
+			done();
+
+		}, function (error) {
+			throw error;
+			done();
+		});
 	});
 
 	it('MediaStreamTrack.getSources :: static method', function (done) {
