@@ -26,7 +26,6 @@ describe('RTCPeerConnection: Properties', function() {
 			return code();
 		} catch (error) {
 			throw error;
-			done();
 		}
 	};
 
