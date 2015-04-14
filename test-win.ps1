@@ -6,5 +6,11 @@ function runTest{
 	}
 }
 
-grunt test;
-runTest;
+function autoClick{
+	cmd /c start powershell.exe -noexit -command "./autoclick.ps1" 
+}
+
+#grunt test;
+#runTest;
+
+autoClick;
