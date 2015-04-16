@@ -7,7 +7,7 @@ module.exports = function (config) {
 
     frameworks: ['mocha', 'chai'],
 
-    files: ['../../publish/adapter.debug.js'],
+    files: ['../../tests/globals.js', '../../publish/adapter.debug.js'],
 
     reporters: ['mocha'],
 
@@ -20,12 +20,12 @@ module.exports = function (config) {
     singleRun: true,
 
     // Levels: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DISABLE,
 
     // set the timeout
     //browserDisconnectTimeout: 10000, // default 2000
 
-    //browserDisconnectTolerance: 1, // default 0
+    //browserDisconnectTolerance: 2, // default 0
 
     //browserNoActivityTimeout: 4 * 60 * 1000, //default 10000
 
@@ -33,7 +33,16 @@ module.exports = function (config) {
 
     customLaunchers: {},
 
+    transports: ['websocket', 'flashsocket', 'xhr-polling', 'jsonp-polling', 'polling'],
+
+    //reportSlowerThan: 1000,
+
     browsers: [],
+
+    /*client: {
+      useIframe: false,
+      captureConsole: true
+    },*/
 
     plugins: ['karma-mocha', 'karma-mocha-reporter', 'karma-chai']
   });

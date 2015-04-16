@@ -31,13 +31,13 @@
     "grunt-replace": "^0.7.9",
     "karma": "^0.12.31",
     "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^0.1.0",
-    "karma-firefox-launcher": "^0.1.0",
-    "karma-ie-launcher": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-firefox-launcher": "^0.1.4",
+    "karma-ie-launcher": "^0.1.5",
     "karma-mocha": "^0.1.10",
-    "karma-mocha-reporter": "^0.3.0",
+    "karma-mocha-reporter": "^1.0.2",
     "karma-opera-launcher": "^0.1.0",
-    "karma-safari-launcher": "^0.1.0",
+    "karma-safari-launcher": "^0.1.1",
     "mocha-funnynyan-reporter": "*"
   },
   "engines": {
