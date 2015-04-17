@@ -280,6 +280,18 @@ describe('RTCPeerConnection | Properties', function() {
     });
   });
 
+  it('RTCPeerConnection.createOffer :: method < When > RTCPeerConnection.createOffer(invalid parameters)', function () {
+    this.timeout(testItemTimeout);
+
+    expect(function () {
+      peer1.createOffer(function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.createOffer(function () {});
+    }).to.throw(Error);
+  });
+
   it('RTCPeerConnection.setRemoteDescription(offer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
@@ -297,6 +309,26 @@ describe('RTCPeerConnection | Properties', function() {
     }, function (error) {
       throw error;
     });
+  });
+
+  it('RTCPeerConnection.setRemoteDescription :: method < When > RTCPeerConnection.setRemoteDescription(invalid parameters)', function () {
+    this.timeout(testItemTimeout);
+
+    expect(function () {
+      peer1.setRemoteDescription(function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.setRemoteDescription(function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer1.setRemoteDescription(offer, function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.setRemoteDescription(offer, function () {});
+    }).to.throw(Error);
   });
 
   it('RTCPeerConnection.createAnswer :: method', function (done) {
@@ -323,6 +355,18 @@ describe('RTCPeerConnection | Properties', function() {
     });
   });
 
+  it('RTCPeerConnection.createAnswer :: method < When > RTCPeerConnection.createAnswer(invalid parameters)', function () {
+    this.timeout(testItemTimeout);
+
+    expect(function () {
+      peer1.createAnswer(function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.createAnswer(function () {});
+    }).to.throw(Error);
+  });
+
   it('RTCPeerConnection.setLocalDescription(offer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
@@ -336,6 +380,26 @@ describe('RTCPeerConnection | Properties', function() {
     }, function (error) {
       throw error;
     });
+  });
+
+  it('RTCPeerConnection.setLocalDescription :: method < When > RTCPeerConnection.setLocalDescription(invalid parameters)', function () {
+    this.timeout(testItemTimeout);
+
+    expect(function () {
+      peer1.setLocalDescription(function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.setLocalDescription(function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer1.setLocalDescription(offer, function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.setLocalDescription(offer, function () {});
+    }).to.throw(Error);
   });
 
   it('RTCPeerConnection.setLocalDescription(answer) :: method', function (done) {
@@ -400,6 +464,34 @@ describe('RTCPeerConnection | Properties', function() {
       expect(success2).to.equal(candidates2.length);
       done();
     }, 2000);
+  });
+
+  it('RTCPeerConnection.addIceCandidate :: method < When > RTCPeerConnection.addIceCandidate(invalid parameters)', function () {
+    this.timeout(testItemTimeout);
+
+    expect(function () {
+      peer1.addIceCandidate(candidates1[0]);
+    }).to.not.throw(Error);
+
+    expect(function () {
+      peer2.addIceCandidate(candidates2[0]);
+    }).to.not.throw(Error);
+
+    expect(function () {
+      peer1.addIceCandidate(candidates1[0], function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.addIceCandidate(candidates2[0], function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer1.addIceCandidate(candidates1[0], function () {}, function () {});
+    }).to.throw(Error);
+
+    expect(function () {
+      peer2.addIceCandidate(candidates2[0], function () {}, function () {});
+    }).to.throw(Error);
   });
 
   it('RTCPeerConnection.close :: method', function (done) {
