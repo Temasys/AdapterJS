@@ -16,7 +16,8 @@ var testItemTimeout = 4000;
 
 
 describe('MediaStream | EventHandler', function() {
-	this.timeout(testTimeout);
+	this.timeout(testTimeout + 2000);
+	this.slow(2000);
 
 	/* Attributes */
 	var stream = null;
@@ -42,8 +43,7 @@ describe('MediaStream | EventHandler', function() {
 
 	/* Get User Media */
 	beforeEach(function (done) {
-		this.slow(1000);
-		this.timeout(gUMTimeout + 1000);
+		this.timeout(gUMTimeout);
 
 		window.navigator.getUserMedia({
 			audio: true,
