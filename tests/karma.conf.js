@@ -7,7 +7,7 @@ module.exports = function (config) {
 
     frameworks: ['mocha', 'chai'],
 
-    files: ['../../tests/globals.js', '../../publish/adapter.debug.js'],
+    files: ['../../publish/adapter.debug.js', 'globals.js'],
 
     reporters: ['mocha'],
 
