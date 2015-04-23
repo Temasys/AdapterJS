@@ -833,9 +833,8 @@ if (navigator.mozGetUserMedia) {
     };
 
     getUserMedia = function (constraints, successCallback, failureCallback) {
-      if (!constraints.audio) {
-        constraints.audio = false;
-      }
+      constraints.audio = constraints.audio || false;
+      constraints.video = constraints.video || false;
 
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.
