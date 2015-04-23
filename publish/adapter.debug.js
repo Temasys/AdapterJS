@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.6 - 2015-03-31 */
+/*! adapterjs - v0.10.6 - 2015-04-23 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -835,9 +835,8 @@ if (navigator.mozGetUserMedia) {
     };
 
     getUserMedia = function (constraints, successCallback, failureCallback) {
-      if (!constraints.audio) {
-        constraints.audio = false;
-      }
+      constraints.audio = constraints.audio || false;
+      constraints.video = constraints.video || false;
 
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.
