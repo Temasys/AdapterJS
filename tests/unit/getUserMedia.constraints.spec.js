@@ -12,7 +12,7 @@ var testTimeout = 35000;
 var gUMTimeout = 25000;
 
 // Test item timeout
-var testItemTimeout = 4000;
+var testItemTimeout = 10000;
 
 // Shared functions
 // Checking the bytes of the canvas
@@ -247,6 +247,11 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 	before(function (done) {
 		this.timeout(testItemTimeout);
 
+		setTimeout(function(){
+			done();
+		},5000);
+
+		/*
 		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
 			AdapterJS.onwebrtcreadyDone = true;
 		}
@@ -267,6 +272,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		} else {
 			checkReady();
 		}
+		*/
 	});
 
 	it('getUserMedia(MediaStreamConstraints = ' + printJSON(tc1Constraints) + ')', function (done) {

@@ -1,5 +1,5 @@
 module.exports = function (config) {
-  'use strict';
+  //'use strict';
 
   config.set({
 
