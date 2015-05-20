@@ -1,9 +1,9 @@
-/*! adapterjs - v0.10.6 - 2015-04-23 */
+/*! adapterjs - v0.10.6 - 2015-05-20 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
 
-AdapterJS.options = {};
+AdapterJS.options = AdapterJS.options || {};
 
 // uncomment to get virtual webcams
 // AdapterJS.options.getAllCams = true;
@@ -15,12 +15,12 @@ AdapterJS.options = {};
 AdapterJS.VERSION = '0.10.6';
 
 // This function will be called when the WebRTC API is ready to be used
-// Whether it is the native implementation (Chrome, Firefox, Opera) or 
+// Whether it is the native implementation (Chrome, Firefox, Opera) or
 // the plugin
 // You may Override this function to synchronise the start of your application
 // with the WebRTC API being ready.
-// If you decide not to override use this synchronisation, it may result in 
-// an extensive CPU usage on the plugin start (once per tab loaded) 
+// If you decide not to override use this synchronisation, it may result in
+// an extensive CPU usage on the plugin start (once per tab loaded)
 // Params:
 //    - isUsingPlugin: true is the WebRTC plugin is being used, false otherwise
 //
@@ -57,8 +57,8 @@ AdapterJS.WebRTCPlugin.pageId = Math.random().toString(36).slice(2);
 AdapterJS.WebRTCPlugin.plugin = null;
 
 // Set log level for the plugin once it is ready.
-// The different values are 
-// This is an asynchronous function that will run when the plugin is ready 
+// The different values are
+// This is an asynchronous function that will run when the plugin is ready
 AdapterJS.WebRTCPlugin.setLogLevel = null;
 
 // Defines webrtc's JS interface according to the plugin's implementation.
@@ -94,22 +94,22 @@ AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.NONE;
 // Used to make sure AdapterJS.onwebrtcready is only called once
 AdapterJS.onwebrtcreadyDone = false;
 
-// Log levels for the plugin. 
+// Log levels for the plugin.
 // To be set by calling AdapterJS.WebRTCPlugin.setLogLevel
 /*
-Log outputs are prefixed in some cases. 
-  INFO: Information reported by the plugin. 
+Log outputs are prefixed in some cases.
+  INFO: Information reported by the plugin.
   ERROR: Errors originating from within the plugin.
   WEBRTC: Error originating from within the libWebRTC library
 */
 // From the least verbose to the most verbose
 AdapterJS.WebRTCPlugin.PLUGIN_LOG_LEVELS = {
   NONE : 'NONE',
-  ERROR : 'ERROR',  
-  WARNING : 'WARNING', 
-  INFO: 'INFO', 
-  VERBOSE: 'VERBOSE', 
-  SENSITIVE: 'SENSITIVE'  
+  ERROR : 'ERROR',
+  WARNING : 'WARNING',
+  INFO: 'INFO',
+  VERBOSE: 'VERBOSE',
+  SENSITIVE: 'SENSITIVE'
 };
 
 // Does a waiting check before proceeding to load the plugin.
@@ -117,11 +117,6 @@ AdapterJS.WebRTCPlugin.WaitForPluginReady = null;
 
 // This methid will use an interval to wait for the plugin to be ready.
 AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
-
-// This function will be called if the plugin is needed (browser different
-// from Chrome or Firefox), but the plugin is not installed.
-// Override it according to your application logic.
-AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
 
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
@@ -256,7 +251,7 @@ AdapterJS.maybeFixConfiguration = function (pcConfig) {
 AdapterJS.addEvent = function(elem, evnt, func) {
   if (elem.addEventListener) { // W3C DOM
     elem.addEventListener(evnt, func, false);
-  } else if (elem.attachEvent) {// OLD IE DOM 
+  } else if (elem.attachEvent) {// OLD IE DOM
     elem.attachEvent('on'+evnt, func);
   } else { // No much to do
     elem[evnt] = func;
@@ -702,7 +697,7 @@ if (navigator.mozGetUserMedia) {
         '" />' +
         // uncomment to be able to use virtual cams
         (AdapterJS.options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
-  
+
         '</object>';
       while (AdapterJS.WebRTCPlugin.plugin.firstChild) {
         frag.appendChild(AdapterJS.WebRTCPlugin.plugin.firstChild);
@@ -721,7 +716,7 @@ if (navigator.mozGetUserMedia) {
       if (isIE) {
         AdapterJS.WebRTCPlugin.plugin.width = '1px';
         AdapterJS.WebRTCPlugin.plugin.height = '1px';
-      } else { // The size of the plugin on Safari should be 0x0px 
+      } else { // The size of the plugin on Safari should be 0x0px
               // so that the autorisation prompt is at the top
         AdapterJS.WebRTCPlugin.plugin.width = '0px';
         AdapterJS.WebRTCPlugin.plugin.height = '0px';
@@ -963,6 +958,8 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.injectPlugin();
   };
 
+  // This function will be called if the plugin is needed (browser different
+  // from Chrome or Firefox), but the plugin is not installed.
   AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb ||
     function() {
       AdapterJS.addEvent(document,
@@ -981,7 +978,7 @@ if (navigator.mozGetUserMedia) {
       var popupString;
       if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) { // is portal link
        popupString = 'This website requires you to install the ' +
-        ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink + 
+        ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink +
         '" target="_blank">' + AdapterJS.WebRTCPlugin.pluginInfo.companyName +
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
@@ -1055,7 +1052,7 @@ if (navigator.mozGetUserMedia) {
   };
   // Try to detect the plugin and act accordingly
   AdapterJS.WebRTCPlugin.isPluginInstalled(
-    AdapterJS.WebRTCPlugin.pluginInfo.prefix, 
+    AdapterJS.WebRTCPlugin.pluginInfo.prefix,
     AdapterJS.WebRTCPlugin.pluginInfo.plugName,
     AdapterJS.WebRTCPlugin.defineWebRTCInterface,
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
