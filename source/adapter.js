@@ -256,6 +256,64 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink) {
+  // only inject once the page is ready
+  if (document.readyState !== 'complete') {
+    return;
+  }
+
+  var w = window;
+  var i = document.createElement('iframe');
+  i.style.position = 'fixed';
+  i.style.top = '-41px';
+  i.style.left = 0;
+  i.style.right = 0;
+  i.style.width = '100%';
+  i.style.height = '40px';
+  i.style.backgroundColor = '#ffffe1';
+  i.style.border = 'none';
+  i.style.borderBottom = '1px solid #888888';
+  i.style.zIndex = '9999999';
+  if(typeof i.style.webkitTransition === 'string') {
+    i.style.webkitTransition = 'all .5s ease-out';
+  } else if(typeof i.style.transition === 'string') {
+    i.style.transition = 'all .5s ease-out';
+  }
+  document.body.appendChild(i);
+  c = (i.contentWindow) ? i.contentWindow :
+    (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
+  c.document.open();
+  c.document.write('<span style="font-family: Helvetica, Arial,' +
+    'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
+    'middle; cursor: default;">' + text + '</span>');
+  if(buttonText && buttonLink) {
+    c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
+    c.document.close();
+    AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
+      window.open(buttonLink, '_top');
+      e.preventDefault();
+      try {
+        event.cancelBubble = true;
+      } catch(error) { }
+    });
+  }
+  else {
+    c.document.close();
+  }
+  AdapterJS.addEvent(c.document, 'click', function() {
+    w.document.body.removeChild(i);
+  });
+  setTimeout(function() {
+    if(typeof i.style.webkitTransform === 'string') {
+      i.style.webkitTransform = 'translateY(40px)';
+    } else if(typeof i.style.transform === 'string') {
+      i.style.transform = 'translateY(40px)';
+    } else {
+      i.style.top = '0px';
+    }
+  }, 300);
+};
+
 // -----------------------------------------------------------
 // Detected webrtc implementation. Types are:
 // - 'moz': Mozilla implementation of webRTC.
@@ -985,69 +1043,12 @@ if (navigator.mozGetUserMedia) {
         'to work on this browser.';
       }
 
-      AdapterJS.WebRTCPlugin.renderNotificationBar(popupString, 'Install Now', downloadLink);
+      AdapterJS.renderNotificationBar(popupString, 'Install Now', downloadLink);
     } else { // no download link, just print a generic explanation
-      AdapterJS.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
+      AdapterJS.renderNotificationBar('Your browser does not support WebRTC.');
     }
   };
 
-  AdapterJS.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
-    // only inject once the page is ready
-    if (document.readyState !== 'complete') {
-      return;
-    }
-
-    var w = window;
-    var i = document.createElement('iframe');
-    i.style.position = 'fixed';
-    i.style.top = '-41px';
-    i.style.left = 0;
-    i.style.right = 0;
-    i.style.width = '100%';
-    i.style.height = '40px';
-    i.style.backgroundColor = '#ffffe1';
-    i.style.border = 'none';
-    i.style.borderBottom = '1px solid #888888';
-    i.style.zIndex = '9999999';
-    if(typeof i.style.webkitTransition === 'string') {
-      i.style.webkitTransition = 'all .5s ease-out';
-    } else if(typeof i.style.transition === 'string') {
-      i.style.transition = 'all .5s ease-out';
-    }
-    document.body.appendChild(i);
-    c = (i.contentWindow) ? i.contentWindow :
-      (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
-    c.document.open();
-    c.document.write('<span style="font-family: Helvetica, Arial,' +
-      'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
-      'middle; cursor: default;">' + text + '</span>');
-    if(buttonText && buttonLink) {
-      c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
-      c.document.close();
-      AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-        window.open(buttonLink, '_top');
-        e.preventDefault();
-        try {
-          event.cancelBubble = true;
-        } catch(error) { }
-      });
-    }
-    else {
-      c.document.close();
-    }
-    AdapterJS.addEvent(c.document, 'click', function() {
-      w.document.body.removeChild(i);
-    });
-    setTimeout(function() {
-      if(typeof i.style.webkitTransform === 'string') {
-        i.style.webkitTransform = 'translateY(40px)';
-      } else if(typeof i.style.transform === 'string') {
-        i.style.transform = 'translateY(40px)';
-      } else {
-        i.style.top = '0px';
-      }
-    }, 300);
-  };
   // Try to detect the plugin and act accordingly
   AdapterJS.WebRTCPlugin.isPluginInstalled(
     AdapterJS.WebRTCPlugin.pluginInfo.prefix,

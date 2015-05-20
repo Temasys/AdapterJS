@@ -59,7 +59,7 @@ module.exports = function (grunt) {
 				dest: '<%= production %>/adapter.debug.js'
 			},
 			screenshare: {
-				src: ['<%= source %>/*.js'],
+				src: ['<%= source %>/adapter.js', '<%= source %>/adapter.screenshare.js'],
 				dest: '<%= production %>/adapter.screenshare.js'
 			}
 		},
