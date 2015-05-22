@@ -1,7 +1,7 @@
-/*! adapterjs - v0.10.6 - 2015-05-20 */
+/*! adapterjs - v0.10.6 - 2015-05-22 */
 
 // Adapter's interface.
-var AdapterJS = AdapterJS || {};
+window.AdapterJS = window.AdapterJS || {};
 
 AdapterJS.options = AdapterJS.options || {};
 

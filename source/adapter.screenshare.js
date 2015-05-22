@@ -2,9 +2,11 @@
 
   'use strict';
 
+  var tempGetUserMedia = null;
+
   // start
   if (window.navigator.mozGetUserMedia) {
-    var tempGetUserMedia = window.navigator.getUserMedia;
+    tempGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
@@ -12,15 +14,29 @@
       if (constraints.video ? !!constraints.video.mediaSource : false) {
         constraints.video.mediaSource = 'window';
         constraints.video.mozMediaSource = 'window';
-      }
 
-      tempGetUserMedia(constraints, successCb, failureCb);
+        AdapterJS.firefoxCallback = function (error, success) {
+          if (error) {
+            failureCb(error);
+          }
+          if (success) {
+            successCb(success);
+          }
+        };
+
+        postFrameMessage({
+          mozConstraints: constraints
+        });
+
+      } else {
+        tempGetUserMedia(constraints, successCb, failureCb);
+      }
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
 
   } else if (window.navigator.webkitGetUserMedia) {
-    var tempGetUserMedia = window.navigator.getUserMedia;
+    tempGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
@@ -46,14 +62,7 @@
             tempGetUserMedia(constraints, successCb, failureCb);
 
           } else {
-            if (error === 'not-installed') {
-              AdapterJS.renderNotificationBar(
-                'You require an extension for screensharing to work',
-                'Install Now',
-                'https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc/related'
-              );
-
-            } else if (error === 'permission-denied') {
+            if (error === 'permission-denied') {
               throw new Error('Permission denied for screen retrieval');
             } else {
               throw new Error('Failed retrieving selected screen');
@@ -80,11 +89,13 @@
 
           // this event listener is no more needed
           window.removeEventListener('message', onIFrameCallback);
-        }
+        };
 
         window.addEventListener('message', onIFrameCallback);
 
-        postFrameMessage();
+        postFrameMessage({
+          captureSourceId: true
+        });
 
       } else {
         tempGetUserMedia(constraints, successCb, failureCb);
@@ -94,7 +105,7 @@
     window.getUserMedia = window.navigator.getUserMedia;
 
   } else {
-    var tempGetUserMedia = window.navigator.getUserMedia;
+    tempGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
@@ -132,19 +143,21 @@
     iframe.isLoaded = true;
   };
 
-  iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html';
+  iframe.src = 'detectRTC.html'; //'https://cdn.temasys.com.sg/demos/test/detectRTC.html';
   iframe.style.display = 'none';
 
   (document.body || document.documentElement).appendChild(iframe);
 
-  var postFrameMessage = function () {
+  var postFrameMessage = function (object) {
+    object = object || {};
+
     if (!iframe.isLoaded) {
-      setTimeout(postMessage, 100);
+      setTimeout(function () {
+        iframe.contentWindow.postMessage(object, '*');
+      }, 100);
       return;
     }
 
-    iframe.contentWindow.postMessage({
-      captureSourceId: true
-    }, '*');
-  }
+    iframe.contentWindow.postMessage(object, '*');
+  };
 })();
