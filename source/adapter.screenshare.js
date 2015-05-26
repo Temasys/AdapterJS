@@ -15,7 +15,7 @@
         constraints.video.mediaSource = 'window';
         constraints.video.mozMediaSource = 'window';
 
-        AdapterJS.firefoxCallback = function (error, success) {
+        AdapterJS.screensharingCallback = function (error, success) {
           if (error) {
             failureCb(error);
           }

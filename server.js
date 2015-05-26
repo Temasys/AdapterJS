@@ -2,10 +2,11 @@
 var connect = require('connect');
 var fs = require('fs');
 var https = require('https');
+var http = require('http');
 var app = connect();
 app.use(connect.static(__dirname));
 
-connect.createServer().listen(8081);
+http.createServer(app).listen(8081);
 https.createServer({
   key: fs.readFileSync('certificates/server.key'),
   cert: fs.readFileSync('certificates/server.crt')
