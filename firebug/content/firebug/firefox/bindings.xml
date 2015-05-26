@@ -1,0 +1,1247 @@
+<?xml version="1.0"?>
+<!-- See license.txt for terms of usage -->
+
+<bindings xmlns="http://www.mozilla.org/xbl"
+    xmlns:xbl="http://www.mozilla.org/xbl"
+    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    xmlns:html="http://www.w3.org/1999/xhtml">
+
+<binding id="initializer">
+    <implementation>
+        <destructor><![CDATA[
+            Firebug.chrome.shutdown();
+        ]]></destructor>
+    </implementation>
+</binding>
+
+<binding id="panelBar">
+    <!-- The XUL structure for the panel bar is specified in the XUL source
+         inside each "panelBar" element.  This allows us to have panel bars
+         with substantially different layout, including the ability to embed
+         one panel bar within another - albeit at some cost in maintainability. -->
+    <content>
+        <children/>
+    </content>
+
+    <implementation>
+        <constructor><![CDATA[
+            this.tabBox = this.getChildElement("tabBox");
+            this.deck = this.getChildElement("deck");
+            this.browser = this.getChildElement("browser");
+            this.panelTabs = this.getChildElement("panelTabs");
+            this.tabMap = {};
+
+            function onBrowserLoad()
+            {
+                this.removeEventListener("load", onBrowserLoad, true);
+                this.complete = true;
+            }
+            this.browser.addEventListener("load", onBrowserLoad, true);
+
+            window.panelBarWaiter.panelBarReady();
+        ]]></constructor>
+
+        <method name="getChildElement">
+            <parameter name="id"/>
+            <body><![CDATA[
+                // Construct a unique ID from the panel bar ID and the child element ID,
+                // for example: "panelBar1-panelTabs".  This allows us to define children
+                // in the XUL source, which in turn allows us to have panel bars with
+                // substantially different layouts.
+                return document.getElementById(this.id + "-" + id);
+            ]]></body>
+        </method>
+
+        <method name="createTab">
+            <parameter name="panelType"/>
+            <body><![CDATA[
+                var tab = document.createElement("panelTab");
+                tab.panelType = panelType;
+
+                var typeName = panelType.prototype.name;
+                var title = Firebug.getPanelTitle(panelType);
+                var tooltip = Firebug.getPanelTooltip(panelType);
+                tab.setAttribute("label", title);
+                tab.setAttribute("tooltiptext", tooltip);
+                tab.setAttribute("class", typeName + "PanelTab");
+
+                this.tabMap[typeName] = tab;
+                this.updateTab(panelType);
+
+                return tab;
+            ]]></body>
+        </method>
+
+        <method name="addTab">
+            <parameter name="panelType"/>
+            <body><![CDATA[
+                var tab = this.createTab(panelType);
+                this.panelTabs.appendChild(tab);
+            ]]></body>
+        </method>
+
+        <method name="getTab">
+            <parameter name="panelName"/>
+            <body><![CDATA[
+                return this.tabMap[panelName];
+            ]]></body>
+        </method>
+
+        <method name="updateTab">
+            <parameter name="panelType"/>
+            <body><![CDATA[
+                var tab = this.getTab(panelType.prototype.name);
+
+                if (tab && panelType.prototype.activable)
+                {
+                    var enabled = panelType.prototype.isEnabled();
+                    tab.setAttribute("disabled", enabled ? "false" : "true");
+                    tab.setAttribute("aria-disabled", enabled ? "false" : "true");
+                }
+
+                // xxxHonza: This doesn't belong here, the start button should utilize
+                // the onUpdateTab event fired below.
+                // The activation logic (above) should be implemented similarly.
+                Firebug.StartButton.resetTooltip();
+
+                Firebug.dispatch(Firebug.uiListeners, "onUpdateTab",
+                    [Firebug.currentContext, tab, panelType]);
+            ]]></body>
+        </method>
+
+        <method name="updatePanels">
+            <parameter name="panelTypes"/>
+            <body><![CDATA[
+                this.tabMap = {};
+
+                // Replace tabs at the same position if type has changed
+                var i = 0;
+                var tab = this.panelTabs.firstChild;
+                for (; i < panelTypes.length && tab; tab = tab.nextSibling)
+                {
+                    var panelType = panelTypes[i++];
+                    if (tab.panelType.prototype.name != panelType.prototype.name)
+                    {
+                        var newTab = this.createTab(panelType);
+                        this.panelTabs.replaceChild(newTab, tab);
+                        tab = newTab;
+                    }
+                    else
+                    {
+                        this.tabMap[panelType.prototype.name] = tab;
+                    }
+                }
+
+                // Remove old tabs after the last panel
+                while (tab)
+                {
+                    var nextTab = tab.nextSibling;
+                    this.panelTabs.removeChild(tab);
+                    tab = nextTab;
+                }
+
+                // Insert new tabs after the last old tab
+                for (; i < panelTypes.length; ++i)
+                {
+                    var panelType = panelTypes[i];
+                    var newTab = this.createTab(panelType);
+                    this.panelTabs.appendChild(newTab);
+                }
+
+                Firebug.dispatch(Firebug.uiListeners, "updatePanels", [panelTypes]);
+            ]]></body>
+        </method>
+
+        <method name="selectTab">
+            <parameter name="tab"/>
+            <body><![CDATA[
+                var panelName = tab ? tab.panelType.prototype.name : null;
+                this.selectPanel(panelName);
+                var scrollBox = this.getElementsByClassName("panelbar-arrowscrollbox").item(0);
+                scrollBox.ensureVisibleTab(tab);
+            ]]></body>
+        </method>
+
+        <method name="selectPanel">
+            <parameter name="panelName"/>
+            <parameter name="forceUpdate"/>
+            <parameter name="noRefresh"/>
+            <body><![CDATA[
+                var tab = panelName ? this.tabMap[panelName] : null;
+                var panelType = tab ? tab.panelType : null;
+                var panel = Firebug.currentContext ?
+                    Firebug.currentContext.getPanel(panelName) : null;
+
+                if (panelName && tab && !tab.panelType.prototype.parentPanel)
+                {
+                    if (Firebug.Options)
+                        Firebug.Options.set("defaultPanelName", panelName);
+                    else
+                        Firebug.setPref(Firebug.prefDomain, "defaultPanelName", panelName);
+                }
+
+                // Make sure the panel is visible.
+                Firebug.PanelSelector.togglePanel(panelName, true);
+
+                // Optimization is done only if the panel really doesn't need to be refreshed.
+                if (panel && (panel == this.selectedPanel) && !forceUpdate)
+                    return panel;
+
+                if (FBTrace.DBG_PANELS)
+                    FBTrace.sysout("selectPanel " + panelName + " panel: " + panel +
+                        ", forceUpdate: " + forceUpdate + ", noRefresh: " + noRefresh +
+                        ", needsUpdate: " + (panel ? panel.needsRefresh : ""));
+
+                // Do not hide the panel if it's going to be selected. But, don't forget
+                // that the new selected panel (with the same name) can come from different
+                // context.
+                if (this.selectedPanel != panel)
+                    this.hideSelectedPanel();
+
+                //xxxHonza: can be removed, but Chromebug needs it for now.
+                this.tabBox.removeAttribute("collapsed");
+
+                if (this.selectedTab)
+                    this.selectedTab.selected = false;
+
+                this.selectedTab = tab;
+                this.selectedPanel = panel;
+
+                if (tab)
+                {
+                    tab.selected = true;
+                    if (Firebug.A11yModel && Firebug.A11yModel.isEnabled() &&
+                        Firebug.A11yModel.tabFocused && !forceUpdate)
+                    {
+                        tab.focus();
+                    }
+                }
+
+                if (panel)
+                {
+                    panel.panelBrowser = panel.browser ? panel.browser : this.browser;
+                    panel.panelBrowser.currentPanel = panel;
+                }
+
+                if (!panel || panel.panelBrowser != this.browser)
+                    this.browser.currentPanel = null;
+
+                this.dispatch("selectingPanel");
+
+                var sel = this.browser.contentWindow.getSelection();
+                if (sel)
+                    sel.removeAllRanges();
+
+                this.showSelectedPanel(panelName); // sets active attribute true
+
+                if (panel && !noRefresh && panel.needsRefresh)
+                {
+                    delete panel.needsRefresh;
+                    panel.refresh();
+                }
+
+                if (panel && panel.browser)
+                {
+                    if (panel.browser.parentNode != this.deck)
+                        this.deck.appendChild(panel.browser);
+
+                    this.deck.selectedPanel = panel.browser;
+                }
+                else
+                {
+                    this.deck.selectedPanel = this.browser;
+                }
+
+                this.dispatch("selectPanel");
+
+                var scrollBox = this.getElementsByClassName("panelbar-arrowscrollbox").item(0);
+                scrollBox.adjustTabSize();
+
+                return panel;
+            ]]></body>
+        </method>
+
+        <method name="dispatch">
+            <parameter name="eventName"/>
+            <body><![CDATA[
+                var ev = document.createEvent("Events");
+                ev.initEvent(eventName, true, false);
+                this.dispatchEvent(ev);
+            ]]></body>
+        </method>
+
+        <method name="showSelectedPanel">
+            <parameter name="panelName"/>
+            <body><![CDATA[
+                var panel = this.selectedPanel;
+                if (panel)
+                {
+                    panel.visible = true;
+                    panel.panelNode.setAttribute("active", true);
+
+                    var state = Firebug.getPanelState(panel);
+                    panel.show(state);
+
+                    Firebug.dispatch(Firebug.uiListeners, "onShowPanel", [panel]);
+                }
+                else
+                {
+                    // Render default content (note that the template is available as soon as
+                    // FB namespaces are evaluated)
+                    if (Firebug.DisabledPanelBox)
+                        Firebug.DisabledPanelBox.show(this.browser, panelName);
+                }
+            ]]></body>
+        </method>
+
+        <method name="hideSelectedPanel">
+            <body><![CDATA[
+                var oldPanel = this.selectedPanel;
+                if (oldPanel)
+                {
+                    var state = FBL.getPersistedState(oldPanel.context, oldPanel.name);
+                    oldPanel.hide(state);
+
+                    Firebug.dispatch(Firebug.uiListeners, "onHidePanel", [oldPanel]);
+
+                    oldPanel.visible = false; // xxxjjb Why three ways to un-show the panel?
+                    oldPanel.panelNode.removeAttribute("active");
+                }
+
+                // Also hide disabled panel content if any
+                if (Firebug.DisabledPanelBox)
+                    Firebug.DisabledPanelBox.hide(this.browser);
+            ]]></body>
+        </method>
+    </implementation>
+
+    <handlers>
+        <handler event="mousedown" button="0"><![CDATA[
+            event.stopPropagation();
+            var tab = event.target;
+            for (; tab && !tab.panelType; tab = tab.parentNode);
+
+            if (tab && tab.getAttribute("selected") != "true")
+            {
+                // Select after a timeout to increase the snappy
+                setTimeout(FBL.bindFixed(function()
+                {
+                    this.selectTab(tab);
+                }, this));
+            }
+        ]]></handler>
+    </handlers>
+</binding>
+
+<binding id="panelBarArrowscrollbox"
+    extends="chrome://global/content/bindings/scrollbox.xml#arrowscrollbox-clicktoscroll">
+    <implementation>
+        <constructor><![CDATA[
+            var id = this.getAttribute("id")
+            var index = id.indexOf("-Arrowscrollbox");
+            var parentPanelBarId = id.substr(0, index);
+
+            this.panelBar = document.getElementById(parentPanelBarId);
+            this.panelTabs = document.getElementById(parentPanelBarId + "-panelTabs");
+
+            this.scrollbox = document.getAnonymousElementByAttribute(this, "anonid", "scrollbox");
+            window.addEventListener("resize", this, false);
+        ]]></constructor>
+
+        <destructor><![CDATA[
+            window.removeEventListener("resize", this, false);
+        ]]></destructor>
+
+        <method name="_getScrollableElements">
+            <body><![CDATA[
+                return this.panelTabs.childNodes;
+            ]]></body>
+        </method>
+
+        <method name="handleEvent">
+            <parameter name="event"/>
+            <body><![CDATA[
+                switch (event.type)
+                {
+                    case "resize":
+                        this.adjustTabSize();
+                    break;
+                }
+            ]]></body>
+        </method>
+
+        <method name="adjustTabSize">
+            <body><![CDATA[
+                if (!this.initialized)
+                    return;
+
+                // Don't shrink at all, if the pref is set to zero or less
+                var minWidth = Firebug.Options.get("panelTabMinWidth");
+                if (minWidth <= 0)
+                    return;
+
+                var totalWidth = parseInt(this.scrollbox.boxObject.width, 10);
+                if (!totalWidth)
+                    return;
+
+                var tabs = FBL.cloneArray(this.panelTabs.children);
+                if (!tabs.length)
+                    return;
+
+                var availableSpace = totalWidth;
+                while (tabs.length && availableSpace > 0)
+                {
+                    var noSpace = true;
+                    var tabWidth = Math.max(minWidth, availableSpace / tabs.length);
+
+                    for (var i=0; i<tabs.length; i++)
+                    {
+                        var tab = tabs[i];
+
+                        // If the tab is new, set its originalWidth property here.
+                        if (!tab.originalWidth)
+                            tab.originalWidth = tab.boxObject.width;
+
+                        tab.style.maxWidth = tab.selected == "true" ? "none" : tabWidth + "px";
+                        if (tab.originalWidth <= tabWidth)
+                        {
+                            noSpace = false;
+                            tabs.splice(i, 1);
+                            availableSpace = availableSpace - tab.originalWidth;
+                            break;
+                        }
+                    }
+                    if (noSpace)
+                        break;
+                }
+            ]]></body>
+        </method>
+
+        <method name="updateOriginalSize">
+            <body><![CDATA[
+                if (this.initialized)
+                    return;
+
+                if (!this.panelTabs)
+                    return;
+
+                var tab = this.panelTabs.firstChild;
+                while (tab)
+                {
+                    tab.originalWidth = tab.boxObject.width;
+                    tab = tab.nextSibling;
+                }
+                this.initialized = true;
+                this.adjustTabSize();
+            ]]></body>
+        </method>
+
+        <method name="ensureVisibleTab">
+            <parameter name="tab"/>
+            <body><![CDATA[
+                if (tab)
+                    this.scrollBoxObject.ensureElementIsVisible(tab);
+            ]]></body>
+        </method>
+    </implementation>
+
+    <handlers>
+        <handler event="underflow"><![CDATA[
+            if (event.detail == 0)
+                return; // Ignore vertical events
+            this.updateOriginalSize();
+        ]]></handler>
+
+        <handler event="overflow"><![CDATA[
+            if (event.detail == 0)
+                return; // Ignore vertical events
+
+            this.updateOriginalSize();
+
+            this.ensureVisibleTab(this.panelBar.selectedTab);
+        ]]></handler>
+    </handlers>
+</binding>
+
+<binding id="panelTab" display="xul:button">
+    <content>
+        <xul:label class="panelTab-text" crop="right" flex="1"
+                   xbl:inherits="value=label,accesskey,crop,toolbarmode,buttonstyle,disabled"/>
+        <children includes="panelTabMenu"/>
+    </content>
+    <implementation>
+        <constructor><![CDATA[
+            this.labelNode = document.getAnonymousElementByAttribute(this, "class",
+                "panelTab-text");
+            this.setAttribute("role", "tab");
+            this.setAttribute("aria-haspopup", "true");
+            if (!this.tabMenu)
+            {
+                this.tabMenu = document.createElement("panelTabMenu");
+                this.appendChild(this.tabMenu);
+            }
+            return this.tabMenu;
+        ]]>
+        </constructor>
+
+        <property name="selected">
+            <getter><![CDATA[
+                return this.getAttribute("selected");
+            ]]></getter>
+
+            <setter><![CDATA[
+                this.setAttribute("selected", val);
+                this.tabMenu.updateVisibility();
+            ]]></setter>
+        </property>
+
+        <property name="label">
+            <getter><![CDATA[
+                return this.labelNode.getAttribute("value");
+            ]]></getter>
+
+            <setter><![CDATA[
+                this.labelNode.setAttribute(val);
+            ]]></setter>
+        </property>
+    </implementation>
+    <handlers>
+        <handler event="contextmenu"><![CDATA[
+            var panelTabMenu = this.getElementsByTagName('panelTabMenu')[0];
+            if (panelTabMenu)
+                panelTabMenu.showMenu(this);
+        ]]></handler>
+    </handlers>
+</binding>
+
+<binding id="panelTabMenu" display="xul:button" extends="chrome://global/content/bindings/toolbarbutton.xml#toolbarbutton">
+    <content>
+        <!-- Specify an empty tooltiptext to avoid displaying tooltip from the tab -->
+        <xul:menupopup anonid="popup" tooltiptext="" class="menuPopup"/>
+        <xul:image anonid="menuTarget" class="menuTarget"/>
+    </content>
+
+    <implementation>
+        <constructor><![CDATA[
+            this.setAttribute("role", "presentation");
+            this.popup = document.getAnonymousElementByAttribute(this, "anonid", "popup");
+            this.panelBar = FBL.getAncestorByClass(this, "panelBar");
+        ]]>
+        </constructor>
+
+        <field name="value"/>
+
+        <method name="onToggle">
+            <body><![CDATA[
+                var panelType = this.parentNode.panelType;
+                panelType.prototype.setEnabled(!panelType.prototype.isEnabled());
+                this.panelBar.updateTab(panelType);
+            ]]></body>
+        </method>
+
+        <method name="onEnable">
+            <body><![CDATA[
+                var panelType = this.parentNode.panelType;
+                panelType.prototype.setEnabled(true);
+                this.panelBar.updateTab(panelType);
+            ]]></body>
+        </method>
+
+        <method name="onDisable">
+            <body><![CDATA[
+                var panelType = this.parentNode.panelType;
+                panelType.prototype.setEnabled(false);
+                this.panelBar.updateTab(panelType);
+            ]]></body>
+        </method>
+
+        <method name="optionMenu">
+            <parameter name="label"/>
+            <parameter name="checked"/>
+            <parameter name="command"/>
+            <parameter name="tooltiptext"/>
+            <body><![CDATA[
+                return {label: label, type: "checkbox", checked: checked, tooltiptext: tooltiptext,
+                    command: FBL.bindFixed(command, this), closemenu: true};
+            ]]></body>
+        </method>
+
+        <method name="updateVisibility">
+            <body><![CDATA[
+                // Hide the mini-menu (displaying panel's option) if following is true:
+                // 1) The panel isn't activable and so there are no enable/disable options.
+                // 2) The panel doesn't provide any additional options.
+                var panel = this.panelBar.selectedPanel;
+                if (!panel)
+                    return;
+
+                var panelItems = this.getOptionsMenuItems(panel);
+
+                if (!panel.activable && !(panelItems && panelItems.length))
+                    this.setAttribute("collapsed", "true");
+                else
+                    this.removeAttribute("collapsed");
+            ]]></body>
+        </method>
+
+        <method name="showMenu">
+            <parameter name="anchor"/>
+            <body><![CDATA[
+                var popupBoxObject = this.popup.popupBoxObject;
+                popupBoxObject.setConsumeRollupEvent(popupBoxObject.ROLLUP_NO_CONSUME);
+                var style = this.ownerDocument.defaultView.getComputedStyle(this.popup, null);
+                var rtlLanguage = style.direction == "rtl";
+
+                var position = rtlLanguage ? "after_end" : "after_start";
+                this.popup.openPopup(this.parentNode, position, 0, -1, false, false);
+            ]]></body>
+        </method>
+
+        <method name="getOptionsMenuItems">
+            <parameter name="panel"/>
+            <body><![CDATA[
+                if (!panel)
+                    return null;
+
+                // Get menu items from the current panel.
+                var context = Firebug.currentContext;
+                var items = panel.getOptionsMenuItems(context);
+
+                // Distribute to listeners so, other modules/extensions can extend the menu.
+                Firebug.dispatch(Firebug.uiListeners, "onOptionsMenu", [context, panel, items]);
+
+                return items;
+            ]]></body>
+        </method>
+    </implementation>
+
+    <handlers>
+        <handler event="mousedown" button="0"><![CDATA[
+            this.showMenu();
+            // needed for displaying menu on not selected tabs
+            event.stopPropagation();
+        ]]></handler>
+
+        <handler event="popupshowing"><![CDATA[
+            // If the event comes from a sub-menu ignore it (just the root has "menuPopup" class)
+            if (!FBL.hasClass(event.originalTarget, "menuPopup"))
+                return;
+
+            var tab = this.parentNode;
+            if (!tab)
+                return false;
+            this.setAttribute("role", "menu");
+            var items = [];
+            var panelType = tab.panelType;
+            var enabled = true;
+
+            // Create menu items for activation (only for activable panels).
+            if (panelType.prototype.activable)
+            {
+                enabled = panelType.prototype.isEnabled();
+                items.push(this.optionMenu("panel.Enabled", enabled, this.onToggle,
+                    "panel.tip.Enabled"));
+            }
+
+            // force creating panel only if it's not disabled
+            var panel = Firebug.currentContext.getPanelByType(panelType, !enabled);
+
+            if (panel)
+            {
+                // Get panel's option items
+                var panelItems = this.getOptionsMenuItems(panel);
+                if (panelItems && panelItems.length > 0)
+                    items.push("-");
+            }
+
+            var menu = FBL.extendArray(items, panelItems);
+            for (var i = 0; i < menu.length; ++i)
+                FBL.createMenuItem(this.popup, menu[i]);
+
+            if (!this.popup.childNodes.length)
+                return false;
+
+            return true;
+        ]]></handler>
+
+        <handler event="popuphidden"><![CDATA[
+            // If the event comes from a sub-menu ignore it (just the root has "menuPopup" class)
+            if (!FBL.hasClass(event.originalTarget, "menuPopup"))
+                return;
+
+            this.setAttribute("role", "presentation");
+            FBL.eraseNode(this.popup);
+        ]]></handler>
+    </handlers>
+</binding>
+
+<binding id="panelStatus">
+    <implementation>
+        <method name="addItem">
+            <parameter name="label"/>
+            <parameter name="object"/>
+            <parameter name="rep"/>
+            <parameter name="separator"/>
+            <body><![CDATA[
+                if (this.firstChild)
+                {
+                    // extra box needed to fix alignment issue in Vista theme
+                    var box = document.createElement("hbox");
+                    box.setAttribute("role", "separator");
+                    box.setAttribute("align", "center");
+                    box.setAttribute("class", "panelStatusSeparator");
+                    this.appendChild(box);
+                }
+
+                var item = document.createElement("toolbarbutton");
+                item.setAttribute("class", "panelStatusLabel");
+                item.setAttribute("label", label);
+                item.repObject = object;
+                item.rep = rep;
+                this.appendChild(item);
+                return item;
+            ]]></body>
+        </method>
+
+        <method name="clear">
+            <parameter name="tab"/>
+            <body><![CDATA[
+                while (this.lastChild)
+                    this.removeChild(this.lastChild);
+                this.selectedItem = null;
+            ]]></body>
+        </method>
+
+        <method name="getItems">
+            <body><![CDATA[
+                var items = [];
+                for (var item = this.lastChild; item; item = item.previousSibling)
+                {
+                    if (item.repObject)
+                       items.push(item);
+                }
+                return items;
+            ]]></body>
+        </method>
+
+        <method name="getItemByObject">
+            <parameter name="object"/>
+            <body><![CDATA[
+                for (var item = this.lastChild; item; item = item.previousSibling)
+                {
+                    if (item.rep)
+                    {
+                        var itemObject = item.rep.getRealObject(item.repObject,
+                            Firebug.currentContext);
+                        if (itemObject === object)
+                            return item;
+                        // For items implementing equals() (such as StackFrame).
+                        // Also make sure we get an object from chrome.
+                        if (itemObject instanceof Object &&
+                            itemObject.equals && itemObject.equals(object))
+                        {
+                            return item;
+                        }
+                    }
+                }
+            ]]></body>
+        </method>
+
+        <method name="selectObject">
+            <parameter name="object"/>
+            <body><![CDATA[
+                var item = this.getItemByObject(object);
+                this.selectItem(item);
+            ]]></body>
+        </method>
+
+        <method name="selectItem">
+            <parameter name="item"/>
+            <body><![CDATA[
+                if (this.selectedItem)
+                    this.selectedItem.removeAttribute("selected");
+
+                this.selectedItem = item;
+
+                if (item)
+                {
+                    item.setAttribute("selected", "true");
+
+                    var ev = document.createEvent("Events");
+                    ev.initEvent("selectItem", true, false);
+                    this.dispatchEvent(ev);
+                }
+            ]]></body>
+        </method>
+    </implementation>
+
+    <handlers>
+        <handler event="command" ><![CDATA[
+            var object = Firebug.getRepObject(event.target);
+            if (object)
+            {
+                var rep = Firebug.getRep(object, Firebug.currentContext);
+                object = rep.getRealObject(object, Firebug.currentContext);
+                if (object)
+                {
+                    this.selectObject(object);
+                    Firebug.chrome.select(object, null, null, true);
+                }
+            }
+        ]]></handler>
+
+        <handler event="mouseover"><![CDATA[
+            var object = Firebug.getRepObject(event.target);
+            if (object)
+            {
+                var rep = Firebug.getRep(object, Firebug.currentContext);
+                object = rep.getRealObject(object, Firebug.currentContext);
+                if (object)
+                    Firebug.Inspector.highlightObject(object, Firebug.currentContext);
+            }
+        ]]></handler>
+
+        <handler event="mouseout"><![CDATA[
+            Firebug.Inspector.highlightObject(null);
+        ]]></handler>
+    </handlers>
+</binding>
+
+<!-- This binding represents a location list used in a panel. The list is based
+     on a menu-button (toolbar button with a popup-menu) and its purpose is displaying
+     available files on the current page. For instance, in the Script panel, the location
+     list displays list of all scripts. -->
+<binding id="panelFileList" display="xul:menu"
+    extends="chrome://global/content/bindings/toolbarbutton.xml#menu-button">
+    <content popup="_child">
+        <xul:label class="toolbarbutton-text title" crop="right" flex="1"
+            xbl:inherits="value=title"/>
+        <xul:menupopup anonid="popup"/>
+        <xul:toolbarbutton class="fb-toolbarbutton box-inherit toolbarbutton-menubutton-button"
+            anonid="button" flex="1"
+            xbl:inherits="disabled,crop,image,label,accesskey,command,align,dir,pack,orient" />
+        <xul:dropmarker type="menu-button" class="toolbarbutton-menubutton-dropmarker"
+            xbl:inherits="align,dir,pack,orient,disabled,label"/>
+    </content>
+
+    <resources>
+        <stylesheet src="chrome://global/skin/toolbarbutton.css"/>
+    </resources>
+
+    <implementation>
+        <constructor><![CDATA[
+            this.popup = document.getAnonymousElementByAttribute(this, "anonid", "popup");
+            this._closed = true;
+        ]]></constructor>
+
+        <property name="location">
+            <getter><![CDATA[
+                if (FBTrace.DBG_LOCATIONS)
+                    FBTrace.sysout("location getter label:" + this.getAttribute("label") +
+                        " location: " + this.getAttribute("location"));
+                return this.getAttribute("location");
+            ]]></getter>
+
+            <setter><![CDATA[
+                var locator = this.getLocator();
+
+                var fileName = "";
+                if (!locator)
+                {
+                    fileName = "no locator!";
+                }
+                else if (val)
+                {
+                    var description = locator.getObjectDescription(val);
+                    fileName = (description.protocol == "file" && description.path == "" &&
+                        description.name == "") ? description.domain : description.name;
+                }
+
+                this.repObject = val;
+
+                var button = document.getAnonymousElementByAttribute(this, "anonid", "button");
+                
+                var path = description.path != "/" ? description.path : description.domain;
+                if (fileName == path)
+                    FBL.setClass(button, "fbInlineItem");
+                else
+                    FBL.removeClass(button, "fbInlineItem");
+
+                this.setAttribute("label", fileName != path ?
+                    FBL.cropString(fileName, 80) : FBL.$STR("location.inline"));
+                this.setAttribute("location", val);
+                if (FBTrace.DBG_LOCATIONS)
+                {
+                    FBTrace.sysout("location setter label:" + this.getAttribute("label") +
+                        " fileName: " + fileName + " val: " + val);
+                }
+            ]]></setter>
+        </property>
+
+        <method name="getLocator">
+            <body><![CDATA[
+                // XXXjjb this is complicated because the location list depends upon
+                // the current panel
+                if (!this.locator)
+                {
+                    var functionYieldingExpression = this.getAttribute("locationProvider");
+                    try {
+                        if (functionYieldingExpression && functionYieldingExpression.length > 0)
+                            this.locator = eval(functionYieldingExpression);
+                    }
+                    catch (e)
+                    {
+                        FBTrace.sysout("getLocator Fails " + e + " in " + window.location);
+                    }
+
+                    if (!this.locator || typeof(this.locator) != "function")
+                    {
+                        var whichBinding = this.getAttribute("id");
+                        var msg = "ERROR: panelFileList " + whichBinding + " requires attribute " +
+                            "\'locationProvider\', an expression yielding a function";
+                        FBTrace.sysout(msg, {locator: this.locator,
+                            expression: functionYieldingExpression});
+                        return null;
+                    }
+                }
+
+                // The locator needs
+                //     getObjectDescription(object): return {path, name}
+                //     getLocationList(), a list of objects that can be fed into getObjectDescription
+                //     getObjectLocation(object)
+                return this.locator(this);
+            ]]></body>
+        </method>
+
+        <method name="selectObject">
+            <parameter name="object"/>
+            <body><![CDATA[
+                this.repObject = object;
+
+                var ev = document.createEvent("Events");
+                ev.initEvent("selectObject", true, false);
+                this.dispatchEvent(ev);
+            ]]></body>
+        </method>
+
+        <method name="enterActiveItem">
+            <body><![CDATA[
+                for (var child = this.popup.firstChild; child; child = child.nextSibling)
+                {
+                    if (child.getAttribute("_moz-menuactive") == "true")
+                    {
+                        this.location = child.repObject;
+                        this.selectObject(child.repObject);
+                        this.popup.hidePopup();
+                    }
+                }
+            ]]></body>
+        </method>
+
+        <method name="onKeyPress">
+            <parameter name="event"/>
+            <body><![CDATA[
+                if (event.keyCode == KeyEvent.DOM_VK_RETURN)
+                {
+                    this.enterActiveItem();
+                    FBL.cancelEvent(event);
+                }
+
+                this.filter.onKeyPress(event);
+            ]]></body>
+        </method>
+
+        <method name="onClick">
+            <parameter name="event"/>
+            <body><![CDATA[
+                //https://developer.mozilla.org/en/XUL/arrowscrollbox
+                var scrollbutton = event.originalTarget;
+                var anonid = scrollbutton.getAttribute("anonid");
+                if (anonid == "scrollbutton-up")
+                    scrollbutton.parentNode.scrollByIndex(-15);
+                if (anonid == "scrollbutton-down")
+                    scrollbutton.parentNode.scrollByIndex(+15);
+            ]]>
+            </body>
+        </method>
+    </implementation>
+
+    <handlers>
+        <handler event="popupshowing"><![CDATA[
+            if (this.popup.firstChild)
+                return false;
+
+            var locator = this.getLocator();
+            var objects = locator.getLocationList();
+            if (!objects)
+            {
+                this.setAttribute("label", "");
+                this.setAttribute("location", null);
+                return false;
+            }
+
+            if (locator.getLocationContent)
+            {
+                locator.getLocationContent(objects, this.popup);
+                return;
+            }
+
+            this.filter = FBL.createMenuHeader(this.popup,
+                {label: "script.Type any key to filter list"});
+            FBL.setClass(this.filter, "fbURLMenuItem");
+            FBL.setClass(this.filter, "fbLocationListFilter");
+
+            var groupNames = [];
+            var groups = {};
+
+            var currentDescription = null;
+            if (this.repObject)
+                currentDescription = locator.getObjectDescription(this.repObject);
+
+            for (var i = 0; i < objects.length; ++i)
+            {
+                var object = objects[i];
+                var description = locator.getObjectDescription(object);
+                if (!description)
+                    FBTrace.sysout("binding.xml popupshowing Fails", object);
+
+                var name = (description.protocol == "file" && description.path == "" &&
+                    description.name == "") ? description.domain : description.name;
+                var entry = {object: object, fileName: name};
+
+                if (currentDescription &&
+                    currentDescription.protocol == description.protocol &&
+                    currentDescription.domain == description.domain &&
+                    currentDescription.path == description.path &&
+                    currentDescription.name == description.name)
+                {
+                    entry.selected = true;
+                }
+
+                var path = description.path != "/" ? description.path : description.domain;
+                if (groups.hasOwnProperty(description.path))
+                {
+                    groups[path].push(entry);
+                }
+                else
+                {
+                    groups[path] = [entry];
+                    groupNames.push(path);
+                }
+            }
+
+            groupNames.sort();
+
+            for (var i = 0; i < groupNames.length; ++i)
+            {
+                var path = groupNames[i];
+                var urls = groups[path];
+                urls.sort(function(a, b) { return a.fileName < b.fileName ? -1 : 1; });
+
+                var menuHeader = FBL.createMenuHeader(this.popup, {
+                    label: path || FBL.$STR("location.no_domain"),
+                    nol10n: true
+                });
+                FBL.setClass(menuHeader, "fbURLMenuItem");
+                if (path == "")
+                    FBL.setClass(menuHeader, "fbNoDomain");
+
+                for (var j = 0; j < urls.length; ++j)
+                {
+                    var label = urls[j].fileName != path ?
+                        urls[j].fileName : FBL.$STR("location.inline");
+                    var menuInfo = {
+                        label: FBL.cropString(label, Firebug.Options.get("stringCropLength")),
+                        tooltiptext: path + urls[j].fileName,
+                        nol10n: true
+                    };
+
+                    if (urls[j].selected)
+                    {
+                        menuInfo.type = "checkbox";
+                        menuInfo.checked = true;
+                    }
+
+                    var menuItem = FBL.createMenuItem(this.popup, menuInfo);
+                    menuItem.repObject = urls[j].object;
+                    FBL.setClass(menuItem, "fbURLMenuItem");
+                    if (urls[j].fileName == path)
+                        FBL.setClass(menuItem, "fbInlineItem");
+                }
+            }
+
+            // Focus Firebug UI so that keyboard navigation (up/down) in the menu works.
+            Firebug.chrome.focus();
+        ]]></handler>
+
+        <handler event="popupshown"><![CDATA[
+            // Weird, but this gets fired when the user clicks on a menuitem,
+            // which hides the buttons again and resulting in jitters - let's avoid that.
+            if (!this._closed)
+                return;
+
+            this._closed = false;
+
+            this.filter.filterString = "";
+
+            this.onkeypress = FBL.bind(this.onKeyPress, this);
+            window.parent.addEventListener("keypress", this.onkeypress, true);
+
+            this.onclick = FBL.bind(this.onClick, this);
+            this.popup.addEventListener("click", this.onclick, true);
+        ]]></handler>
+
+        <handler event="popuphidden"><![CDATA[
+            window.parent.removeEventListener("keypress", this.onkeypress, true);
+            this.popup.removeEventListener("click", this.onclick, true);
+
+            delete this.onkeypress;
+
+            delete this.filter.filterString;
+
+            FBL.eraseNode(this.popup);
+            this._closed = true;
+        ]]></handler>
+
+        <handler event="command"><![CDATA[
+            var object = event.originalTarget.repObject;
+
+            // Select after a timeout to increase the snappy
+            setTimeout(FBL.bindFixed(function()
+            {
+                this.selectObject(object);
+            }, this));
+        ]]></handler>
+    </handlers>
+</binding>
+
+<!-- Panel file list filter is used in the file list (location list) to filter its content. -->
+<binding id="panelFileListFilter">
+    <implementation>
+        <constructor><![CDATA[
+            this.popup = this.parentNode;
+        ]]></constructor>
+
+        <method name="filterList">
+            <parameter name="substring"/>
+            <body><![CDATA[
+                this.firstMatch = null;
+                var groupMatchCount = 0;
+                substring = substring.toLowerCase();
+                for (var child = this.popup.lastChild; child; child = child.previousSibling)
+                {
+                    if (child.localName == "menuitem")
+                    {
+                        var label = child.getAttribute("tooltiptext").toLowerCase();
+                        child._searchMatch = label.indexOf(substring) != -1;
+                        if (child._searchMatch)
+                        {
+                            this.firstMatch = child;
+                            ++groupMatchCount;
+                        }
+                    }
+                    else
+                    {
+                        child._searchMatch = !!groupMatchCount;
+                        groupMatchCount = 0;
+                    }
+                }
+
+                if (this.firstMatch)
+                {
+                    // skip the filterMessageHeader
+                    for (var child = this.popup.firstChild.nextSibling; child;
+                        child = child.nextSibling)
+                    {
+                        child.hidden = !child._searchMatch;
+                    }
+
+                    try
+                    {
+                        var toolbarButtonBO = this.popup.parentNode.boxObject;
+                        if (toolbarButtonBO instanceof Components.interfaces.nsIMenuBoxObject)
+                            toolbarButtonBO.activeChild = this.firstMatch;
+                    }
+                    catch (err)
+                    {
+                        if (FBTrace.DBG_ERRORS)
+                            FBTrace.sysout("bindings; panelFileListFilter EXCEPTION " + err, err);
+                    }
+                }
+
+                return this.firstMatch;
+            ]]></body>
+        </method>
+
+        <method name="onKeyPress">
+            <parameter name="event"/>
+            <body><![CDATA[
+                if (event.keyCode == KeyEvent.DOM_VK_RETURN)
+                {
+                    this.filterString = "";
+                }
+                else if (event.keyCode == KeyEvent.DOM_VK_BACK_SPACE)
+                {
+                    this.filterString = this.filterString.substr(0, this.filterString.length - 1);
+                    this.filterList(this.filterString);
+                }
+                else if (event.charCode)
+                {
+                    this.filterString += String.fromCharCode(event.charCode).toLowerCase();
+                    this.filterList(this.filterString);
+                }
+                else
+                {
+                    return;
+                }
+
+                this.setFilterStringMessage(this.filterString, this.firstMatch);
+                FBL.cancelEvent(event);
+            ]]></body>
+        </method>
+
+        <method name="setFilterStringMessage">
+            <parameter name="filterString"/>
+            <parameter name="matched"/>
+            <body><![CDATA[
+                // The placeholder is displayed in gray while the filter is in black
+                this.setAttribute("keyword", filterString ? true : false);
+
+                // If there is no match the background is red
+                this.setAttribute("match", matched ? true : false);
+
+                // Set the text into the box. If the user entirely removed the text use
+                // the placeholder again.
+                filterString = filterString ? filterString :
+                    FBL.$STR("script.Type any key to filter list");
+
+                this.setAttribute("value", filterString);
+            ]]>
+            </body>
+        </method>
+    </implementation>
+</binding>
+
+<binding id="commandEditor" extends="chrome://global/content/bindings/textbox.xml#textarea">
+    <handlers>
+        <handler event="input"><![CDATA[
+            Firebug.CommandLine.update(Firebug.currentContext);
+        ]]></handler>
+
+        <handler event="keypress" keycode="VK_TAB"><![CDATA[
+            var input = document.getAnonymousElementByAttribute(this, "anonid", "input");
+            FBL.insertTextIntoElement(input, Firebug.Editor.tabCharacter);
+            event.preventDefault();
+        ]]></handler>
+
+        <handler event="keypress" keycode="VK_RETURN" modifiers="accel" preventdefault="true"><![CDATA[
+            Firebug.CommandLine.enter(Firebug.currentContext);
+        ]]></handler>
+
+        <handler event="keypress" keycode="VK_ESCAPE" preventdefault="true"><![CDATA[
+            Firebug.CommandLine.cancel(Firebug.currentContext);
+        ]]></handler>
+    </handlers>
+</binding>
+
+</bindings>

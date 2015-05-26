@@ -1,0 +1,307 @@
+/* See license.txt for terms of usage */
+
+.panelNode-script {
+    overflow: hidden;
+    font-family: monospace;
+}
+
+/************************************************************************************************/
+
+.scriptTooltip {
+    position: fixed;
+    z-index: 2147483647;
+    padding: 2px 3px;
+    border: 1px solid #CBE087;
+    background: LightYellow;
+    font-family: monospace;
+    color: #000000;
+}
+
+/************************************************************************************************/
+
+.sourceBox {
+    overflow: scroll; /* see issue 1479 */
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.sourceRow {
+    white-space: nowrap;
+    -moz-user-select: text;
+}
+
+.sourceRow.hovered {
+    background-color: #EEEEEE;
+}
+
+/************************************************************************************************/
+
+.sourceLine {
+    position: relative;
+    -moz-user-select: none;
+    margin-right: 10px;
+    border-right: 1px solid #CCCCCC;
+    padding: 0px 4px 0 20px;
+    background: #EEEEEE no-repeat 5px 1px;
+    color: #888888;
+    white-space: pre;
+    font-family: monospace; /* see issue 2953 */
+}
+
+.noteInToolTip { /* below sourceLine, so it overrides it */
+    background-color: #FFD472;
+}
+
+.useA11y .sourceBox .sourceViewport:focus .sourceLine {
+    background-color: #FFFFC0;
+    color: navy;
+    border-right: 1px solid black;
+}
+
+.useA11y .sourceBox .sourceViewport:focus {
+    outline: none;
+}
+
+.a11y1emSize {
+    width: 1em;
+    height: 1em;
+    position: absolute;
+}
+
+.useA11y .panelStatusLabel:focus {
+    outline-offset: -2px !important;
+ }
+
+.sourceBox > .sourceRow > .sourceLine {
+    cursor: pointer;
+}
+
+.sourceLine:hover {
+    text-decoration: none;
+}
+
+.sourceRowText {
+    white-space: pre;
+}
+
+.sourceRow[exe_line="true"] {
+    outline: 1px solid #D9D9B6;
+    margin-right: 1px;
+    background-color: lightgoldenrodyellow;
+}
+
+.sourceRow[executable="true"] > .sourceLine {
+    content: "-";
+    color: #4AA02C;  /* Spring Green */
+    font-weight: bold;
+}
+
+.sourceRow[exe_line="true"] > .sourceLine {
+    background-image: url(chrome://firebug/skin/executionPointer.svg);
+    background-position: 7px 1px;
+    color: #000000;
+}
+
+.sourceRow[breakpoint="true"] > .sourceLine {
+    background-image: url(chrome://firebug/skin/breakpoint.svg);
+}
+
+.sourceRow[breakpoint="true"][condition="true"] > .sourceLine {
+    background-image: url(chrome://firebug/skin/breakpointCondition.svg), url(chrome://firebug/skin/breakpoint.svg);
+    background-position: 9px 3px, 5px 1px;
+}
+
+.sourceRow[breakpoint="true"][disabledBreakpoint="true"] > .sourceLine {
+    background-image: none;
+}
+
+.sourceRow[breakpoint="true"][disabledBreakpoint="true"]:not([condition="true"]) > .sourceLine::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 12px;
+    height: 12px;
+    background: url(chrome://firebug/skin/breakpoint.svg) no-repeat;
+    opacity: 0.5;
+}
+
+.sourceRow[breakpoint="true"][disabledBreakpoint="true"][condition="true"] > .sourceLine::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 12px;
+    height: 12px;
+    background: url(chrome://firebug/skin/breakpointCondition.svg) no-repeat;
+    opacity: 0.5;
+}
+
+.sourceRow[breakpoint="true"][exe_line="true"] > .sourceLine {
+    background-image: url(chrome://firebug/skin/executionPointer.svg), url(chrome://firebug/skin/breakpoint.svg);
+    background-position: 7px 1px, 5px 1px;
+}
+
+.sourceRow[breakpoint="true"][exe_line="true"][disabledBreakpoint="true"] > .sourceLine {
+    background-image: none;
+}
+
+.sourceRow[breakpoint="true"][exe_line="true"][disabledBreakpoint="true"] > .sourceLine::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 5px;
+    width: 12px;
+    height: 12px;
+    background: url(chrome://firebug/skin/breakpoint.svg) no-repeat;
+    opacity: 0.5;
+}
+
+.sourceRow[breakpoint="true"][exe_line="true"][disabledBreakpoint="true"] > .sourceLine::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 7px;
+    width: 11px;
+    height: 12px;
+    background: url(chrome://firebug/skin/executionPointer.svg) no-repeat;
+}
+
+.sourceLine.editing {
+    background-image: url(chrome://firebug/skin/breakpoint.svg);
+}
+
+/************************************************************************************************/
+/* Breakpoint condition */
+
+.conditionEditor {
+    z-index: 2147483647;
+    position: absolute;
+    margin-top: 0;
+    left: 5px;
+    width: 90%;
+    border-style: solid;
+    border-width: 19px 25px 33px 33px;
+    /* Need to use a PNG for this. See https://bugzil.la/619500 */
+    border-image: url(chrome://firebug/skin/win/breakpointConditionEditor.png) 19 25 33 33 fill stretch;
+}
+
+.conditionCaption {
+    margin-bottom: 2px;
+    font-family: Lucida Grande, sans-serif;
+    font-weight: bold;
+    font-size: 11px;
+    color: #226679;
+}
+
+.conditionInput {
+    width: 100%;
+    font-size: inherit;
+    border: 1px solid #0096C0;
+    font-family: monospace;
+}
+
+.conditionInput.completionInput {
+    position: relative;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+.upsideDown {
+    border-width: 28px 25px 19px 33px;
+    /* Need to use a PNG for this. See https://bugzil.la/619500 */
+    border-image: url(chrome://firebug/skin/win/breakpointConditionEditorDown.png) 28 25 19 33 fill stretch;
+}
+
+/*************************************************************************************************/
+/* Notification */
+
+.notificationBox {
+    padding: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    pointer-events: none;
+}
+
+.notificationTable {
+    border: 1px solid lightgray;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    background: rgb(255, 255, 225);
+    font-family: Lucida Grande,Tahoma,sans-serif;
+    font-size: 12px;
+    color: #000000;
+    width: 100%;
+    padding: 2px 0;
+    pointer-events: auto;
+}
+
+.notificationBox TD {
+    vertical-align: middle;
+}
+
+.notificationImage {
+    vertical-align: middle;
+    margin: 0 5px;
+}
+
+.notificationDesc {
+    padding-left: 1px;
+}
+
+.noNotificationDesc {
+    color: gray;
+}
+
+.noNotificationDesc a {
+    font-weight: bold;
+    color: gray;
+}
+
+.noNotificationDesc a:hover {
+    text-decoration: underline;
+}
+
+.notificationBox .descCol {
+    width: 100%;
+    line-height: 17px;
+}
+
+.notificationBox .buttonsCol {
+    white-space: nowrap;
+}
+
+.notificationBox .hideCol {
+    color: gray;
+    padding-top: 7px;
+}
+
+.notificationBox .hideNotification {
+    vertical-align: middle;
+}
+
+.notificationButton {
+    margin-right: 4px;
+}
+
+.notificationClose {
+    background: url(chrome://firebug/skin/win/close.svg) no-repeat scroll 0 0 transparent;
+    width: 16px;
+    height: 16px;
+    border: none;
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.notificationClose:hover {
+    filter: url(resource://firebugui/filters.svg#darken);
+}
+
+.notificationClose:active {
+    filter: url(resource://firebugui/filters.svg#deepDarken);
+}

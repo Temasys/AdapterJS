@@ -1,0 +1,187 @@
+/* See license.txt for terms of usage */
+
+.domTable {
+    width: 100%;
+}
+
+.memberLabelCell {
+    padding: 2px 0 2px 0px;
+    vertical-align: top;
+}
+
+.memberValueCell {
+    padding: 2px 0 2px 5px;
+    display: block;
+    overflow: hidden;
+}
+
+.memberLabel {
+    cursor: default;
+    overflow: hidden;
+    padding-left: 18px;
+    white-space: nowrap;
+}
+
+.memberLabelPrefix {
+    color: gray;
+    margin-right: 3px;
+    font-weight: normal;
+}
+
+.memberValueIcon > div {
+    width: 15px;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* Read Only Properties */
+
+.memberValueCell.readOnly {
+    opacity: 0.5;
+}
+
+.memberValueIcon.readOnly {
+    background: url("chrome://firebug/skin/readOnlyProp.svg") no-repeat;
+    background-position: 4px 4px;
+    background-size: 10px 10px;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* Read Only InfoTip */
+
+.readOnlyInfoTip {
+    margin: 3px;
+}
+
+.readOnlyInfoTip > .name {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.readOnlyInfoTip > div {
+    padding: 0 2px 0 2px;
+}
+
+.readOnlyInfoTip > div.no {
+    text-decoration: line-through;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* Breakpoints */
+
+/* In order to set memberRowHeader's height to 100%, memberRow and
+ * memberHeaderCell (parents) has to also be set to height: 100%,
+ * otherwise it wouldn't work */
+.memberHeaderCell {
+    height: 100%;
+}
+
+.memberRow {
+    height: 100%;
+    border: 1px solid transparent; /* see issue 5769 */
+}
+
+.memberRowHeader {
+    position: relative;
+    cursor: pointer;
+    display: none;
+    height: 100%;
+}
+
+/* Show breakpoints bar only in the DOM panel (and DOM side panel) so far */
+.panelNode-dom .memberRowHeader,
+.panelNode-domSide .memberRowHeader {
+    display: block;
+}
+
+/* Display breakpoint disc */
+.memberRow .memberRowHeader {
+    background-position: 5px 4px;
+}
+
+.memberRow[breakpoint="true"] .memberRowHeader {
+    background-image: url(chrome://firebug/skin/breakpoint.svg);
+}
+
+.memberRow[breakpoint="true"][disabledBreakpoint="true"] .memberRowHeader {
+    background-image: none;
+}
+
+.memberRow[breakpoint="true"][disabledBreakpoint="true"] .memberRowHeader::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 5px;
+    width: 12px;
+    height: 12px;
+    background: url(chrome://firebug/skin/breakpoint.svg) no-repeat;
+    opacity: 0.5;
+}
+
+.memberRow[breakable="true"]:hover .memberRowHeader {
+    background-color: #F6F6F6;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+.memberRow.hasChildren > .memberLabelCell > .memberLabel:hover,
+.memberRow.cropped > .memberLabelCell > .memberLabel:hover {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
+}
+
+.memberRow:hover {
+    background-color: #EFEFEF;
+}
+
+.panelNode-dom .memberRow td,
+.panelNode-domSide .memberRow td {
+    border-bottom: 1px solid #EFEFEF;
+}
+
+/*************************************************************************************************/
+/* Spinner (used for async fetch) */
+
+.memberRow.hasChildren.spinning > .memberLabelCell > .memberLabel {
+    background-image: url(chrome://firebug/skin/spinner.png) !important;
+    background-repeat: no-repeat;
+    background-position: 3px 3px;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+.userLabel,
+.userClassLabel,
+.userFunctionLabel {
+    font-weight: bold;
+}
+
+.userLabel {
+    color: #000000;
+}
+
+.userClassLabel {
+    color: #E90000;
+}
+
+.userFunctionLabel {
+    color: #025E2A;
+}
+
+.domLabel {
+    color: #000000;
+}
+
+.domClassLabel {
+    color: #E90000;
+}
+
+.domFunctionLabel {
+    color: #025E2A;
+}
+
+.ordinalLabel {
+    color: SlateBlue;
+    font-weight: bold;
+}

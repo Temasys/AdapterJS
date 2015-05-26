@@ -1,0 +1,331 @@
+/* See license.txt for terms of usage */
+
+@import "chrome://firebug/skin/firebug.css";
+@import "chrome://firebug-os/skin/firebug.css";
+
+window[chromehidden~="toolbar"] #fbToolbar {
+   display: -moz-box;
+}
+
+/*************************************************************************************************/
+/* browser.xul & browserOverlayWithFrame */
+
+#fbMainFrame {
+    height: 270px;
+    width: 370px;
+}
+
+/*************************************************************************************************/
+/* Firebug Splitter */
+
+#fbContentSplitter[dir=reverse]{
+    transform: scale(-1, -1);
+}
+
+#fbContentSplitter[orient=vertical] {
+    border-top: 1px solid !important;
+    border-bottom: none;
+    min-height: 5px;
+    max-height: 5px;
+    background-color: -moz-dialog;
+}
+
+#fbContentSplitter[orient=horizontal] {
+    border-right: 1px solid !important;
+    border-left: none;
+    min-width: 5px;
+    max-width: 5px;
+    background-color: -moz-dialog;
+}
+
+/*************************************************************************************************/
+/* FirebugFrame.xul */
+
+#fbContentBox {
+    -moz-binding: url("firefox/bindings.xml#initializer");
+    height: 270px;
+    background-color: -moz-dialog;
+    font-size: 12px;
+}
+
+#mainPopupSet, #fbResumeBox {
+    font-size: initial;
+}
+
+/*************************************************************************************************/
+/* FirebugOverlay.xul */
+
+textbox#fbCommandEditor {
+    -moz-binding: url("firefox/bindings.xml#commandEditor");
+}
+
+#fbCommandEditor > textbox {
+    padding: 0;
+    margin: 0;
+}
+
+.fbCommandLineCompletionPanel {
+    -moz-appearance: none;
+    background-color: #F0F0F0;
+    border: 1px solid #BEBEBE;
+    border-radius: 5px;
+
+    font-size: 10px;
+
+    /* Remove xul panel shadow */
+    -moz-window-shadow: none !important;
+}
+
+.fbCommandLineCompletions {
+    cursor: default;
+    font-family: monospace;
+    white-space: pre;
+    background-color: white;
+    border: 1px solid #BEBEBE;
+    border-radius: 3px;
+    margin: 2px;
+    direction: ltr;
+}
+
+.fbPopupTitle {
+    font-family: Lucida Grande, Tahoma, sans-serif;
+    padding: 2px 18px;
+    background-color: LightYellow;
+    border-bottom: 1px solid #BEBEBE;
+    color: #666666;
+}
+
+.fbPopupSeparator {
+    font-family: Lucida Grande, Tahoma, sans-serif;
+    padding: 1px 18px;
+    color: #646464;
+    /*border-top: 1px solid #BEBEBE;
+    border-bottom: 1px solid #BEBEBE;*/
+    margin: 3px 0 3px 0;
+    background-color: #F0F0F0;
+}
+
+/* The first separator doesn't need margin-top */
+.fbPopupTitle + .fbPopupSeparator {
+    margin-top: 0;
+}
+
+.fbPopupEntry {
+    padding: 0 5px 0 5px;
+}
+
+.completionText {
+    color: #666666;
+    margin-right: 1px;
+}
+[selected="true"] > .completionText {
+    background-color: highlight;
+    border-color: highlight;
+    color: highlighttext !important;
+}
+
+textbox[type="fbSearchBox"] {
+    -moz-binding: url("firefox/searchBox.xml#searchBox");
+}
+textbox[type="fbSearchBox"] .panelFocusBound {
+    -moz-user-focus: normal;
+}
+
+.useA11y textbox[type="fbSearchBox"] .panelFocusBound {
+    -moz-user-focus: ignore;
+}
+
+panelBar {
+    -moz-binding: url("firefox/bindings.xml#panelBar");
+    -moz-box-orient: vertical;
+}
+
+/*************************************************************************************************/
+
+panelStatus {
+    -moz-binding: url("firefox/bindings.xml#panelStatus");
+}
+
+#fbCallstack {
+    -moz-binding: url("firefox/bindings.xml#panelStatus");
+}
+
+/*************************************************************************************************/
+/* Location List */
+
+#fbLocationList {
+    -moz-binding: url("firefox/bindings.xml#panelFileList");
+    /* Evaluated scripts can take a lot of horizontal space on the toolbar, so this is the limit */
+    max-width: 250px;
+}
+
+.fbLocationListFilter {
+    -moz-binding: url("firefox/bindings.xml#panelFileListFilter");
+    background: white;
+    border: 1px solid rgb(150, 150, 157);
+    padding: 3px;
+    color: gray;
+    font-weight: normal;
+}
+
+.fbLocationListFilter[match="false"] {
+    background-color: rgb(255, 102, 102);
+}
+
+.fbLocationListFilter[keyword="true"] {
+    color: black;
+}
+
+/*************************************************************************************************/
+
+#fbStatusText {
+    visibility: collapse;
+}
+
+#fbStatusBar[showErrors] #fbStatusText {
+    visibility: visible;
+}
+
+#fbToolbar[moz-collapsed="true"] {
+    /* Prevent full-screen from hiding toolbar */
+    visibility: visible;
+}
+
+panelTab {
+    -moz-binding: url("firefox/bindings.xml#panelTab");
+}
+
+/* Lightup the text, eg on the Script tab when stopped on a breakpoint */
+panelTab[highlight="true"] {
+    color: #FF9933;
+}
+
+/*************************************************************************************************/
+/* Mini-menu on the panel tab */
+
+panelTabMenu {
+    -moz-binding: url("firefox/bindings.xml#panelTabMenu");
+}
+
+panelTab > panelTabMenu .menuTarget {
+    visibility: collapse;
+}
+
+panelTab > panelTabMenu .menuPopup:-moz-locale-dir(rtl) {
+    direction: rtl;
+}
+
+/*************************************************************************************************/
+/* Detached Firebug Window */
+
+#fbResumeBox > #fbWindowButtons {
+    padding-right: 4px;
+}
+
+/*************************************************************************************************/
+/* Focus related */
+
+/* Make the following selectors part of the tab order */
+
+/* current tab */
+.useA11y panelTab[selected="true"],
+/* Firebug  Menu */
+.useA11y #fbFirebugMenu,
+/* Status bar icon*/
+#fbStatusBar.useA11y {
+    -moz-user-focus: normal;
+}
+
+/* Toolbar buttons in a visible toolbar group (usually hbox) */
+.useA11y .innerToolbar  *:not([collapsed="true"]) toolbarbutton,
+.useA11y .innerToolbar > toolbarbutton{
+   -moz-user-focus: normal;
+}
+
+/* Now override the previous selector and only leave the first button of each group in the tab order*/
+.useA11y .innerToolbar  *:not([collapsed="true"]) toolbarbutton ~ toolbarbutton,
+.useA11y .innerToolbar > toolbarbutton ~ toolbarbutton{
+   -moz-user-focus: ignore;
+}
+
+/* remove toolbar groups from the tab order if they have .noTabStop and are NOT the first visible group in the toolbar */
+.useA11y .innerToolbar *[collapsed="false"] ~ *.noTabStop toolbarbutton,
+.useA11y .innerToolbar toolbarbutton.noTabStop,
+/*fbNetButtonsFilter situation, added extra id for specificity*/
+.useA11y .innerToolbar toolbarbutton:not([collapsed="true"]) ~ *.noTabStop toolbarbutton {
+    -moz-user-focus: ignore;
+}
+
+/* Buttons in a group with .hasTabOrder (this class is briefly added during right/left arrow key event handlers in a11y.js.*/
+.innerToolbar.hasTabOrder toolbarbutton {
+    -moz-user-focus: normal !important;
+}
+
+.useA11y #fbPanelBar1 toolbarbutton:focus,
+.useA11y #fbPanelBar1 textbox[focused],
+#fbStatusBar.useA11y:focus,
+.useA11y panelTab:focus,
+.useA11y .searchOptionsMenu .a11yFocus:focus {
+    outline: 2px solid #FF9933;
+    outline-offset: -2px;
+    -moz-outline-radius: 5px;
+}
+
+.useA11y panelTab:focus > label {
+    text-decoration: underline;
+    color: black;
+}
+/**** end focus related ****/
+
+/*************************************************************************************************/
+/* panelFileList */
+
+.toolbarbutton-text.title[value] {
+    padding-right: 5px;
+}
+
+#fbLocationList.noTabStop > menupopup > arrowscrollbox > scrollbox,
+#fbCommandHistory > arrowscrollbox > scrollbox {
+    overflow-y: auto;
+}
+
+#fbLocationList .toolbarbutton-text {
+    color: #000000;
+}
+
+/*************************************************************************************************/
+/* Don't let Personas to destroy Firebug's CSS */
+
+#fbContentBox:-moz-lwtheme {
+    text-shadow: none !important;
+    color: -moz-dialogtext;
+}
+
+/*************************************************************************************************/
+
+@keyframes armedBlinking {
+    100% {
+        text-shadow: 1px 1px 2px darkGray, 0px 0px 1em orange, 0px 0px 0.2em orange;
+    }
+}
+
+panelTab[breakOnNextArmed="true"] > .panelTab-text {
+    animation: armedBlinking 0.8s steps(9, end) infinite alternate;
+}
+
+panelTab.highlighted {
+    text-shadow: 1px 1px 2px darkGray, 0px 0px 1em orange, 0px 0px 0.2em orange !important;
+    transition-property: text-shadow;
+    transition-duration: 1.4s;
+}
+
+panelTab[aria-disabled='true'] {
+    color: graytext !important;
+}
+
+/*************************************************************************************************/
+/* Scrollable TabBar + TabList */
+
+panelBarArrowscrollbox {
+    -moz-binding: url("firefox/bindings.xml#panelBarArrowscrollbox");
+}

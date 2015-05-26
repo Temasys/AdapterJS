@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://firebug/content/remoting/connectionMenu.css"?>
+
+<overlay xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <!-- Commands -->
+    <commandset id="mainCommandSet">
+        <command id="cmd_firebugConnect" oncommand="Firebug.ConnectionMenu.connect()"/>
+        <command id="cmd_firebugDisconnect" oncommand="Firebug.ConnectionMenu.disconnect()"/>
+    </commandset>
+
+    <!-- Firebug UI overlay -->
+    <vbox id="fbContentBox">
+        <box id="fbPanelBox">
+            <panelBar id="fbPanelBar1">
+                <!-- xxxHonza: hidden for now, till remoting is really supported -->
+                <hbox id="fbPaneBar1-connectionToolbar" insertbefore="fbPanelBar1-tabBox"
+                    style="display:none">
+
+                    <!-- Connect/disconnect menu -->
+                    <toolbarbutton id="firebugConnectionMenu" type="menu"
+                        tooltiptext="firebug_connectionMenu" role="button"
+                        aria-haspopup="true"
+                        label="Connect Me ">
+                        <menupopup onpopupshowing="return Firebug.ConnectionMenu.onShowing(this);">
+                            <menuitem id="fbRemoteConnect"
+                                command="cmd_firebugConnect"
+                                label="Connect" />
+                            <menuitem id="fbRemoteDisconnect"
+                                command="cmd_firebugDisconnect"
+                                label="Disconnect" />
+                        </menupopup>
+                    </toolbarbutton>
+
+                    <!-- Tab list menu -->
+                    <toolbarbutton id="firebugTabListMenu" type="menu">
+                        <menupopup onpopupshowing="return Firebug.TabListMenu.onShowing(this);"
+                            onpopuphidden="Firebug.TabListMenu.onHidden(this)"/>
+                    </toolbarbutton>
+                </hbox>
+            </panelBar>
+        </box>
+    </vbox>
+
+</overlay>

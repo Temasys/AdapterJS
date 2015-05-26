@@ -1,0 +1,315 @@
+/* See license.txt for terms of usage */
+
+#fbFirebugMenu > .toolbarbutton-text,
+#fbFirebugMenu > .toolbarbutton-menu-dropmarker {
+    display: none;
+}
+
+toolbarbutton {
+    padding: 1px 6px;
+}
+
+.toolbar-text-button > .toolbarbutton-icon:not([src]),
+.toolbar-text-menubutton > .toolbarbutton-icon:not([src]),
+toolbarbutton[type="menu"] > .toolbarbutton-icon:not([src]) {
+    display: none;
+}
+
+.toolbar-text-menubutton:hover:active,
+.toolbar-text-menubutton[open="true"] {
+    padding: 4px 5px 2px 7px;
+}
+
+/*************************************************************************************************/
+/* Buttons */
+
+#fbSearchButtons {
+    margin-bottom: 2px;
+}
+
+#fbMinimizeButton {
+    list-style-image: url(chrome://firebug/skin/win/minimize.svg);
+}
+
+#fbDetachButton {
+    list-style-image: url(chrome://firebug/skin/win/detach.svg);
+}
+
+#fbCloseButton {
+    list-style-image: url(chrome://firebug/skin/win/deactivate.svg);
+}
+
+#fbCommandLineHistoryButton {
+    list-style-image: url(chrome://firebug/skin/win/commandHistory.svg);
+}
+
+#fbToggleCommandLine {
+    list-style-image: url(chrome://firebug/skin/win/up.svg);
+}
+
+:-moz-any(#fbMinimizeButton,
+          #fbDetachButton,
+          #fbCloseButton,
+          #fbCommandLineHistoryButton,
+          #fbToggleCommandLine):hover {
+    filter: url(resource://firebugui/filters.svg#darken);
+}
+
+:-moz-any(#fbMinimizeButton,
+          #fbDetachButton,
+          #fbCloseButton,
+          #fbCommandLineHistoryButton,
+          #fbToggleCommandLine):active,
+#fbCommandLineHistoryButton[checked="true"] {
+    filter: url(resource://firebugui/filters.svg#deepDarken);
+}
+
+#fbCommandLineHistoryButton[disabled] {
+    filter: url(resource://firebugui/filters.svg#grayscale);
+}
+
+/*************************************************************************************************/
+/* Command Editor */
+
+#fbCommandEditor {
+    -moz-appearance: none;
+    border: none;
+    /*border-top: 1px solid;*/
+    -moz-border-top-colors: threedshadow;
+    /*padding: 2px 0 0 2px;*/
+}
+
+#fbCommandToolbar {
+    border-bottom: 1px solid rgb(170, 188, 207);
+    background-color: rgb(219, 234, 249);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+}
+
+#fbToolbox {
+    border-bottom: 1px solid rgb(170, 188, 207);
+    background-color: rgb(219, 234, 249);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+}
+
+/*************************************************************************************************/
+/* Window buttons */
+
+/* Set proper height of window buttons (close, min, detach) */
+#fbWindowButtons.innerToolbar {
+    padding: 4px 0 6px 0;
+}
+
+#fbWindowButtons.innerToolbar:-moz-locale-dir(ltr) {
+    margin-right: 4px;
+}
+
+#fbWindowButtons.innerToolbar:-moz-locale-dir(rtl) {
+    margin-left: 4px;
+}
+
+#fbWindowButtons > toolbarbutton {
+    margin: 0;
+}
+
+/*************************************************************************************************/
+/* Panel toolbar */
+
+#fbPanelBar1-tabBoxBackground,
+#fbPanelBar2-tabBoxBackground {
+    border-bottom: 1px solid rgb(170, 188, 207);
+}
+
+#fbPanelBar1-tabBoxBackground {
+    background-color: rgb(219, 234, 249);
+    background-image: linear-gradient(rgba(253, 253, 253, 0.2), rgba(253, 253, 253, 0));
+}
+
+#fbPanelBar2-tabBoxBackground {
+    background-color: rgb(219, 234, 249);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+}
+
+/*************************************************************************************************/
+/* Panel tabs */
+
+.panelTabs {
+    -moz-box-align: end;
+}
+
+/* Make sure panel-tab labels are centered within the toolbar */
+@media (-moz-os-version:windows-vista) {
+panelTab {
+    padding: 5px 7px;
+}}
+
+panelTab[selected="true"] {
+    border: 1px solid rgb(170, 188, 207);
+    background-color: rgb(247, 251, 254);
+    border-bottom: 1px solid rgb(247, 251, 254);
+}
+
+panelTab:not([selected="true"]):hover {
+    border: 1px solid rgb(170, 188, 207);
+}
+
+.panelTab-text {
+    margin: auto 0;
+}
+
+.panelTab-text[disabled="true"] {
+    color: gray;
+}
+
+panelTab[selected="true"] > panelTabMenu {
+    margin-left: 3px;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#fbPanelSplitter {
+    background-color: rgb(231, 241, 251) !important;
+}
+
+#fbPanelSplitter > #fbPanelSplitterBox {
+    background-color: rgb(219, 234, 249);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.2));
+    border-bottom: 1px solid rgb(170, 188, 207);
+}
+
+#fbCommandPopupSplitter {
+    background-color: rgb(231, 241, 251) !important;
+}
+
+/*************************************************************************************************/
+/* Search Box */
+
+.fbsearch-textbox {
+    border: 1px solid rgb(170, 188, 207);
+}
+
+.fbsearch-options-buttons {
+    border: 1px solid rgb(170, 188, 207);
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+.panelOptionsButton {
+    -moz-appearance: none;
+    border: none;
+}
+
+.panelOptionsButton,
+.panelOptionsButton:hover:active,
+.panelOptionsButton[open="true"] {
+    margin: 2px;
+    padding: 0 6px;
+}
+
+.panelOptionsButton:hover {
+    cursor: pointer;
+}
+
+.panelOptionsButton:hover > .toolbarbutton-text {
+    color: blue;
+    text-decoration: underline;
+}
+
+.panelOptionsButton[open="true"] > .toolbarbutton-text {
+    color: red;
+    text-decoration: underline;
+}
+
+.panelOptionsButton[disabled="true"] > .toolbarbutton-text {
+    color: graytext;
+    text-decoration: none;
+}
+
+/*************************************************************************************************/
+/* Ancestor path */ 
+
+#fbPanelStatus {
+    margin-top: 0;
+    -moz-margin-end: 5px;
+    margin-bottom: 0;
+    -moz-margin-start: 0;
+    overflow: hidden;
+}
+
+/************************************************************************************************/
+/* Location list */
+
+.menuHeader {
+    margin: 2px 6px;
+    font-weight: bold;
+}
+
+/*************************************************************************************************/
+/* Scrollable TabBar + TabList */
+
+panelBarArrowscrollbox > .scrollbutton-up,
+panelBarArrowscrollbox > .scrollbutton-down {
+    margin: 0 !important;
+}
+
+#fbPanelBar1-tabBox > panelBarArrowscrollbox {
+    margin-right: 4px;
+}
+
+#fbPanelBar2-tabBox > panelBarArrowscrollbox > .scrollbutton-up,
+#fbPanelBar2-tabBox > panelBarArrowscrollbox > .scrollbutton-down {
+    border-top: none !important;
+    border-radius: 0px !important;
+}
+
+#fbPanelBar1-buttons {
+    margin: 0 4px 0 4px;
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* Tab scrollbox arrow and all-tabs buttons */
+
+panelBarArrowscrollbox > .scrollbutton-up,
+panelBarArrowscrollbox > .scrollbutton-down {
+    -moz-appearance: none;
+    width: 18px;
+    margin: 3px 0px 4px;
+    padding: 0px;
+    border: 1px solid rgb(170,188,207);
+    border-bottom: none;
+    border-top: none;
+}
+
+panelBarArrowscrollbox > .scrollbutton-up:not([disabled="true"]):hover,
+panelBarArrowscrollbox > .scrollbutton-down:not([disabled="true"]):hover {
+    border-top-width: 1px;
+    padding-top: 1px;
+}
+
+panelBarArrowscrollbox > .scrollbutton-up[disabled="true"],
+panelBarArrowscrollbox > .scrollbutton-down[disabled="true"] {
+    opacity: 0.4;
+}
+
+panelBarArrowscrollbox > .scrollbutton-up {
+    border-left-style: none;
+    /*border-top-right-radius: 2px;*/
+}
+
+panelBarArrowscrollbox > .scrollbutton-up:-moz-locale-dir(rtl) {
+    border-left-style: solid;
+    border-right-style: none;
+    /*border-top-left-radius: 2px;
+    border-top-right-radius: 0px;*/
+}
+
+panelBarArrowscrollbox > .scrollbutton-down {
+    border-right-style: none;
+    /*border-top-left-radius: 2px;*/
+}
+
+panelBarArrowscrollbox > .scrollbutton-down:-moz-locale-dir(rtl) {
+    border-left-style: none;
+    border-right-style: solid;
+    /*border-top-left-radius: 0px;
+    border-top-right-radius: 2px;*/
+}

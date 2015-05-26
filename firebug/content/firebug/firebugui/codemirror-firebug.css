@@ -1,0 +1,177 @@
+/* See license.txt for terms of usage */
+
+/*************************************************************************************************/
+/* Firebug CodeMirror Theme */
+
+.cm-s-firebug.CodeMirror {
+    height: 100%;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.2;
+    cursor: text;
+}
+
+.cm-s-firebug .linehighlighting {
+    background-color: lightgoldenrodyellow;
+}
+
+
+.cm-s-firebug .CodeMirror-activeline-background {
+    background: #00FFFF;
+}
+
+/* Text indent from the breakpoint column */
+
+.cm-s-firebug pre {
+    padding-left: 10px;
+}
+
+/*
+ * Unset the padding when the Command Editor is hidden to prevent "Unresponsive Warnings".
+ * See issue 6824
+ */
+.cm-s-firebug.CommandEditor-hidden pre {
+    padding-left: 0px;
+}
+
+.cm-s-firebug .CodeMirror-scrollbar-filler {
+    background-color: white;
+}
+
+.cm-s-firebug .CodeMirror-gutters {
+    border-right: 1px solid #ddd;
+    background-color: rgb(238, 238, 238);
+    overflow: hidden;
+    position: absolute; left: 0; top: 0;
+    height: 100%;
+    padding-bottom: 30px;
+    z-index: 3;
+}
+
+/*************************************************************************************************/
+/* Color Syntax */
+
+.cm-s-firebug .cm-keyword {color: BlueViolet; font-weight: bold;}
+.cm-s-firebug .cm-atom {color: #219;}
+.cm-s-firebug .cm-number {color: #164;}
+.cm-s-firebug .cm-def {color: #00f;}
+.cm-s-firebug .cm-variable {color: black;}
+.cm-s-firebug .cm-variable-2 {color: black;}
+.cm-s-firebug .cm-variable-3 {color: black;}
+.cm-s-firebug .cm-property {color: black;}
+.cm-s-firebug .cm-operator {color: black;}
+.cm-s-firebug .cm-comment {color: Silver;}
+.cm-s-firebug .cm-string {color: Red;}
+.cm-s-firebug .cm-string-2 {color: Red;}
+.cm-s-firebug .cm-meta {color: rgb(120, 120, 120); font-style: italic;}
+.cm-s-firebug .cm-error {color: #f00;}
+.cm-s-firebug .cm-qualifier {color: #555;}
+.cm-s-firebug .cm-builtin {color: #30a;}
+.cm-s-firebug .cm-bracket {color: #997;}
+.cm-s-firebug .cm-tag {color: blue;}
+.cm-s-firebug .cm-attribute {color: rgb(0, 0, 136);}
+.cm-s-firebug .cm-header {color: blue;}
+.cm-s-firebug .cm-quote {color: #090;}
+.cm-s-firebug .cm-hr {color: #999;}
+.cm-s-firebug .cm-link {color: #00c;}
+
+/*************************************************************************************************/
+/* Gutters */
+
+.cm-s-firebug .CodeMirror-gutter {
+    cursor: default;
+}
+
+.cm-s-firebug .CodeMirror-gutter.breakpoints {
+    width: 16px;
+}
+
+.cm-s-firebug .CodeMirror-gutter-elt {
+    padding-left: 3px;
+    padding-right: 4px;
+    min-width: 1ch;
+}
+
+/*************************************************************************************************/
+/* Breakpoints */
+
+.cm-s-firebug .breakpoint {
+    background-image: url(chrome://firebug/skin/breakpoint.svg);
+    background-repeat: no-repeat;
+    padding: 7px;
+}
+
+.cm-s-firebug .breakpointLoading {
+    background-image: url(chrome://firebug/skin/loading.svg);
+    background-repeat: no-repeat;
+    padding: 7px;
+}
+
+.cm-s-firebug .breakpoint.condition {
+    background-image: url(chrome://firebug/skin/breakpointCondition.svg), url(chrome://firebug/skin/breakpoint.svg);
+    background-position: center;
+    padding: 6px;
+}
+
+.cm-s-firebug .breakpoint.disabled:not(.debugLocation) {
+    opacity: 0.5;
+}
+
+/*************************************************************************************************/
+/* Debug Location */
+
+.cm-s-firebug .CodeMirror-debugLocation .CodeMirror-gutter-elt .debugLocation {
+    background-image: url(chrome://firebug/skin/executionPointer.svg);
+    background-position: 2px 0;
+    color: #000000;
+    background-repeat: no-repeat;
+    padding: 7px;
+}
+
+.cm-s-firebug .CodeMirror-debugLocation .CodeMirror-gutter-elt .breakpoint {
+    background-image: url(chrome://firebug/skin/executionPointer.svg), url(chrome://firebug/skin/breakpoint.svg);
+    background-position: 2px 0, 0 0;
+}
+
+.cm-s-firebug .CodeMirror-debugLocation {
+    outline: 1px solid #D9D9B6;
+    background-color: rgb(255,255,224);
+}
+
+/*************************************************************************************************/
+/* Highlighted Line */
+
+.cm-s-firebug .CodeMirror-highlightedLine {
+    background-color: rgb(196, 244, 255);
+}
+
+/*************************************************************************************************/
+/* Executable Line */
+
+.cm-s-firebug .CodeMirror-executableLine .CodeMirror-linenumber {
+    color: green;
+    font-weight: bold;
+}
+
+/*************************************************************************************************/
+/* Auto-completion */
+
+/* xxxsz: Workaround to let the popup look like the Completion List Popup.
+   This can be removed when both popups share the same element structure. */
+.CodeMirror-hints {
+    font-size: inherit;
+    /* xxxsz: This should be set dynamically, i.e. regard the text size setting of the UI */
+    font-size-adjust: 0.547;
+    -moz-user-select: none;
+    -moz-border-top-colors: #BEBEBE #F0F0F0 #F0F0F0 #BEBEBE;
+    -moz-border-right-colors: #BEBEBE #F0F0F0 #F0F0F0 #BEBEBE;
+    -moz-border-bottom-colors: #BEBEBE #F0F0F0 #F0F0F0 #BEBEBE;
+    -moz-border-left-colors: #BEBEBE #F0F0F0 #F0F0F0 #BEBEBE;
+    border-width: 4px;
+    border-radius: 5px;
+    padding: 0;
+}
+
+.CodeMirror-hint {
+    border-radius: 0;
+}

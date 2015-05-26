@@ -1,0 +1,169 @@
+/* See license.txt for terms of usage */
+
+html {
+    background-color: #f3f3f3;
+}
+
+body {
+    border-top: 1px solid #BBB9BA;
+}
+
+/************************************************************************************************/
+/* Twisties */
+
+.twisty,
+.foldableGroup > .groupHeader > .twisty,
+.logRow-errorMessage .hasTwisty > .errorTitle,
+.logRow-log .objectBox-array.hasTwisty,
+.logRow-spy .spyHead .spyTitle,
+.logGroup > .logRow,
+.memberRow.hasChildren > .memberLabelCell > .memberLabel,
+.memberRow.cropped > .memberLabelCell > .memberLabel,
+.hasHeaders .netHrefLabel,
+.objectBox-stackFrame.hasTwisty,
+.objectBox-functionCall.hasTwisty,
+.netPageRow > .netCol > .netPageTitle,
+.cssComputedHeader > .twisty,
+.breakpointHeader > .twisty,
+.computedStyle.hasSelectors > .stylePropName,
+.cookieRow > .cookieNameCol > .cookieNameLabel {
+    background-image: url(chrome://firebug/skin/mac/twistyClosed.svg);
+    background-repeat: no-repeat;
+    background-position: 2px calc(0.5em - 3px);
+}
+
+.foldableGroup.opened > .groupHeader > .twisty,
+.logRow-errorMessage .hasTwisty.opened > .errorTitle,
+.logRow-log .objectBox-array.hasTwisty.opened,
+.logRow-spy.opened .spyHead .spyTitle,
+.logGroup.opened > .logRow,
+.memberRow.hasChildren.opened > .memberLabelCell > .memberLabel,
+.memberRow.cropped.opened > .memberLabelCell > .memberLabel,
+.nodeBox.highlightOpen > .nodeLabel > .twisty,
+.nodeBox.open > .nodeLabel > .twisty,
+.netRow.opened > .netCol > .netHrefLabel,
+.netPageRow.opened > .netCol > .netPageTitle,
+.netHeadersGroup.opened > .netInfoHeadersGroup > .twisty,
+.objectBox-stackFrame.hasTwisty.opened,
+.objectBox-functionCall.hasTwisty.opened,
+.computedStylesGroup.opened > .cssComputedHeader > .twisty,
+.breakpointBlock.opened > .breakpointHeader > .twisty,
+.computedStyle.hasSelectors.opened > .stylePropName,
+.cookieRow.opened > .cookieNameCol > .cookieNameLabel {
+    background-image: url(chrome://firebug/skin/mac/twistyOpen.svg);
+}
+
+/************************************************************************************************/
+/* Panel base */
+
+.infoTip,
+.fullPanelEditor {
+    font-family: monospace;
+}
+
+/************************************************************************************************/
+/* Console panel */
+
+.logRow-command > .objectBox-text,
+.objectBox-string,
+.objectBox-text,
+.objectBox-number,
+.objectLink-element,
+.objectLink-textNode,
+.objectLink-function,
+.objectBox-stackTrace,
+.objectLink-profile,
+.objectBox-table,
+.errorSource,
+.selectorTag,
+.selectorId,
+.selectorClass,
+.objectLeftBrace,
+.objectRightBrace,
+.objectEqual,
+.objectComma,
+.arrayLeftBracket,
+.arrayRightBracket,
+.arrayComma {
+      font-family: monospace;
+}
+
+/************************************************************************************************/
+/* HTML panel */
+
+.nodeBox,
+.docType,
+.breakpointCode .nodeBox.containerNodeBox,
+.breakpointCode .nodeLabel {
+    font-family: monospace;
+}
+
+.nodeBox.selected > .nodeLabel > .nodeLabelBox,
+.nodeBox.selected > .nodeLabel {
+    border-color: #3875d7;
+    background-color: #3875d7;
+    color: #FFFFFF !important;
+}
+
+.nodeBox.highlighted > .nodeLabel {
+    border-color: #3875d7 !important;
+}
+
+/************************************************************************************************/
+/* Layout panel */
+
+.layoutBox.editing,
+.layoutBox.highlighted {
+    background-color: #3875d7;
+}
+
+.layoutBox.editing,
+.layoutBox.editing > .layoutCaption,
+.layoutBox.editing > .layoutLabel,
+.layoutBox.highlighted,
+.layoutBox.highlighted > .layoutCaption,
+.layoutBox.highlighted > .layoutLabel {
+    color: #FFFFFF;
+}
+
+/************************************************************************************************/
+/* CSS panel */
+
+.cssRule {
+    font-family: monospace;
+}
+
+/************************************************************************************************/
+/* DOM panel */
+
+.editor-watchNewRow,
+.editor-memberRow {
+    font-family: monospace !important;
+}
+
+.watchRow > .memberLabelCell {
+    font-family: monospace;
+}
+
+.closeButton {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    background: url(chrome://firebug/skin/mac/close.svg) no-repeat 0 0;
+}
+
+.closeButton:hover {
+    filter: url(resource://firebugui/filters.svg#darken);
+}
+
+.closeButton:hover:active {
+    filter: url(resource://firebugui/filters.svg#deepDarken);
+}
+
+/************************************************************************************************/
+/* Net panel */
+
+.useA11y .a11yShowFullLabel,
+.netInfoText {
+    font-family: monospace;
+}

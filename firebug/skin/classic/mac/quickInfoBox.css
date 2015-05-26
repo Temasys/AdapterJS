@@ -1,0 +1,28 @@
+/* See license.txt for terms of usage */
+
+/*************************************************************************************************/
+/* Quick Info Box */
+
+.fbQuickInfoPanelBody {
+    font-family: monospace;
+}
+
+.fbQuickInfoName, .fbQuickInfoValue {
+    font-family: monospace;
+}
+
+.fbQuickInfoPin {
+    background: url(chrome://firebug/skin/mac/pin.svg) no-repeat;
+    width: 13px;
+    height: 13px;
+}
+
+.fbQuickInfoClose {
+    background: url(chrome://firebug/skin/mac/close.svg) no-repeat;
+    width: 13px;
+    height: 13px;
+}
+
+.fbQuickInfoPin.pin {
+    background: url(chrome://firebug/skin/mac/pinned.svg) no-repeat;
+}
