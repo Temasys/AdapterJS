@@ -1198,27 +1198,29 @@ if (navigator.mozGetUserMedia) {
     window.getUserMedia = window.navigator.getUserMedia;
   }
 
-  var iframe = document.createElement('iframe');
+  if (window.webrtcDetectedBrowser === 'firefox' || window.webrtcDetectedBrowser === 'chrome') {
+    var iframe = document.createElement('iframe');
 
-  iframe.onload = function() {
-    iframe.isLoaded = true;
-  };
+    iframe.onload = function() {
+      iframe.isLoaded = true;
+    };
 
-  iframe.src = 'detectRTC.html'; //'https://cdn.temasys.com.sg/demos/test/detectRTC.html';
-  iframe.style.display = 'none';
+    iframe.src = 'detectRTC.html'; //'https://cdn.temasys.com.sg/demos/test/detectRTC.html';
+    iframe.style.display = 'none';
 
-  (document.body || document.documentElement).appendChild(iframe);
+    (document.body || document.documentElement).appendChild(iframe);
 
-  var postFrameMessage = function (object) {
-    object = object || {};
+    var postFrameMessage = function (object) {
+      object = object || {};
 
-    if (!iframe.isLoaded) {
-      setTimeout(function () {
-        iframe.contentWindow.postMessage(object, '*');
-      }, 100);
-      return;
-    }
+      if (!iframe.isLoaded) {
+        setTimeout(function () {
+          iframe.contentWindow.postMessage(object, '*');
+        }, 100);
+        return;
+      }
 
-    iframe.contentWindow.postMessage(object, '*');
-  };
+      iframe.contentWindow.postMessage(object, '*');
+    };
+  }
 })();
