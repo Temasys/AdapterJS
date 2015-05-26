@@ -1,6 +1,11 @@
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
 
+// Browserify compatibility
+if(typeof exports !== 'undefined') {
+  module.exports = AdapterJS;
+}
+
 AdapterJS.options = AdapterJS.options || {};
 
 // uncomment to get virtual webcams
