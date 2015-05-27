@@ -1210,7 +1210,7 @@ if (navigator.mozGetUserMedia) {
       iframe.isLoaded = true;
     };
 
-    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html';
+    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detection-script/detectRTC.html';
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);
