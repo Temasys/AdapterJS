@@ -144,7 +144,7 @@
       iframe.isLoaded = true;
     };
 
-    iframe.src = 'detectRTC.html'; //'https://cdn.temasys.com.sg/demos/test/detectRTC.html';
+    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html';
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);
