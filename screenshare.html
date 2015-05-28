@@ -11,11 +11,7 @@
 
     <script>
 
-        if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
-            AdapterJS.onwebrtcreadyDone = true;
-        }
-
-        function done () {
+        AdapterJS.webRTCReady(function () {
             getUserMedia({
                 video: {
                     mediaSource: 'window'
@@ -25,13 +21,7 @@
             }, function (error) {
                 throw error;
             });
-        }
-
-        if (!AdapterJS.onwebrtcreadyDone) {
-            AdapterJS.onwebrtcready = done;
-        } else {
-            done();
-        }
+        });
     </script>
 </body>
 </html>

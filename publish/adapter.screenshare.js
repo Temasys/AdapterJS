@@ -1064,6 +1064,25 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 }
 
+// It's just for webRTCReady function
+AdapterJS.webRTCReady = function (callback) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback provided is not a function');
+  }
+
+  if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
+    setTimeout(function () {
+      callback(false);
+    }, 1000);
+  } else {
+    if (window.onwebrtcreadyDone !== true) {
+      AdapterJS.onwebrtcready = callback;
+    } else {
+      callback(AdapterJS.WebRTCPlugin.plugin !== null);
+    }
+  }
+};
+
 (function () {
 
   'use strict';
@@ -1205,7 +1224,7 @@ if (navigator.mozGetUserMedia) {
       iframe.isLoaded = true;
     };
 
-    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detection-script/detectRTC.html';
+    iframe.src = 'https://temasys-cdn.s3.amazonaws.com/skylink/extensions/detection-script-dev/detectRTC.html';
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);
