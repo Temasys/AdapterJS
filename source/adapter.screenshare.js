@@ -4,7 +4,6 @@
 
   var tempGetUserMedia = null;
 
-  // start
   if (window.navigator.mozGetUserMedia) {
     tempGetUserMedia = window.navigator.getUserMedia;
 
@@ -15,18 +14,14 @@
         constraints.video.mediaSource = 'window';
         constraints.video.mozMediaSource = 'window';
 
-        AdapterJS.screensharingCallback = function (error, success) {
-          if (error) {
+        tempGetUserMedia(constraints, successCb, function (error) {
+          if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
+            console.error(error);
+            window.location.href = 'https://cdn.temasys.com.sg/skylink/extensions/skylink-webrtc-tools.xpi';
+          } else {
             failureCb(error);
           }
-          if (success) {
-            successCb(success);
-          }
-        };
-
-        postFrameMessage({
-          mozConstraints: constraints
-        });
+        })
 
       } else {
         tempGetUserMedia(constraints, successCb, failureCb);
@@ -137,7 +132,7 @@
     window.getUserMedia = window.navigator.getUserMedia;
   }
 
-  if (window.webrtcDetectedBrowser === 'firefox' || window.webrtcDetectedBrowser === 'chrome') {
+  if (window.webrtcDetectedBrowser === 'chrome') {
     var iframe = document.createElement('iframe');
 
     iframe.onload = function() {
