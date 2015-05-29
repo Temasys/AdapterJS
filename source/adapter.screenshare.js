@@ -139,7 +139,8 @@
       iframe.isLoaded = true;
     };
 
-    iframe.src = 'https://temasys-cdn.s3.amazonaws.com/skylink/extensions/detection-script-dev/detectRTC.html';
+    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detection-script/detectRTC.html';
+      //'https://temasys-cdn.s3.amazonaws.com/skylink/extensions/detection-script-dev/detectRTC.html';
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);

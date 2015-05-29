@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.6 - 2015-05-28 */
+/*! adapterjs - v0.10.6 - 2015-05-29 */
 
 // Adapter's interface.
 window.AdapterJS = window.AdapterJS || {};
@@ -1224,7 +1224,8 @@ AdapterJS.webRTCReady = function (callback) {
       iframe.isLoaded = true;
     };
 
-    iframe.src = 'https://temasys-cdn.s3.amazonaws.com/skylink/extensions/detection-script-dev/detectRTC.html';
+    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detection-script/detectRTC.html';
+      //'https://temasys-cdn.s3.amazonaws.com/skylink/extensions/detection-script-dev/detectRTC.html';
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);

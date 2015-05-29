@@ -10,8 +10,13 @@
     <script src="../publish/adapter.screenshare.js"></script>
 
     <script>
+        function done1 () {
+            console.log('done 1');
+        }
 
-        AdapterJS.webRTCReady(function () {
+        function done2 () {
+            console.log('done 2');
+
             getUserMedia({
                 video: {
                     mediaSource: 'window'
@@ -21,7 +26,20 @@
             }, function (error) {
                 throw error;
             });
-        });
+        }
+        if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
+            AdapterJS.onwebrtcreadyDone = true;
+        }
+
+        if (!AdapterJS.onwebrtcreadyDone) {
+            AdapterJS.onwebrtcready = done1;
+        } else {
+            done1();
+        }
+
+
+
+        AdapterJS.webRTCReady(done2);
     </script>
 </body>
 </html>
