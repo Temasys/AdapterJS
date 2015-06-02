@@ -1061,3 +1061,25 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.defineWebRTCInterface,
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 }
+
+// It's just for webRTCReady function
+AdapterJS.webRTCReady = function (callback) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback provided is not a function');
+  }
+
+  if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
+    var checkDocumentReady = setInterval(function () {
+      if (document.readyState === 'complete') {
+        clearInterval(checkDocumentReady);
+        callback(false);
+      }
+    }, 10);
+  } else {
+    if (window.onwebrtcreadyDone !== true) {
+      AdapterJS.onwebrtcready = callback;
+    } else {
+      callback(AdapterJS.WebRTCPlugin.plugin !== null);
+    }
+  }
+};
