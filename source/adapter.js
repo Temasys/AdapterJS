@@ -1069,7 +1069,12 @@ AdapterJS.webRTCReady = function (callback) {
   }
 
   if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
-    callback(false);
+    var checkDocumentReady = setInterval(function () {
+      if (document.readyState === 'complete') {
+        clearInterval(checkDocumentReady);
+        callback(false);
+      }
+    }, 10);
   } else {
     if (window.onwebrtcreadyDone !== true) {
       AdapterJS.onwebrtcready = callback;
