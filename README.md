@@ -29,8 +29,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 #### Working with AdapterJS
 
-We **strongly** recommend only executing any WebRTC related code when AdapterJS triggers the `AdapterJS.webRTCReady` event. This function is called whenever the browser or our Temasys WebRTC plugin are ready.
-Note that `AdapterJS.onwebrtcready` is now deprecated and does not work with Chrome or Firefox.
+We **strongly** recommend only executing any WebRTC related code in the callback of the `AdapterJS.webRTCReady` function. It is triggered whenever the browser or our Temasys WebRTC plugin is ready to be used.
 
 ```javascript
 AdapterJS.webRTCReady(function(isUsingPlugin) {
@@ -39,6 +38,8 @@ AdapterJS.webRTCReady(function(isUsingPlugin) {
     getUserMedia(constraints, successCb, failCb);
 });
 ```
+
+Note that `AdapterJS.onwebrtcready` is now deprecated and does not work with Chrome or Firefox.
 
 Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+Temasys+WebRTC+Plugin+into+your+website).
 
