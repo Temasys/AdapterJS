@@ -188,11 +188,11 @@ expected values:
 
 #### Using screensharing functionality
 
-To use the screensharing functionality, simply add the `mediaSource: 'window'` constraints to the video media constraints.
+To use the screensharing functionality, reference `adapter.screenshare.js` and add the `mediaSource: 'window'` constraints to the video media constraints.
 
 Example:
 
-```
+```javascript
 window.navigator.getUserMedia({
   video: {
     mediaSource: 'window'
