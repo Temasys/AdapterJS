@@ -1069,9 +1069,7 @@ AdapterJS.webRTCReady = function (callback) {
   }
 
   if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
-    setTimeout(function () {
-      callback(false);
-    }, 1000);
+    callback(false);
   } else {
     if (window.onwebrtcreadyDone !== true) {
       AdapterJS.onwebrtcready = callback;

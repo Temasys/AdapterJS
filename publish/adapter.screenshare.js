@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.6 - 2015-05-29 */
+/*! adapterjs - v0.10.6 - 2015-06-02 */
 
 // Adapter's interface.
 window.AdapterJS = window.AdapterJS || {};
@@ -1071,9 +1071,7 @@ AdapterJS.webRTCReady = function (callback) {
   }
 
   if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
-    setTimeout(function () {
-      callback(false);
-    }, 1000);
+    callback(false);
   } else {
     if (window.onwebrtcreadyDone !== true) {
       AdapterJS.onwebrtcready = callback;
