@@ -1087,19 +1087,21 @@ if (navigator.mozGetUserMedia) {
 
   'use strict';
 
-  var tempGetUserMedia = null;
+  var baseGetUserMedia = null;
 
   if (window.navigator.mozGetUserMedia) {
-    tempGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
 
-      if (constraints.video ? !!constraints.video.mediaSource : false) {
+      if (constraints.video && !!constraints.video.mediaSource) {
+        // intercepting screensharing requests
+
         constraints.video.mediaSource = 'window';
         constraints.video.mozMediaSource = 'window';
 
-        tempGetUserMedia(constraints, successCb, function (error) {
+        baseGetUserMedia(constraints, successCb, function (error) {
           if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
             console.error(error);
             window.location.href = 'https://cdn.temasys.com.sg/skylink/extensions/skylink-webrtc-tools.xpi';
@@ -1108,20 +1110,20 @@ if (navigator.mozGetUserMedia) {
           }
         })
 
-      } else {
-        tempGetUserMedia(constraints, successCb, failureCb);
+      } else { // regular GetUserMediaRequest
+        baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
 
   } else if (window.navigator.webkitGetUserMedia) {
-    tempGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
 
-      if (constraints.video ? !!constraints.video.mediaSource : false) {
+      if (constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           throw new Error('Current browser does not support screensharing');
         }
@@ -1139,7 +1141,7 @@ if (navigator.mozGetUserMedia) {
 
             delete constraints.video.mediaSource;
 
-            tempGetUserMedia(constraints, successCb, failureCb);
+            baseGetUserMedia(constraints, successCb, failureCb);
 
           } else {
             if (error === 'permission-denied') {
@@ -1178,21 +1180,23 @@ if (navigator.mozGetUserMedia) {
         });
 
       } else {
-        tempGetUserMedia(constraints, successCb, failureCb);
+        baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
 
   } else {
-    tempGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
 
-      if (constraints.video ? !!constraints.video.mediaSource : false) {
+      if (constraints.video && !!constraints.video.mediaSource) {
         // check if plugin is ready
-        if(AdapterJS.WebRTCPlugin.pluginState === 4) {
+        if(AdapterJS.WebRTCPlugin.pluginState === AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
+          // TODO: use AdapterJS.WebRTCPlugin.callWhenPluginReady instead
+
           // check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
             !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
@@ -1211,7 +1215,7 @@ if (navigator.mozGetUserMedia) {
         }
       }
 
-      tempGetUserMedia(constraints, successCb, failureCb);
+      baseGetUserMedia(constraints, successCb, failureCb);
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
