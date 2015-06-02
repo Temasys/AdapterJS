@@ -186,6 +186,25 @@ expected values:
 - `RTP`: RTP enabled datachannel.
 
 
+#### Using screensharing functionality
+
+To use the screensharing functionality, simply add the `mediaSource: 'window'` constraints to the video media constraints.
+
+Example:
+
+```
+window.navigator.getUserMedia({
+  video: {
+    mediaSource: 'window'
+  }
+}, function (stream) {
+  console.log('Received stream', stream);
+}, function (error) {
+  console.log('Failed getting stream', error);
+});
+```
+
+
 ## Setup this project
 
 - Install or update to at lest version 0.10.26 of node and version 1.4.6 of npm
