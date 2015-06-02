@@ -34,6 +34,23 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
   // Override me and do whatever you want here
 };
 
+// Sets a callback function to be called when the WebRTC interface is ready.
+// The first argument is the function to callback.\
+// Throws an error if the first argument is not a function
+AdapterJS.webRTCReady = function (callback) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback provided is not a function');
+  }
+
+  if (true === AdapterJS.onwebrtcreadyDone) { 
+    // All WebRTC interfaces are ready, just call the callback
+    callback(null !== AdapterJS.WebRTCPlugin.plugin);
+  } else {
+    // will be triggered automatically when your browser/plugin is ready.
+    AdapterJS.onwebrtcready = callback;
+  }
+};
+
 // Plugin namespace
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
 
@@ -1064,27 +1081,7 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 }
 
-// It's just for webRTCReady function
-AdapterJS.webRTCReady = function (callback) {
-  if (typeof callback !== 'function') {
-    throw new Error('Callback provided is not a function');
-  }
 
-  if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
-    var checkDocumentReady = setInterval(function () {
-      if (document.readyState === 'complete') {
-        clearInterval(checkDocumentReady);
-        callback(false);
-      }
-    }, 10);
-  } else {
-    if (window.onwebrtcreadyDone !== true) {
-      AdapterJS.onwebrtcready = callback;
-    } else {
-      callback(AdapterJS.WebRTCPlugin.plugin !== null);
-    }
-  }
-};
 
 (function () {
 
