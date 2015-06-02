@@ -55,8 +55,12 @@ module.exports = function (grunt) {
 					'<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
 			},
 			production: {
-				src: ['<%= source %>/*.js'],
+				src: ['<%= source %>/adapter.js'],
 				dest: '<%= production %>/adapter.debug.js'
+			},
+			screenshare: {
+				src: ['<%= source %>/adapter.js', '<%= source %>/adapter.screenshare.js'],
+				dest: '<%= production %>/adapter.screenshare.js'
 			}
 		},
 
@@ -73,6 +77,11 @@ module.exports = function (grunt) {
 			production: {
 				files: {
 					'<%= production %>/adapter.min.js': ['<%= production %>/adapter.debug.js']
+				}
+			},
+			screenshare: {
+				files: {
+					'<%= production %>/adapter.screenshare.min.js': ['<%= production %>/adapter.screenshare.js']
 				}
 			}
 		},
