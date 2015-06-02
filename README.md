@@ -6,6 +6,8 @@ Find the most recent version hosted on our CDN.
 
 - Minified version: `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.min.js`
 - Debug version `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.debug.js`
+- Minified version (with screensharing changes): `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.screenshare.min.js`
+- Debug version (with screensharing changes)`//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.screenshare.js`
 
 Part of the [Skylink WebRTC](http://skylink.io/web) toolkit.
 
