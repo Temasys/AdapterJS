@@ -12,8 +12,8 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
-        constraints.video.mediaSource = 'window';
-        constraints.video.mozMediaSource = 'window';
+        //constraints.video.mediaSource = constraints.video.mediaSource;
+        constraints.video.mozMediaSource = constraints.video.mediaSource;
 
         baseGetUserMedia(constraints, successCb, function (error) {
           if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
