@@ -1089,6 +1089,15 @@ if (navigator.mozGetUserMedia) {
 
   var baseGetUserMedia = null;
 
+  var clone = function(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+  };
+
   if (window.navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
@@ -1097,7 +1106,7 @@ if (navigator.mozGetUserMedia) {
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
-        var updatedConstraints = JSON.parse(JSON.stringify(constraints));
+        var updatedConstraints = clone(constraints);
 
         //constraints.video.mediaSource = constraints.video.mediaSource;
         updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource;
@@ -1128,7 +1137,7 @@ if (navigator.mozGetUserMedia) {
         }
 
         // would be fine since no methods
-        var updatedConstraints = JSON.parse(JSON.stringify(constraints));
+        var updatedConstraints = clone(constraints);
 
         var chromeCallback = function(error, sourceId) {
           if(!error) {
@@ -1202,7 +1211,7 @@ if (navigator.mozGetUserMedia) {
           !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
 
           // would be fine since no methods
-          var updatedConstraints = JSON.parse(JSON.stringify(constraints));
+          var updatedConstraints = clone(constraints);
 
           // set the constraints
           updatedConstraints.video.optional = updatedConstraints.video.optional || [];
