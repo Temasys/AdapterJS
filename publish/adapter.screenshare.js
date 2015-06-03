@@ -34,6 +34,23 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
   // Override me and do whatever you want here
 };
 
+// Sets a callback function to be called when the WebRTC interface is ready.
+// The first argument is the function to callback.\
+// Throws an error if the first argument is not a function
+AdapterJS.webRTCReady = function (callback) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback provided is not a function');
+  }
+
+  if (true === AdapterJS.onwebrtcreadyDone) { 
+    // All WebRTC interfaces are ready, just call the callback
+    callback(null !== AdapterJS.WebRTCPlugin.plugin);
+  } else {
+    // will be triggered automatically when your browser/plugin is ready.
+    AdapterJS.onwebrtcready = callback;
+  }
+};
+
 // Plugin namespace
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
 
@@ -1064,45 +1081,27 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 }
 
-// It's just for webRTCReady function
-AdapterJS.webRTCReady = function (callback) {
-  if (typeof callback !== 'function') {
-    throw new Error('Callback provided is not a function');
-  }
 
-  if (window.webrtcDetectedBrowser !== 'safari' && window.webrtcDetectedBrowser !== 'IE') {
-    var checkDocumentReady = setInterval(function () {
-      if (document.readyState === 'complete') {
-        clearInterval(checkDocumentReady);
-        callback(false);
-      }
-    }, 10);
-  } else {
-    if (window.onwebrtcreadyDone !== true) {
-      AdapterJS.onwebrtcready = callback;
-    } else {
-      callback(AdapterJS.WebRTCPlugin.plugin !== null);
-    }
-  }
-};
 
 (function () {
 
   'use strict';
 
-  var tempGetUserMedia = null;
+  var baseGetUserMedia = null;
 
   if (window.navigator.mozGetUserMedia) {
-    tempGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
 
-      if (constraints.video ? !!constraints.video.mediaSource : false) {
+      if (constraints.video && !!constraints.video.mediaSource) {
+        // intercepting screensharing requests
+
         constraints.video.mediaSource = 'window';
         constraints.video.mozMediaSource = 'window';
 
-        tempGetUserMedia(constraints, successCb, function (error) {
+        baseGetUserMedia(constraints, successCb, function (error) {
           if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
             window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
           } else {
@@ -1110,20 +1109,20 @@ AdapterJS.webRTCReady = function (callback) {
           }
         })
 
-      } else {
-        tempGetUserMedia(constraints, successCb, failureCb);
+      } else { // regular GetUserMediaRequest
+        baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
 
   } else if (window.navigator.webkitGetUserMedia) {
-    tempGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
 
-      if (constraints.video ? !!constraints.video.mediaSource : false) {
+      if (constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           throw new Error('Current browser does not support screensharing');
         }
@@ -1141,7 +1140,7 @@ AdapterJS.webRTCReady = function (callback) {
 
             delete constraints.video.mediaSource;
 
-            tempGetUserMedia(constraints, successCb, failureCb);
+            baseGetUserMedia(constraints, successCb, failureCb);
 
           } else {
             if (error === 'permission-denied') {
@@ -1180,21 +1179,23 @@ AdapterJS.webRTCReady = function (callback) {
         });
 
       } else {
-        tempGetUserMedia(constraints, successCb, failureCb);
+        baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
 
   } else {
-    tempGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
       constraints = constraints || {};
 
-      if (constraints.video ? !!constraints.video.mediaSource : false) {
+      if (constraints.video && !!constraints.video.mediaSource) {
         // check if plugin is ready
-        if(AdapterJS.WebRTCPlugin.pluginState === 4) {
+        if(AdapterJS.WebRTCPlugin.pluginState === AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
+          // TODO: use AdapterJS.WebRTCPlugin.callWhenPluginReady instead
+
           // check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
             !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
@@ -1213,7 +1214,7 @@ AdapterJS.webRTCReady = function (callback) {
         }
       }
 
-      tempGetUserMedia(constraints, successCb, failureCb);
+      baseGetUserMedia(constraints, successCb, failureCb);
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
