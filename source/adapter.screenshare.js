@@ -12,10 +12,12 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
-        //constraints.video.mediaSource = constraints.video.mediaSource;
-        constraints.video.mozMediaSource = constraints.video.mediaSource;
+        var updatedConstraints = JSON.parse(JSON.stringify(constraints));
 
-        baseGetUserMedia(constraints, successCb, function (error) {
+        //constraints.video.mediaSource = constraints.video.mediaSource;
+        updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource;
+
+        baseGetUserMedia(updatedConstraints, successCb, function (error) {
           if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
             window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
           } else {
@@ -40,20 +42,23 @@
           throw new Error('Current browser does not support screensharing');
         }
 
+        // would be fine since no methods
+        var updatedConstraints = JSON.parse(JSON.stringify(constraints));
+
         var chromeCallback = function(error, sourceId) {
           if(!error) {
-            constraints.video.mandatory = constraints.video.mandatory || {};
-            constraints.video.mandatory.chromeMediaSource = 'desktop';
-            constraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
-            constraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
+            updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
+            updatedConstraints.video.mandatory.chromeMediaSource = 'desktop';
+            updatedConstraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
+            updatedConstraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
 
             if (sourceId) {
-              constraints.video.mandatory.chromeMediaSourceId = sourceId;
+              updatedConstraints.video.mandatory.chromeMediaSourceId = sourceId;
             }
 
-            delete constraints.video.mediaSource;
+            delete updatedConstraints.video.mediaSource;
 
-            baseGetUserMedia(constraints, successCb, failureCb);
+            baseGetUserMedia(updatedConstraints, successCb, failureCb);
 
           } else {
             if (error === 'permission-denied') {
@@ -111,13 +116,17 @@
           // check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
             !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
+
+            // would be fine since no methods
+            var updatedConstraints = JSON.parse(JSON.stringify(constraints));
+
             // set the constraints
-            constraints.video.optional = constraints.video.optional || [];
-            constraints.video.optional.push({
+            updatedConstraints.video.optional = updatedConstraints.video.optional || [];
+            updatedConstraints.video.optional.push({
               sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
             });
 
-            delete constraints.video.mediaSource;
+            delete updatedConstraints.video.mediaSource;
           } else {
             throw new Error('Your WebRTC plugin does not support screensharing');
           }
@@ -126,7 +135,7 @@
         }
       }
 
-      baseGetUserMedia(constraints, successCb, failureCb);
+      baseGetUserMedia(updatedConstraints, successCb, failureCb);
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
