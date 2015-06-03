@@ -122,7 +122,7 @@
             throw new Error('Your WebRTC plugin does not support screensharing');
           }
         } else {
-          throw new Error('Your WebRTC plugin is ready to be used yet');
+          throw new Error('Your WebRTC plugin is not ready to be used yet');
         }
       }
 

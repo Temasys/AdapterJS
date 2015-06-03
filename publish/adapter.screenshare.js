@@ -1,7 +1,7 @@
-/*! adapterjs - v0.10.7 - 2015-06-03 */
+/*! adapterjs - v0.11.0 - 2015-06-03 */
 
 // Adapter's interface.
-window.AdapterJS = window.AdapterJS || {};
+var AdapterJS = AdapterJS || {};
 
 // Browserify compatibility
 if(typeof exports !== 'undefined') {
@@ -17,7 +17,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.10.7';
+AdapterJS.VERSION = '0.11.0';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -519,8 +519,8 @@ if (navigator.mozGetUserMedia) {
   RTCIceCandidate = mozRTCIceCandidate;
   window.RTCIceCandidate = RTCIceCandidate;
 
-  getUserMedia = navigator.mozGetUserMedia.bind(navigator);
-  navigator.getUserMedia = getUserMedia;
+  window.getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+  navigator.getUserMedia = window.getUserMedia;
 
   // Shim for MediaStreamTrack.getSources.
   MediaStreamTrack.getSources = function(successCb) {
@@ -669,8 +669,8 @@ if (navigator.mozGetUserMedia) {
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
   };
 
-  getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
-  navigator.getUserMedia = getUserMedia;
+  window.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+  navigator.getUserMedia = window.getUserMedia;
 
   attachMediaStream = function (element, stream) {
     if (typeof element.srcObject !== 'undefined') {
@@ -909,7 +909,7 @@ if (navigator.mozGetUserMedia) {
       });
     };
 
-    getUserMedia = function (constraints, successCallback, failureCallback) {
+    window.getUserMedia = function (constraints, successCallback, failureCallback) {
       constraints.audio = constraints.audio || false;
       constraints.video = constraints.video || false;
 
@@ -918,7 +918,7 @@ if (navigator.mozGetUserMedia) {
           getUserMedia(constraints, successCallback, failureCallback);
       });
     };
-    navigator.getUserMedia = getUserMedia;
+    window.navigator.getUserMedia = window.getUserMedia;
 
     attachMediaStream = function (element, stream) {
       if (!element || !element.parentNode) {
@@ -1093,9 +1093,8 @@ if (navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      constraints = constraints || {};
 
-      if (constraints.video && !!constraints.video.mediaSource) {
+      if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
         constraints.video.mediaSource = 'window';
@@ -1120,9 +1119,8 @@ if (navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      constraints = constraints || {};
 
-      if (constraints.video && !!constraints.video.mediaSource) {
+      if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           throw new Error('Current browser does not support screensharing');
         }
@@ -1189,9 +1187,8 @@ if (navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      constraints = constraints || {};
 
-      if (constraints.video && !!constraints.video.mediaSource) {
+      if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // check if plugin is ready
         if(AdapterJS.WebRTCPlugin.pluginState === AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
           // TODO: use AdapterJS.WebRTCPlugin.callWhenPluginReady instead
@@ -1207,10 +1204,10 @@ if (navigator.mozGetUserMedia) {
 
             delete constraints.video.mediaSource;
           } else {
-            throw new Error('The plugin installed does not support screensharing');
+            throw new Error('Your WebRTC plugin does not support screensharing');
           }
         } else {
-          throw new Error('The plugin is currently not yet available');
+          throw new Error('Your WebRTC plugin is not ready to be used yet');
         }
       }
 
