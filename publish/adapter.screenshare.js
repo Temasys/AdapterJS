@@ -42,7 +42,7 @@ AdapterJS.webRTCReady = function (callback) {
     throw new Error('Callback provided is not a function');
   }
 
-  if (true === AdapterJS.onwebrtcreadyDone) { 
+  if (true === AdapterJS.onwebrtcreadyDone) {
     // All WebRTC interfaces are ready, just call the callback
     callback(null !== AdapterJS.WebRTCPlugin.plugin);
   } else {
@@ -280,7 +280,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink) {
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, showRefreshButton) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -311,10 +311,17 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink) {
     'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
     'middle; cursor: default;">' + text + '</span>');
   if(buttonText && buttonLink) {
-    c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
+    c.document.write('<button id="okay">' + buttonText + '</button>' +
+      (!!showRefreshButton ? '<button id="refresh" style="display: none;">Refresh</button>' : '') +
+      '<button>Cancel</button>');
     c.document.close();
+
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-      window.open(buttonLink, '_top');
+      if (!!showRefreshButton) {
+        AdapterJS.renderNotificationBar('You require to refresh the page to load extension');
+      }
+      window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
+
       e.preventDefault();
       try {
         event.cancelBubble = true;
@@ -1115,13 +1122,23 @@ if (navigator.mozGetUserMedia) {
         //constraints.video.mediaSource = constraints.video.mediaSource;
         updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource;
 
-        baseGetUserMedia(updatedConstraints, successCb, function (error) {
-          if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
-            window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
-          } else {
-            failureCb(error);
+        // so generally, it requires for document.readyState to be completed before the getUserMedia could be invoked.
+        // strange but this works anyway
+        var checkIfReady = setInterval(function () {
+          if (document.readyState === 'complete') {
+            clearInterval(checkIfReady);
+
+            baseGetUserMedia(updatedConstraints, successCb, function (error) {
+              if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
+                AdapterJS.renderNotificationBar('You require the Firefox add-on to use screensharing', 'Install Now',
+                  'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
+                //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
+              } else {
+                failureCb(error);
+              }
+            });
           }
-        })
+        }, 1);
 
       } else { // regular GetUserMediaRequest
         baseGetUserMedia(constraints, successCb, failureCb);
@@ -1181,7 +1198,12 @@ if (navigator.mozGetUserMedia) {
           }
 
           if (event.data.chromeExtensionStatus) {
-            chromeCallback(event.data.chromeExtensionStatus, null);
+            if (event.data.chromeExtensionStatus === 'not-installed') {
+              AdapterJS.renderNotificationBar('You require the Chrome extension to use screensharing', 'Install Now',
+                event.data.data, true, true);
+            } else {
+              chromeCallback(event.data.chromeExtensionStatus, null);
+            }
           }
 
           // this event listener is no more needed
