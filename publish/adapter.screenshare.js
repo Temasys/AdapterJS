@@ -178,6 +178,16 @@ AdapterJS.maybeThroughWebRTCReady = function() {
   }
 };
 
+// Text namespace
+AdapterJS.Text = {
+  Plugin: {
+    requireInstallation: 'This website requires you to install a WebRTC-enabling plugin ' +
+      'to work on this browser.',
+    notSupported: 'Your browser does not support WebRTC.'
+  },
+  Refresh: 'Please refresh page'
+};
+
 // The result of ice connection states.
 // - starting: Ice connection is starting.
 // - checking: Ice connection is checking.
@@ -311,14 +321,13 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
     'middle; cursor: default;">' + text + '</span>');
   if(buttonText && buttonLink) {
-    c.document.write('<button id="okay">' + buttonText + '</button>' +
-      (!!showRefreshButton ? '<button id="refresh" style="display: none;">Refresh</button>' : '') +
-      '<button>Cancel</button>');
+    c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
     c.document.close();
 
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
       if (!!showRefreshButton) {
-        AdapterJS.renderNotificationBar('You require to refresh the page to load extension');
+        AdapterJS.renderNotificationBar(AdapterJS.Text.Extension ?
+          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh );
       }
       window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
 
@@ -1070,13 +1079,12 @@ if (navigator.mozGetUserMedia) {
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
       } else { // no portal link, just print a generic explanation
-       popupString = 'This website requires you to install a WebRTC-enabling plugin ' +
-        'to work on this browser.';
+       popupString = AdapterJS.Text.Plugin.requireInstallation;
       }
 
       AdapterJS.renderNotificationBar(popupString, 'Install Now', downloadLink);
     } else { // no download link, just print a generic explanation
-      AdapterJS.renderNotificationBar('Your browser does not support WebRTC.');
+      AdapterJS.renderNotificationBar(AdapterJS.Text.Plugin.notSupported);
     }
   };
 
@@ -1095,6 +1103,12 @@ if (navigator.mozGetUserMedia) {
   'use strict';
 
   var baseGetUserMedia = null;
+
+  AdapterJS.Text.Extension = {
+    requireInstallationFF: 'You require the Firefox add-on to use screensharing',
+    requireInstallationChrome: 'You require the Chrome extension to use screensharing',
+    requireRefresh: 'You require to refresh the page to load extension'
+  };
 
   var clone = function(obj) {
     if (null == obj || "object" != typeof obj) return obj;
@@ -1130,7 +1144,7 @@ if (navigator.mozGetUserMedia) {
 
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
               if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
-                AdapterJS.renderNotificationBar('You require the Firefox add-on to use screensharing', 'Install Now',
+                AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationFF, 'Install Now',
                   'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
                 //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
               } else {
@@ -1199,7 +1213,7 @@ if (navigator.mozGetUserMedia) {
 
           if (event.data.chromeExtensionStatus) {
             if (event.data.chromeExtensionStatus === 'not-installed') {
-              AdapterJS.renderNotificationBar('You require the Chrome extension to use screensharing', 'Install Now',
+              AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationChrome, 'Install Now',
                 event.data.data, true, true);
             } else {
               chromeCallback(event.data.chromeExtensionStatus, null);

@@ -4,6 +4,12 @@
 
   var baseGetUserMedia = null;
 
+  AdapterJS.Text.Extension = {
+    requireInstallationFF: 'You require the Firefox add-on to use screensharing',
+    requireInstallationChrome: 'You require the Chrome extension to use screensharing',
+    requireRefresh: 'You require to refresh the page to load extension'
+  };
+
   var clone = function(obj) {
     if (null == obj || "object" != typeof obj) return obj;
     var copy = obj.constructor();
@@ -38,7 +44,7 @@
 
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
               if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
-                AdapterJS.renderNotificationBar('You require the Firefox add-on to use screensharing', 'Install Now',
+                AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationFF, 'Install Now',
                   'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
                 //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
               } else {
@@ -107,7 +113,7 @@
 
           if (event.data.chromeExtensionStatus) {
             if (event.data.chromeExtensionStatus === 'not-installed') {
-              AdapterJS.renderNotificationBar('You require the Chrome extension to use screensharing', 'Install Now',
+              AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationChrome, 'Install Now',
                 event.data.data, true, true);
             } else {
               chromeCallback(event.data.chromeExtensionStatus, null);
