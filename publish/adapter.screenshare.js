@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.7 - 2015-06-02 */
+/*! adapterjs - v0.10.7 - 2015-06-03 */
 
 // Adapter's interface.
 window.AdapterJS = window.AdapterJS || {};
@@ -1104,8 +1104,7 @@ AdapterJS.webRTCReady = function (callback) {
 
         tempGetUserMedia(constraints, successCb, function (error) {
           if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
-            console.error(error);
-            window.location.href = 'https://cdn.temasys.com.sg/skylink/extensions/skylink-webrtc-tools.xpi';
+            window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
           } else {
             failureCb(error);
           }
