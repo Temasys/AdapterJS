@@ -21,6 +21,10 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
+        if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
+          throw new Error('Only "screen" and "window" option is available as mediaSource');
+        }
+
         var updatedConstraints = clone(constraints);
 
         //constraints.video.mediaSource = constraints.video.mediaSource;
