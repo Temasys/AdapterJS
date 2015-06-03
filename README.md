@@ -43,7 +43,7 @@ AdapterJS.webRTCReady(function(isUsingPlugin) {
 });
 ```
 
-Note that `AdapterJS.onwebrtcready` is now deprecated and does not work with Chrome or Firefox.
+Note that `AdapterJS.onwebrtcready` is now deprecated.
 
 Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+Temasys+WebRTC+Plugin+into+your+website).
 

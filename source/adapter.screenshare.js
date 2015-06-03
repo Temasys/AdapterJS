@@ -8,9 +8,8 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      constraints = constraints || {};
 
-      if (constraints.video && !!constraints.video.mediaSource) {
+      if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
         constraints.video.mediaSource = 'window';
@@ -35,9 +34,8 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      constraints = constraints || {};
 
-      if (constraints.video && !!constraints.video.mediaSource) {
+      if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           throw new Error('Current browser does not support screensharing');
         }
@@ -104,9 +102,8 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      constraints = constraints || {};
 
-      if (constraints.video && !!constraints.video.mediaSource) {
+      if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // check if plugin is ready
         if(AdapterJS.WebRTCPlugin.pluginState === AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
           // TODO: use AdapterJS.WebRTCPlugin.callWhenPluginReady instead
@@ -122,10 +119,10 @@
 
             delete constraints.video.mediaSource;
           } else {
-            throw new Error('The plugin installed does not support screensharing');
+            throw new Error('Your WebRTC plugin does not support screensharing');
           }
         } else {
-          throw new Error('The plugin is currently not yet available');
+          throw new Error('Your WebRTC plugin is ready to be used yet');
         }
       }
 
