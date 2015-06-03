@@ -1194,29 +1194,25 @@ if (navigator.mozGetUserMedia) {
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
 
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
-        // check if plugin is ready
-        if(AdapterJS.WebRTCPlugin.pluginState === AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
-          // TODO: use AdapterJS.WebRTCPlugin.callWhenPluginReady instead
+        // wait for plugin to be ready
+        AdapterJS.WebRTCPlugin.WaitForPluginReady();
 
-          // check if screensharing feature is available
-          if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
-            !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
+        // check if screensharing feature is available
+        if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
+          !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
 
-            // would be fine since no methods
-            var updatedConstraints = JSON.parse(JSON.stringify(constraints));
+          // would be fine since no methods
+          var updatedConstraints = JSON.parse(JSON.stringify(constraints));
 
-            // set the constraints
-            updatedConstraints.video.optional = updatedConstraints.video.optional || [];
-            updatedConstraints.video.optional.push({
-              sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
-            });
+          // set the constraints
+          updatedConstraints.video.optional = updatedConstraints.video.optional || [];
+          updatedConstraints.video.optional.push({
+            sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
+          });
 
-            delete updatedConstraints.video.mediaSource;
-          } else {
-            throw new Error('Your WebRTC plugin does not support screensharing');
-          }
+          delete updatedConstraints.video.mediaSource;
         } else {
-          throw new Error('Your WebRTC plugin is not ready to be used yet');
+          throw new Error('Your WebRTC plugin does not support screensharing');
         }
       }
 
