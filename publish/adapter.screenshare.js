@@ -1,4 +1,4 @@
-/*! adapterjs - v0.11.0 - 2015-06-03 */
+/*! adapterjs - v0.11.0 - 2015-06-04 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -183,9 +183,13 @@ AdapterJS.Text = {
   Plugin: {
     requireInstallation: 'This website requires you to install a WebRTC-enabling plugin ' +
       'to work on this browser.',
-    notSupported: 'Your browser does not support WebRTC.'
+    notSupported: 'Your browser does not support WebRTC.',
+    button: 'Install Now'
   },
-  Refresh: 'Please refresh page'
+  Refresh: {
+    requireRefresh: 'Please refresh page',
+    button: 'Refresh Page'
+  }
 };
 
 // The result of ice connection states.
@@ -290,7 +294,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, showRefreshButton) {
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, displayRefreshBar) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -325,9 +329,10 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     c.document.close();
 
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-      if (!!showRefreshButton) {
+      if (!!displayRefreshBar) {
         AdapterJS.renderNotificationBar(AdapterJS.Text.Extension ?
-          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh );
+          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh.requireRefresh,
+          AdapterJS.Text.Refresh.button, 'javascript:location.reload()');
       }
       window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
 
@@ -1082,7 +1087,7 @@ if (navigator.mozGetUserMedia) {
        popupString = AdapterJS.Text.Plugin.requireInstallation;
       }
 
-      AdapterJS.renderNotificationBar(popupString, 'Install Now', downloadLink);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.Text.Plugin.button, downloadLink);
     } else { // no download link, just print a generic explanation
       AdapterJS.renderNotificationBar(AdapterJS.Text.Plugin.notSupported);
     }
@@ -1107,7 +1112,8 @@ if (navigator.mozGetUserMedia) {
   AdapterJS.Text.Extension = {
     requireInstallationFF: 'You require the Firefox add-on to use screensharing',
     requireInstallationChrome: 'You require the Chrome extension to use screensharing',
-    requireRefresh: 'You require to refresh the page to load extension'
+    requireRefresh: 'You require to refresh the page to load extension',
+    button: 'Install Now',
   };
 
   var clone = function(obj) {
@@ -1144,7 +1150,8 @@ if (navigator.mozGetUserMedia) {
 
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
               if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
-                AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationFF, 'Install Now',
+                AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationFF,
+                  AdapterJS.Text.Extension.button,
                   'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
                 //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
               } else {
@@ -1213,7 +1220,8 @@ if (navigator.mozGetUserMedia) {
 
           if (event.data.chromeExtensionStatus) {
             if (event.data.chromeExtensionStatus === 'not-installed') {
-              AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationChrome, 'Install Now',
+              AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationChrome,
+                AdapterJS.Text.Extension.button,
                 event.data.data, true, true);
             } else {
               chromeCallback(event.data.chromeExtensionStatus, null);

@@ -181,9 +181,13 @@ AdapterJS.Text = {
   Plugin: {
     requireInstallation: 'This website requires you to install a WebRTC-enabling plugin ' +
       'to work on this browser.',
-    notSupported: 'Your browser does not support WebRTC.'
+    notSupported: 'Your browser does not support WebRTC.',
+    button: 'Install Now'
   },
-  Refresh: 'Please refresh page'
+  Refresh: {
+    requireRefresh: 'Please refresh page',
+    button: 'Refresh Page'
+  }
 };
 
 // The result of ice connection states.
@@ -288,7 +292,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, showRefreshButton) {
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, displayRefreshBar) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -323,9 +327,10 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     c.document.close();
 
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-      if (!!showRefreshButton) {
+      if (!!displayRefreshBar) {
         AdapterJS.renderNotificationBar(AdapterJS.Text.Extension ?
-          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh );
+          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh.requireRefresh,
+          AdapterJS.Text.Refresh.button, 'javascript:location.reload()');
       }
       window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
 
@@ -1080,7 +1085,7 @@ if (navigator.mozGetUserMedia) {
        popupString = AdapterJS.Text.Plugin.requireInstallation;
       }
 
-      AdapterJS.renderNotificationBar(popupString, 'Install Now', downloadLink);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.Text.Plugin.button, downloadLink);
     } else { // no download link, just print a generic explanation
       AdapterJS.renderNotificationBar(AdapterJS.Text.Plugin.notSupported);
     }
