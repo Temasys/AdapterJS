@@ -1,7 +1,7 @@
-/*! adapterjs - v0.10.7 - 2015-06-03 */
+/*! adapterjs - v0.11.0 - 2015-06-04 */
 
 // Adapter's interface.
-window.AdapterJS = window.AdapterJS || {};
+var AdapterJS = AdapterJS || {};
 
 // Browserify compatibility
 if(typeof exports !== 'undefined') {
@@ -17,7 +17,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.10.7';
+AdapterJS.VERSION = '0.11.0';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -42,7 +42,7 @@ AdapterJS.webRTCReady = function (callback) {
     throw new Error('Callback provided is not a function');
   }
 
-  if (true === AdapterJS.onwebrtcreadyDone) { 
+  if (true === AdapterJS.onwebrtcreadyDone) {
     // All WebRTC interfaces are ready, just call the callback
     callback(null !== AdapterJS.WebRTCPlugin.plugin);
   } else {
@@ -178,6 +178,20 @@ AdapterJS.maybeThroughWebRTCReady = function() {
   }
 };
 
+// Text namespace
+AdapterJS.Text = {
+  Plugin: {
+    requireInstallation: 'This website requires you to install a WebRTC-enabling plugin ' +
+      'to work on this browser.',
+    notSupported: 'Your browser does not support WebRTC.',
+    button: 'Install Now'
+  },
+  Refresh: {
+    requireRefresh: 'Please refresh page',
+    button: 'Refresh Page'
+  }
+};
+
 // The result of ice connection states.
 // - starting: Ice connection is starting.
 // - checking: Ice connection is checking.
@@ -280,7 +294,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink) {
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, displayRefreshBar) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -313,8 +327,15 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink) {
   if(buttonText && buttonLink) {
     c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
     c.document.close();
+
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-      window.open(buttonLink, '_top');
+      if (!!displayRefreshBar) {
+        AdapterJS.renderNotificationBar(AdapterJS.Text.Extension ?
+          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh.requireRefresh,
+          AdapterJS.Text.Refresh.button, 'javascript:location.reload()');
+      }
+      window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
+
       e.preventDefault();
       try {
         event.cancelBubble = true;
@@ -519,8 +540,8 @@ if (navigator.mozGetUserMedia) {
   RTCIceCandidate = mozRTCIceCandidate;
   window.RTCIceCandidate = RTCIceCandidate;
 
-  getUserMedia = navigator.mozGetUserMedia.bind(navigator);
-  navigator.getUserMedia = getUserMedia;
+  window.getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+  navigator.getUserMedia = window.getUserMedia;
 
   // Shim for MediaStreamTrack.getSources.
   MediaStreamTrack.getSources = function(successCb) {
@@ -669,8 +690,8 @@ if (navigator.mozGetUserMedia) {
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
   };
 
-  getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
-  navigator.getUserMedia = getUserMedia;
+  window.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+  navigator.getUserMedia = window.getUserMedia;
 
   attachMediaStream = function (element, stream) {
     if (typeof element.srcObject !== 'undefined') {
@@ -909,7 +930,7 @@ if (navigator.mozGetUserMedia) {
       });
     };
 
-    getUserMedia = function (constraints, successCallback, failureCallback) {
+    window.getUserMedia = function (constraints, successCallback, failureCallback) {
       constraints.audio = constraints.audio || false;
       constraints.video = constraints.video || false;
 
@@ -918,7 +939,7 @@ if (navigator.mozGetUserMedia) {
           getUserMedia(constraints, successCallback, failureCallback);
       });
     };
-    navigator.getUserMedia = getUserMedia;
+    window.navigator.getUserMedia = window.getUserMedia;
 
     attachMediaStream = function (element, stream) {
       if (!element || !element.parentNode) {
@@ -1063,13 +1084,12 @@ if (navigator.mozGetUserMedia) {
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
       } else { // no portal link, just print a generic explanation
-       popupString = 'This website requires you to install a WebRTC-enabling plugin ' +
-        'to work on this browser.';
+       popupString = AdapterJS.Text.Plugin.requireInstallation;
       }
 
-      AdapterJS.renderNotificationBar(popupString, 'Install Now', downloadLink);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.Text.Plugin.button, downloadLink);
     } else { // no download link, just print a generic explanation
-      AdapterJS.renderNotificationBar('Your browser does not support WebRTC.');
+      AdapterJS.renderNotificationBar(AdapterJS.Text.Plugin.notSupported);
     }
   };
 

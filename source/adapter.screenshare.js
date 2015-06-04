@@ -4,6 +4,22 @@
 
   var baseGetUserMedia = null;
 
+  AdapterJS.Text.Extension = {
+    requireInstallationFF: 'You require the Firefox add-on to use screensharing',
+    requireInstallationChrome: 'You require the Chrome extension to use screensharing',
+    requireRefresh: 'You require to refresh the page to load extension',
+    button: 'Install Now',
+  };
+
+  var clone = function(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+  };
+
   if (window.navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
@@ -12,16 +28,33 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
-        constraints.video.mediaSource = 'window';
-        constraints.video.mozMediaSource = 'window';
+        if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
+          throw new Error('Only "screen" and "window" option is available as mediaSource');
+        }
 
-        baseGetUserMedia(constraints, successCb, function (error) {
-          if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
-            window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
-          } else {
-            failureCb(error);
+        var updatedConstraints = clone(constraints);
+
+        //constraints.video.mediaSource = constraints.video.mediaSource;
+        updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource;
+
+        // so generally, it requires for document.readyState to be completed before the getUserMedia could be invoked.
+        // strange but this works anyway
+        var checkIfReady = setInterval(function () {
+          if (document.readyState === 'complete') {
+            clearInterval(checkIfReady);
+
+            baseGetUserMedia(updatedConstraints, successCb, function (error) {
+              if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
+                AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationFF,
+                  AdapterJS.Text.Extension.button,
+                  'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
+                //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
+              } else {
+                failureCb(error);
+              }
+            });
           }
-        })
+        }, 1);
 
       } else { // regular GetUserMediaRequest
         baseGetUserMedia(constraints, successCb, failureCb);
@@ -40,20 +73,23 @@
           throw new Error('Current browser does not support screensharing');
         }
 
+        // would be fine since no methods
+        var updatedConstraints = clone(constraints);
+
         var chromeCallback = function(error, sourceId) {
           if(!error) {
-            constraints.video.mandatory = constraints.video.mandatory || {};
-            constraints.video.mandatory.chromeMediaSource = 'desktop';
-            constraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
-            constraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
+            updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
+            updatedConstraints.video.mandatory.chromeMediaSource = 'desktop';
+            updatedConstraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
+            updatedConstraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
 
             if (sourceId) {
-              constraints.video.mandatory.chromeMediaSourceId = sourceId;
+              updatedConstraints.video.mandatory.chromeMediaSourceId = sourceId;
             }
 
-            delete constraints.video.mediaSource;
+            delete updatedConstraints.video.mediaSource;
 
-            baseGetUserMedia(constraints, successCb, failureCb);
+            baseGetUserMedia(updatedConstraints, successCb, failureCb);
 
           } else {
             if (error === 'permission-denied') {
@@ -78,7 +114,13 @@
           }
 
           if (event.data.chromeExtensionStatus) {
-            chromeCallback(event.data.chromeExtensionStatus, null);
+            if (event.data.chromeExtensionStatus === 'not-installed') {
+              AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationChrome,
+                AdapterJS.Text.Extension.button,
+                event.data.data, true, true);
+            } else {
+              chromeCallback(event.data.chromeExtensionStatus, null);
+            }
           }
 
           // this event listener is no more needed
@@ -102,31 +144,32 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
-        // check if plugin is ready
-        if(AdapterJS.WebRTCPlugin.pluginState === AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
-          // TODO: use AdapterJS.WebRTCPlugin.callWhenPluginReady instead
+        // would be fine since no methods
+        var updatedConstraints = clone(constraints);
 
+        // wait for plugin to be ready
+        AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
           // check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
             !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
+
+
             // set the constraints
-            constraints.video.optional = constraints.video.optional || [];
-            constraints.video.optional.push({
+            updatedConstraints.video.optional = updatedConstraints.video.optional || [];
+            updatedConstraints.video.optional.push({
               sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
             });
 
-            delete constraints.video.mediaSource;
+            delete updatedConstraints.video.mediaSource;
           } else {
             throw new Error('Your WebRTC plugin does not support screensharing');
           }
-        } else {
-          throw new Error('Your WebRTC plugin is ready to be used yet');
-        }
+          baseGetUserMedia(updatedConstraints, successCb, failureCb);
+        });
+      } else {
+        baseGetUserMedia(constraints, successCb, failureCb);
       }
-
-      baseGetUserMedia(constraints, successCb, failureCb);
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
