@@ -144,31 +144,32 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
-
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
+        // would be fine since no methods
+        var updatedConstraints = clone(constraints);
+
         // wait for plugin to be ready
-        AdapterJS.WebRTCPlugin.WaitForPluginReady();
+        AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
+          // check if screensharing feature is available
+          if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
+            !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
 
-        // check if screensharing feature is available
-        if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
-          !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
 
-          // would be fine since no methods
-          var updatedConstraints = clone(constraints);
+            // set the constraints
+            updatedConstraints.video.optional = updatedConstraints.video.optional || [];
+            updatedConstraints.video.optional.push({
+              sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
+            });
 
-          // set the constraints
-          updatedConstraints.video.optional = updatedConstraints.video.optional || [];
-          updatedConstraints.video.optional.push({
-            sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
-          });
-
-          delete updatedConstraints.video.mediaSource;
-        } else {
-          throw new Error('Your WebRTC plugin does not support screensharing');
-        }
+            delete updatedConstraints.video.mediaSource;
+          } else {
+            throw new Error('Your WebRTC plugin does not support screensharing');
+          }
+          baseGetUserMedia(updatedConstraints, successCb, failureCb);
+        });
+      } else {
+        baseGetUserMedia(constraints, successCb, failureCb);
       }
-
-      baseGetUserMedia(updatedConstraints, successCb, failureCb);
     };
 
     window.getUserMedia = window.navigator.getUserMedia;
