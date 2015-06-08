@@ -1,7 +1,12 @@
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
 
-AdapterJS.options = {};
+// Browserify compatibility
+if(typeof exports !== 'undefined') {
+  module.exports = AdapterJS;
+}
+
+AdapterJS.options = AdapterJS.options || {};
 
 // uncomment to get virtual webcams
 // AdapterJS.options.getAllCams = true;
@@ -13,18 +18,35 @@ AdapterJS.options = {};
 AdapterJS.VERSION = '@@version';
 
 // This function will be called when the WebRTC API is ready to be used
-// Whether it is the native implementation (Chrome, Firefox, Opera) or 
+// Whether it is the native implementation (Chrome, Firefox, Opera) or
 // the plugin
 // You may Override this function to synchronise the start of your application
 // with the WebRTC API being ready.
-// If you decide not to override use this synchronisation, it may result in 
-// an extensive CPU usage on the plugin start (once per tab loaded) 
+// If you decide not to override use this synchronisation, it may result in
+// an extensive CPU usage on the plugin start (once per tab loaded)
 // Params:
 //    - isUsingPlugin: true is the WebRTC plugin is being used, false otherwise
 //
 AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
   // The WebRTC API is ready.
   // Override me and do whatever you want here
+};
+
+// Sets a callback function to be called when the WebRTC interface is ready.
+// The first argument is the function to callback.\
+// Throws an error if the first argument is not a function
+AdapterJS.webRTCReady = function (callback) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback provided is not a function');
+  }
+
+  if (true === AdapterJS.onwebrtcreadyDone) {
+    // All WebRTC interfaces are ready, just call the callback
+    callback(null !== AdapterJS.WebRTCPlugin.plugin);
+  } else {
+    // will be triggered automatically when your browser/plugin is ready.
+    AdapterJS.onwebrtcready = callback;
+  }
 };
 
 // Plugin namespace
@@ -55,8 +77,8 @@ AdapterJS.WebRTCPlugin.pageId = Math.random().toString(36).slice(2);
 AdapterJS.WebRTCPlugin.plugin = null;
 
 // Set log level for the plugin once it is ready.
-// The different values are 
-// This is an asynchronous function that will run when the plugin is ready 
+// The different values are
+// This is an asynchronous function that will run when the plugin is ready
 AdapterJS.WebRTCPlugin.setLogLevel = null;
 
 // Defines webrtc's JS interface according to the plugin's implementation.
@@ -92,22 +114,22 @@ AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.NONE;
 // Used to make sure AdapterJS.onwebrtcready is only called once
 AdapterJS.onwebrtcreadyDone = false;
 
-// Log levels for the plugin. 
+// Log levels for the plugin.
 // To be set by calling AdapterJS.WebRTCPlugin.setLogLevel
 /*
-Log outputs are prefixed in some cases. 
-  INFO: Information reported by the plugin. 
+Log outputs are prefixed in some cases.
+  INFO: Information reported by the plugin.
   ERROR: Errors originating from within the plugin.
   WEBRTC: Error originating from within the libWebRTC library
 */
 // From the least verbose to the most verbose
 AdapterJS.WebRTCPlugin.PLUGIN_LOG_LEVELS = {
   NONE : 'NONE',
-  ERROR : 'ERROR',  
-  WARNING : 'WARNING', 
-  INFO: 'INFO', 
-  VERBOSE: 'VERBOSE', 
-  SENSITIVE: 'SENSITIVE'  
+  ERROR : 'ERROR',
+  WARNING : 'WARNING',
+  INFO: 'INFO',
+  VERBOSE: 'VERBOSE',
+  SENSITIVE: 'SENSITIVE'
 };
 
 // Does a waiting check before proceeding to load the plugin.
@@ -115,11 +137,6 @@ AdapterJS.WebRTCPlugin.WaitForPluginReady = null;
 
 // This methid will use an interval to wait for the plugin to be ready.
 AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
-
-// This function will be called if the plugin is needed (browser different
-// from Chrome or Firefox), but the plugin is not installed.
-// Override it according to your application logic.
-AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = null;
 
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
@@ -156,6 +173,20 @@ AdapterJS.maybeThroughWebRTCReady = function() {
     if (typeof(AdapterJS.onwebrtcready) === 'function') {
       AdapterJS.onwebrtcready(AdapterJS.WebRTCPlugin.plugin !== null);
     }
+  }
+};
+
+// Text namespace
+AdapterJS.TEXT = {
+  PLUGIN: {
+    REQUIRE_INSTALLATION: 'This website requires you to install a WebRTC-enabling plugin ' +
+      'to work on this browser.',
+    NOT_SUPPORTED: 'Your browser does not support WebRTC.',
+    BUTTON: 'Install Now'
+  },
+  REFRESH: {
+    REQUIRE_REFRESH: 'Please refresh page',
+    BUTTON: 'Refresh Page'
   }
 };
 
@@ -254,11 +285,76 @@ AdapterJS.maybeFixConfiguration = function (pcConfig) {
 AdapterJS.addEvent = function(elem, evnt, func) {
   if (elem.addEventListener) { // W3C DOM
     elem.addEventListener(evnt, func, false);
-  } else if (elem.attachEvent) {// OLD IE DOM 
+  } else if (elem.attachEvent) {// OLD IE DOM
     elem.attachEvent('on'+evnt, func);
   } else { // No much to do
     elem[evnt] = func;
   }
+};
+
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, displayRefreshBar) {
+  // only inject once the page is ready
+  if (document.readyState !== 'complete') {
+    return;
+  }
+
+  var w = window;
+  var i = document.createElement('iframe');
+  i.style.position = 'fixed';
+  i.style.top = '-41px';
+  i.style.left = 0;
+  i.style.right = 0;
+  i.style.width = '100%';
+  i.style.height = '40px';
+  i.style.backgroundColor = '#ffffe1';
+  i.style.border = 'none';
+  i.style.borderBottom = '1px solid #888888';
+  i.style.zIndex = '9999999';
+  if(typeof i.style.webkitTransition === 'string') {
+    i.style.webkitTransition = 'all .5s ease-out';
+  } else if(typeof i.style.transition === 'string') {
+    i.style.transition = 'all .5s ease-out';
+  }
+  document.body.appendChild(i);
+  c = (i.contentWindow) ? i.contentWindow :
+    (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
+  c.document.open();
+  c.document.write('<span style="display: inline-block; font-family: Helvetica, Arial,' +
+    'sans-serif; font-size: .9rem; padding: 4px; vertical-align: ' +
+    'middle; cursor: default;">' + text + '</span>');
+  if(buttonText && buttonLink) {
+    c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
+    c.document.close();
+
+    AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
+      if (!!displayRefreshBar) {
+        AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
+          AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
+          AdapterJS.TEXT.REFRESH.BUTTON, 'javascript:location.reload()');
+      }
+      window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
+
+      e.preventDefault();
+      try {
+        event.cancelBubble = true;
+      } catch(error) { }
+    });
+  }
+  else {
+    c.document.close();
+  }
+  AdapterJS.addEvent(c.document, 'click', function() {
+    w.document.body.removeChild(i);
+  });
+  setTimeout(function() {
+    if(typeof i.style.webkitTransform === 'string') {
+      i.style.webkitTransform = 'translateY(40px)';
+    } else if(typeof i.style.transform === 'string') {
+      i.style.transform = 'translateY(40px)';
+    } else {
+      i.style.top = '0px';
+    }
+  }, 300);
 };
 
 // -----------------------------------------------------------
@@ -442,8 +538,8 @@ if (navigator.mozGetUserMedia) {
   RTCIceCandidate = mozRTCIceCandidate;
   window.RTCIceCandidate = RTCIceCandidate;
 
-  getUserMedia = navigator.mozGetUserMedia.bind(navigator);
-  navigator.getUserMedia = getUserMedia;
+  window.getUserMedia = navigator.mozGetUserMedia.bind(navigator);
+  navigator.getUserMedia = window.getUserMedia;
 
   // Shim for MediaStreamTrack.getSources.
   MediaStreamTrack.getSources = function(successCb) {
@@ -592,8 +688,8 @@ if (navigator.mozGetUserMedia) {
     return new webkitRTCPeerConnection(pcConfig, pcConstraints);
   };
 
-  getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
-  navigator.getUserMedia = getUserMedia;
+  window.getUserMedia = navigator.webkitGetUserMedia.bind(navigator);
+  navigator.getUserMedia = window.getUserMedia;
 
   attachMediaStream = function (element, stream) {
     if (typeof element.srcObject !== 'undefined') {
@@ -700,7 +796,7 @@ if (navigator.mozGetUserMedia) {
         '" />' +
         // uncomment to be able to use virtual cams
         (AdapterJS.options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
-  
+
         '</object>';
       while (AdapterJS.WebRTCPlugin.plugin.firstChild) {
         frag.appendChild(AdapterJS.WebRTCPlugin.plugin.firstChild);
@@ -719,7 +815,7 @@ if (navigator.mozGetUserMedia) {
       if (isIE) {
         AdapterJS.WebRTCPlugin.plugin.width = '1px';
         AdapterJS.WebRTCPlugin.plugin.height = '1px';
-      } else { // The size of the plugin on Safari should be 0x0px 
+      } else { // The size of the plugin on Safari should be 0x0px
               // so that the autorisation prompt is at the top
         AdapterJS.WebRTCPlugin.plugin.width = '0px';
         AdapterJS.WebRTCPlugin.plugin.height = '0px';
@@ -832,17 +928,16 @@ if (navigator.mozGetUserMedia) {
       });
     };
 
-    getUserMedia = function (constraints, successCallback, failureCallback) {
-      if (!constraints.audio) {
-        constraints.audio = false;
-      }
+    window.getUserMedia = function (constraints, successCallback, failureCallback) {
+      constraints.audio = constraints.audio || false;
+      constraints.video = constraints.video || false;
 
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.
           getUserMedia(constraints, successCallback, failureCallback);
       });
     };
-    navigator.getUserMedia = getUserMedia;
+    window.navigator.getUserMedia = window.getUserMedia;
 
     attachMediaStream = function (element, stream) {
       if (!element || !element.parentNode) {
@@ -962,6 +1057,8 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.injectPlugin();
   };
 
+  // This function will be called if the plugin is needed (browser different
+  // from Chrome or Firefox), but the plugin is not installed.
   AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb = AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb ||
     function() {
       AdapterJS.addEvent(document,
@@ -980,82 +1077,26 @@ if (navigator.mozGetUserMedia) {
       var popupString;
       if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) { // is portal link
        popupString = 'This website requires you to install the ' +
-        ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink + 
+        ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink +
         '" target="_blank">' + AdapterJS.WebRTCPlugin.pluginInfo.companyName +
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
       } else { // no portal link, just print a generic explanation
-       popupString = 'This website requires you to install a WebRTC-enabling plugin ' +
-        'to work on this browser.';
+       popupString = AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION;
       }
 
-      AdapterJS.WebRTCPlugin.renderNotificationBar(popupString, 'Install Now', downloadLink);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, downloadLink);
     } else { // no download link, just print a generic explanation
-      AdapterJS.WebRTCPlugin.renderNotificationBar('Your browser does not support WebRTC.');
+      AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
     }
   };
 
-  AdapterJS.WebRTCPlugin.renderNotificationBar = function (text, buttonText, buttonLink) {
-    // only inject once the page is ready
-    if (document.readyState !== 'complete') {
-      return;
-    }
-
-    var w = window;
-    var i = document.createElement('iframe');
-    i.style.position = 'fixed';
-    i.style.top = '-41px';
-    i.style.left = 0;
-    i.style.right = 0;
-    i.style.width = '100%';
-    i.style.height = '40px';
-    i.style.backgroundColor = '#ffffe1';
-    i.style.border = 'none';
-    i.style.borderBottom = '1px solid #888888';
-    i.style.zIndex = '9999999';
-    if(typeof i.style.webkitTransition === 'string') {
-      i.style.webkitTransition = 'all .5s ease-out';
-    } else if(typeof i.style.transition === 'string') {
-      i.style.transition = 'all .5s ease-out';
-    }
-    document.body.appendChild(i);
-    c = (i.contentWindow) ? i.contentWindow :
-      (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
-    c.document.open();
-    c.document.write('<span style="font-family: Helvetica, Arial,' +
-      'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
-      'middle; cursor: default;">' + text + '</span>');
-    if(buttonText && buttonLink) {
-      c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
-      c.document.close();
-      AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-        window.open(buttonLink, '_top');
-        e.preventDefault();
-        try {
-          event.cancelBubble = true;
-        } catch(error) { }
-      });
-    }
-    else {
-      c.document.close();
-    }
-    AdapterJS.addEvent(c.document, 'click', function() {
-      w.document.body.removeChild(i);
-    });
-    setTimeout(function() {
-      if(typeof i.style.webkitTransform === 'string') {
-        i.style.webkitTransform = 'translateY(40px)';
-      } else if(typeof i.style.transform === 'string') {
-        i.style.transform = 'translateY(40px)';
-      } else {
-        i.style.top = '0px';
-      }
-    }, 300);
-  };
   // Try to detect the plugin and act accordingly
   AdapterJS.WebRTCPlugin.isPluginInstalled(
-    AdapterJS.WebRTCPlugin.pluginInfo.prefix, 
+    AdapterJS.WebRTCPlugin.pluginInfo.prefix,
     AdapterJS.WebRTCPlugin.pluginInfo.plugName,
     AdapterJS.WebRTCPlugin.defineWebRTCInterface,
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 }
+
+
