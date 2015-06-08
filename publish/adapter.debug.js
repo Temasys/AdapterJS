@@ -321,8 +321,8 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
   c = (i.contentWindow) ? i.contentWindow :
     (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
   c.document.open();
-  c.document.write('<span style="font-family: Helvetica, Arial,' +
-    'sans-serif; font-size: .9rem; padding: 7px; vertical-align: ' +
+  c.document.write('<span style="display: inline-block; font-family: Helvetica, Arial,' +
+    'sans-serif; font-size: .9rem; padding: 4px; vertical-align: ' +
     'middle; cursor: default;">' + text + '</span>');
   if(buttonText && buttonLink) {
     c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
