@@ -5,10 +5,11 @@
   var baseGetUserMedia = null;
 
   AdapterJS.Text.Extension = {
-    requireInstallationFF: 'You require the Firefox add-on to use screensharing',
-    requireInstallationChrome: 'You require the Chrome extension to use screensharing',
-    requireRefresh: 'You require to refresh the page to load extension',
-    button: 'Install Now',
+    requireInstallationFF: 'To enable screensharing you need to install the Skylink WebRTC tools Firefox Add-on.',
+    requireInstallationChrome: 'To enable screensharing you need to install the Skylink WebRTC tools Chrome Extension.',
+    requireRefresh: 'Please refresh this page after the Skylink WebRTC tools extension has been installed',
+    buttonFF: 'Install',
+    buttonChrome: 'Go to Chrome Web Store',
   };
 
   var clone = function(obj) {
@@ -23,7 +24,7 @@
   if (window.navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
-    window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
+    navigator.getUserMedia = function (constraints, successCb, failureCb) {
 
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
@@ -46,7 +47,7 @@
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
               if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationFF,
-                  AdapterJS.Text.Extension.button,
+                  AdapterJS.Text.Extension.buttonFF,
                   'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
                 //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
               } else {
@@ -61,12 +62,12 @@
       }
     };
 
-    window.getUserMedia = window.navigator.getUserMedia;
+    getUserMedia = navigator.getUserMedia;
 
   } else if (window.navigator.webkitGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
-    window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
+    navigator.getUserMedia = function (constraints, successCb, failureCb) {
 
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
@@ -116,7 +117,7 @@
           if (event.data.chromeExtensionStatus) {
             if (event.data.chromeExtensionStatus === 'not-installed') {
               AdapterJS.renderNotificationBar(AdapterJS.Text.Extension.requireInstallationChrome,
-                AdapterJS.Text.Extension.button,
+                AdapterJS.Text.Extension.buttonChrome,
                 event.data.data, true, true);
             } else {
               chromeCallback(event.data.chromeExtensionStatus, null);
@@ -138,12 +139,12 @@
       }
     };
 
-    window.getUserMedia = window.navigator.getUserMedia;
+    getUserMedia = navigator.getUserMedia;
 
   } else {
     baseGetUserMedia = window.navigator.getUserMedia;
 
-    window.navigator.getUserMedia = function (constraints, successCb, failureCb) {
+    navigator.getUserMedia = function (constraints, successCb, failureCb) {
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // would be fine since no methods
         var updatedConstraints = clone(constraints);
@@ -172,7 +173,7 @@
       }
     };
 
-    window.getUserMedia = window.navigator.getUserMedia;
+    getUserMedia = window.navigator.getUserMedia;
   }
 
   if (window.webrtcDetectedBrowser === 'chrome') {
