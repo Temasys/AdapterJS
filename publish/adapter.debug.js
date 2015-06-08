@@ -179,16 +179,16 @@ AdapterJS.maybeThroughWebRTCReady = function() {
 };
 
 // Text namespace
-AdapterJS.Text = {
-  Plugin: {
-    requireInstallation: 'This website requires you to install a WebRTC-enabling plugin ' +
+AdapterJS.TEXT = {
+  PLUGIN: {
+    REQUIRE_INSTALLATION: 'This website requires you to install a WebRTC-enabling plugin ' +
       'to work on this browser.',
-    notSupported: 'Your browser does not support WebRTC.',
-    button: 'Install Now'
+    NOT_SUPPORTED: 'Your browser does not support WebRTC.',
+    BUTTON: 'Install Now'
   },
-  Refresh: {
-    requireRefresh: 'Please refresh page',
-    button: 'Refresh Page'
+  REFRESH: {
+    REQUIRE_REFRESH: 'Please refresh page',
+    BUTTON: 'Refresh Page'
   }
 };
 
@@ -330,9 +330,9 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
 
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
       if (!!displayRefreshBar) {
-        AdapterJS.renderNotificationBar(AdapterJS.Text.Extension ?
-          AdapterJS.Text.Extension.requireRefresh : AdapterJS.Text.Refresh.requireRefresh,
-          AdapterJS.Text.Refresh.button, 'javascript:location.reload()');
+        AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
+          AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
+          AdapterJS.TEXT.REFRESH.BUTTON, 'javascript:location.reload()');
       }
       window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
 
@@ -1084,12 +1084,12 @@ if (navigator.mozGetUserMedia) {
         ' WebRTC Plugin</a>' +
         ' to work on this browser.';
       } else { // no portal link, just print a generic explanation
-       popupString = AdapterJS.Text.Plugin.requireInstallation;
+       popupString = AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION;
       }
 
-      AdapterJS.renderNotificationBar(popupString, AdapterJS.Text.Plugin.button, downloadLink);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, downloadLink);
     } else { // no download link, just print a generic explanation
-      AdapterJS.renderNotificationBar(AdapterJS.Text.Plugin.notSupported);
+      AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
     }
   };
 
