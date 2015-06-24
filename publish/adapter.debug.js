@@ -1,4 +1,4 @@
-/*! adapterjs - v0.10.5 - 2015-04-16 */
+/*! adapterjs - v0.11.0 - 2015-06-24 */
 
 /*
  *  Copyright (c) 2014 The WebRTC project authors. All Rights Reserved.
@@ -259,7 +259,7 @@ AdapterJS.options = {
  * @for AdapterJS
  * @since 0.10.5
  */
-AdapterJS.VERSION = '0.10.5';
+AdapterJS.VERSION = '0.11.0';
 
 /**
  * The event function that will be called when the WebRTC API is

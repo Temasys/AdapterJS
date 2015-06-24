@@ -1,6 +1,6 @@
 
 function runTest{
-	param($testDirectory="tests\gen\opera.*");
+	param($testDirectory="tests\gen\ie.*");
 	foreach($file in Get-ChildItem $testDirectory){
 		karma start $file.fullName;
 	}

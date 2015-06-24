@@ -4,18 +4,22 @@
 
 Find the most recent version hosted on our CDN.
 
-- Minified version: `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.min.js`
-- Debug version `//cdn.temasys.com.sg/adapterjs/0.10.x/adapter.debug.js`
+- Minified version: `//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.min.js`
+- Debug version `//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.debug.js`
+- Minified version (with screensharing changes): `//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.screenshare.min.js`
+- Debug version (with screensharing changes)`//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.screenshare.js`
+
+Part of the [Skylink WebRTC](http://skylink.io/web) toolkit.
 
 
 ## Compatibility
 
-AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins).
+AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](http://skylink.io/plugin/).
 
 - [AdapterJS browser compatibility table](https://temasys.atlassian.net/wiki/display/TPD/AdapterJS+-+Browser+support+and+compatibility)
 
 ![Plugin Install Bar in IE and Safari](http://temasys.github.io/resources/img/adapterheader.png)
-> In versions of IE and Safari that don't support WebRTC natively, AdapterJS will suggest to the user to install the [Temasys WebRTC plugin](https://temasys.atlassian.net/wiki/display/TWPP/WebRTC+Plugins) for Mac or Windows when you try to access getUserMedia or RTCPeerConnection.
+> In versions of IE and Safari that don't support WebRTC natively, AdapterJS will suggest to the user to install the [Temasys WebRTC plugin](http://skylink.io/plugin/) for Mac or Windows when you try to access getUserMedia or RTCPeerConnection.
 
 
 ## Functionality
@@ -29,15 +33,17 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 #### Working with AdapterJS
 
-We **strongly** recommend only executing any WebRTC related code when AdapterJS triggers the `AdapterJS.onwebrtcready` event. This function is called whenever the browser or our Temasys WebRTC plugin are ready.
+We **strongly** recommend only executing any WebRTC related code in the callback of the `AdapterJS.webRTCReady` function. It is triggered whenever the browser or our Temasys WebRTC plugin is ready to be used.
 
 ```javascript
-AdapterJS.onwebrtcready = function(isUsingPlugin) {
+AdapterJS.webRTCReady(function(isUsingPlugin) {
     // The WebRTC API is ready.
     //isUsingPlugin: true is the WebRTC plugin is being used, false otherwise
     getUserMedia(constraints, successCb, failCb);
-};
+});
 ```
+
+Note that `AdapterJS.onwebrtcready` is now deprecated.
 
 Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+Temasys+WebRTC+Plugin+into+your+website).
 
@@ -47,6 +53,7 @@ Find more information about how to optimize your application for the Temasys Web
 ##### `attachMediaStream(element, stream)`
 
 taken over for compatibility with the original adapter.js from Google. Feeds a MediaStream object into video and audio tags.
+Calling attachMediaStream(element, null) will detach any existing stream from the element. The stream will still be running and available to be attached to any rendering element.
 
 
 ##### `reattachMediaStream(elementFrom, elementTo)`
@@ -179,6 +186,27 @@ expected values:
 - null: No datachannel support.
 - `SCTP`: SCTP enabled datachannel.
 - `RTP`: RTP enabled datachannel.
+
+
+#### Using screensharing functionality
+
+AdapterJS 0.11.0+ offers cross-browser screensharing in Chrome 34+, Firefox 33+ and with a licensed copy of our [Temasys WebRTC Plugin](http://skylink.io/plugin) in IE9+ and Safari 7.1+. (For plugin licensing interest please contact sales (a) temasys.com.sg)
+
+To use the screensharing functionality, reference `publish/adapter.screenshare.js` and add the `mediaSource: 'window'` setting to the video media constraints. Requires HTTPS!
+
+Example:
+
+```javascript
+window.navigator.getUserMedia({
+  video: {
+    mediaSource: 'window' || 'screen'
+  }
+}, function (stream) {
+  console.log('Received stream', stream);
+}, function (error) {
+  console.log('Failed getting stream', error);
+});
+```
 
 
 ## Setup this project
