@@ -18,6 +18,24 @@ var testItemTimeout = 2000;
 describe('RTCPeerConnection | Parameters', function() {
   this.timeout(testTimeout);
 
+  /* WebRTC Object should be initialized in Safari/IE Plugin */
+  before(function (done) {
+    this.timeout(testItemTimeout);
+
+    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
+      AdapterJS.onwebrtcreadyDone = true;
+    }
+
+    if (!AdapterJS.onwebrtcreadyDone) {
+      AdapterJS.onwebrtcready = function () {
+        done();
+      };
+
+    } else {
+      done();
+    }
+  });
+
   it('new RTCPeerConnection() -> Error', function () {
     this.timeout(testItemTimeout);
 

@@ -19,23 +19,23 @@ describe('MediaStreamError', function() {
 	this.timeout(testTimeout);
 
 
-	/* Get User Media */
-	before(function (done) {
-		this.timeout(testItemTimeout);
+	/* WebRTC Object should be initialized in Safari/IE Plugin */
+  before(function (done) {
+    this.timeout(testItemTimeout);
 
-		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-			AdapterJS.onwebrtcreadyDone = true;
-		}
+    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
+      AdapterJS.onwebrtcreadyDone = true;
+    }
 
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = function () {
-				done();
-			};
+    if (!AdapterJS.onwebrtcreadyDone) {
+      AdapterJS.onwebrtcready = function () {
+        done();
+      };
 
-		} else {
-			done();
-		}
-	});
+    } else {
+      done();
+    }
+  });
 
 	it('MediaStreamError.name === "NotSupportedError" < When > MediaStreamConstraints === {}', function (done) {
 		this.timeout(testItemTimeout);

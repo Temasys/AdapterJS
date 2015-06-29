@@ -24,35 +24,40 @@ describe('MediaStream | Properties', function() {
 
 	var checkRemoveTrackSuccess = false;
 
-	/* Get User Media */
+	/* WebRTC Object should be initialized in Safari/IE Plugin */
 	before(function (done) {
-		this.timeout(gUMTimeout);
+		this.timeout(testItemTimeout);
 
 		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
 			AdapterJS.onwebrtcreadyDone = true;
 		}
 
-		var getMedia = function () {
-			window.navigator.getUserMedia({
-				audio: true,
-				video: true
-
-			}, function (data) {
-				stream = data;
-				track = data.polygetAudioTracks()[0];
-				done();
-
-			}, function (error) {
-				throw error;
-			});
-		};
-
 		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = getMedia;
+			AdapterJS.onwebrtcready = function () {
+				done();
+			};
 
 		} else {
-			getMedia();
+			done();
 		}
+	});
+
+	/* Get User Media */
+	before(function (done) {
+		this.timeout(gUMTimeout);
+
+		window.navigator.getUserMedia({
+			audio: true,
+			video: true
+
+		}, function (data) {
+			stream = data;
+			track = data.polygetAudioTracks()[0];
+			done();
+
+		}, function (error) {
+			throw error;
+		});
 	});
 
 	it('MediaStream.id :: string', function () {

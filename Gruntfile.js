@@ -47,6 +47,7 @@ module.exports = function(grunt) {
 
     var testUnits = [
       'RTCPeerConnection.constraints.spec.js',
+      'RTCPeerConnection.offerconstraints.spec.js',
       'RTCPeerConnection.param.spec.js',
       'getUserMedia.constraints.spec.js',
       'getUserMedia.param.spec.js',

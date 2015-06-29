@@ -16,43 +16,48 @@ var testItemTimeout = 4000;
 
 
 describe('MediaStream | EventHandler', function() {
-	this.timeout(testTimeout);
+	this.timeout(testTimeout + 2000);
+	this.slow(2000);
 
 	/* Attributes */
 	var stream = null;
 	var track = null;
 
-	/* Get User Media */
-	beforeEach(function (done) {
-		this.slow(1000);
-		this.timeout(gUMTimeout + 1000);
+	/* WebRTC Object should be initialized in Safari/IE Plugin */
+	before(function (done) {
+		this.timeout(testItemTimeout);
 
 		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
 			AdapterJS.onwebrtcreadyDone = true;
 		}
 
-		var getMedia = function () {
-			window.navigator.getUserMedia({
-				audio: true,
-				video: true
-
-			}, function (data) {
-
-				stream = data;
-				track = data.polygetAudioTracks()[0];
-				done();
-
-			}, function (error) {
-				throw error;
-			});
-		};
-
 		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = getMedia;
+			AdapterJS.onwebrtcready = function () {
+				done();
+			};
 
 		} else {
-			getMedia();
+			done();
 		}
+	});
+
+	/* Get User Media */
+	beforeEach(function (done) {
+		this.timeout(gUMTimeout);
+
+		window.navigator.getUserMedia({
+			audio: true,
+			video: true
+
+		}, function (data) {
+
+			stream = data;
+			track = data.polygetAudioTracks()[0];
+			done();
+
+		}, function (error) {
+			throw error;
+		});
 	});
 
 	it('MediaStream.onremovetrack :: emit', function (done) {
