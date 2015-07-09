@@ -33,7 +33,7 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
 };
 
 AdapterJS.onplugininstalled = AdapterJS.onplugininstalled || function() {
-  //Default implementaion is to rinject the plugin for use
+  //Default implementaion is to inject the plugin for use
   AdapterJS.WebRTCPlugin.defineWebRTCInterface();
 }
 
