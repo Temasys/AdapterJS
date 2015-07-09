@@ -32,11 +32,6 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
   // Override me and do whatever you want here
 };
 
-AdapterJS.onplugininstalled = AdapterJS.onplugininstalled || function() {
-  //Default implementaion is to inject the plugin for use
-  AdapterJS.WebRTCPlugin.defineWebRTCInterface();
-}
-
 // Sets a callback function to be called when the WebRTC interface is ready.
 // The first argument is the function to callback.\
 // Throws an error if the first argument is not a function
@@ -344,33 +339,20 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         event.cancelBubble = true;
       } catch(error) { }
 
-     if(! isIE)
-      {
         var pluginInstallInterval = setInterval(function(){
-          navigator.plugins.refresh(false);
-          for (var i = 0; i < navigator.plugins.length; ++i) {
-            if (navigator.plugins[i].name.indexOf(AdapterJS.WebRTCPlugin.pluginInfo.plugName) >= 0) {
-              clearInterval(pluginInstallInterval);
-              AdapterJS.onplugininstalled();
+            if(! isIE) {
+              navigator.plugins.refresh(false);
             }
-          }
-          console.log("plugin not found : ");
-          console.log(navigator.plugins.length);
-        }, 500);
-        
-      }else{
-
-        var pluginInstallInterval = setInterval(function(){
-            
             AdapterJS.WebRTCPlugin.isPluginInstalled(
               AdapterJS.WebRTCPlugin.pluginInfo.prefix,
               AdapterJS.WebRTCPlugin.pluginInfo.plugName,
               AdapterJS.WebRTCPlugin.defineWebRTCInterface,
-              function() { //Does nothing becquse not used here
+              function() { //Does nothing because not used here
               });
+
           } , 500);
         
-      }
+      
 
   
     });   
@@ -871,8 +853,7 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTED;
   };
 
-  AdapterJS.WebRTCPlugin.isPluginInstalled =
-    function (comName, plugName, installedCb, notInstalledCb) {
+  AdapterJS.WebRTCPlugin.isPluginInstalled = function (comName, plugName, installedCb, notInstalledCb) {
     if (!isIE) {
       var pluginArray = navigator.plugins;
       for (var i = 0; i < pluginArray.length; i++) {
