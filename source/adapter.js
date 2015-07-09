@@ -34,7 +34,8 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
 
 AdapterJS.onplugininstalled = AdapterJS.onplugininstalled || function() {
   //Default implementaion is to refresh the page once the plugin has been installed
-  location.reload();
+  console.log("plugin installed")
+  AdapterJS.WebRTCPlugin.defineWebRTCInterface();
 }
 
 // Sets a callback function to be called when the WebRTC interface is ready.
@@ -344,19 +345,39 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         event.cancelBubble = true;
       } catch(error) { }
 
-      var pluginInstallInterval = setInterval(function(){
-        navigator.plugins.refresh(false);
-        for (var i = 0; i < navigator.plugins.length; ++i) {
-          if (navigator.plugins[i].name.indexOf(AdapterJS.WebRTCPlugin.pluginInfo.plugName) >= 0) {
-            clearInterval(pluginInstallInterval);
-            AdapterJS.onplugininstalled();
+     if(! isIE)
+      {
+        var pluginInstallInterval = setInterval(function(){
+          navigator.plugins.refresh(false);
+          for (var i = 0; i < navigator.plugins.length; ++i) {
+            if (navigator.plugins[i].name.indexOf(AdapterJS.WebRTCPlugin.pluginInfo.plugName) >= 0) {
+              clearInterval(pluginInstallInterval);
+              AdapterJS.onplugininstalled();
+            }
           }
-        }
-      }, 500);
-      
-    });
-  }
-  else {
+          console.log("plugin not found : ");
+          console.log(navigator.plugins.length);
+        }, 500);
+        
+      }else{
+
+        var pluginInstallInterval = setInterval(function(){
+            
+            AdapterJS.WebRTCPlugin.isPluginInstalled(
+              AdapterJS.WebRTCPlugin.pluginInfo.prefix,
+              AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+              AdapterJS.WebRTCPlugin.defineWebRTCInterface,
+              function() { //Does nothing becquse not used here
+              });
+          } , 500);
+        
+      }
+
+  
+    });   
+  
+
+  }else {
     c.document.close();
   }
   AdapterJS.addEvent(c.document, 'click', function() {
@@ -875,6 +896,7 @@ if (navigator.mozGetUserMedia) {
 
   AdapterJS.WebRTCPlugin.defineWebRTCInterface = function () {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INITIALIZING;
+    console.log("defineWebrtc");
 
     AdapterJS.isDefined = function (variable) {
       return variable !== null && variable !== undefined;
