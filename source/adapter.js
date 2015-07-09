@@ -33,8 +33,7 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
 };
 
 AdapterJS.onplugininstalled = AdapterJS.onplugininstalled || function() {
-  //Default implementaion is to refresh the page once the plugin has been installed
-  console.log("plugin installed")
+  //Default implementaion is to rinject the plugin for use
   AdapterJS.WebRTCPlugin.defineWebRTCInterface();
 }
 
@@ -896,7 +895,6 @@ if (navigator.mozGetUserMedia) {
 
   AdapterJS.WebRTCPlugin.defineWebRTCInterface = function () {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INITIALIZING;
-    console.log("defineWebrtc");
 
     AdapterJS.isDefined = function (variable) {
       return variable !== null && variable !== undefined;
