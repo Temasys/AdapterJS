@@ -853,7 +853,8 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTED;
   };
 
-  AdapterJS.WebRTCPlugin.isPluginInstalled = function (comName, plugName, installedCb, notInstalledCb) {
+  AdapterJS.WebRTCPlugin.isPluginInstalled =
+    function (comName, plugName, installedCb, notInstalledCb) {
     if (!isIE) {
       var pluginArray = navigator.plugins;
       for (var i = 0; i < pluginArray.length; i++) {
