@@ -32,6 +32,11 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
   // Override me and do whatever you want here
 };
 
+AdapterJS.onplugininstalled = AdapterJS.onplugininstalled || function() {
+  //Default implementaion is to refresh the page once the plugin has been installed
+  location.reload();
+}
+
 // Sets a callback function to be called when the WebRTC interface is ready.
 // The first argument is the function to callback.\
 // Throws an error if the first argument is not a function
@@ -338,6 +343,17 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
       try {
         event.cancelBubble = true;
       } catch(error) { }
+
+      var pluginInstallInterval = setInterval(function(){
+        navigator.plugins.refresh(false);
+        for (var i = 0; i < navigator.plugins.length; ++i) {
+          if (navigator.plugins[i].name.indexOf(AdapterJS.WebRTCPlugin.pluginInfo.plugName) >= 0) {
+            clearInterval(pluginInstallInterval);
+            AdapterJS.onplugininstalled();
+          }
+        }
+      }, 500);
+      
     });
   }
   else {
