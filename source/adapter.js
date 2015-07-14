@@ -349,14 +349,8 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
               AdapterJS.WebRTCPlugin.defineWebRTCInterface,
               function() { //Does nothing because not used here
               });
-
           } , 500);
-        
-      
-
-  
     });   
-  
 
   }else {
     c.document.close();
