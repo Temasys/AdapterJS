@@ -73,7 +73,8 @@ module.exports = function(grunt) {
             variables: {
               'browser': '../browser.' + browser + '.conf.js',
               'unit': '../unit/' + unit,
-              'port': parseInt('50' + i + j, 10)
+              'port': parseInt('50' + i + j, 10),
+              'testResult': '../results/' + browser + '/' + unit + '.xml'
             },
             prefix: '@@'
           },
@@ -107,7 +108,7 @@ module.exports = function(grunt) {
       clean: {
         production: ['<%= production %>/'],
         bamboo: ['<%= bamboo %>/'],
-        test: ['tests/gen/*', 'tests/chrome.*.js','tests/firefox.*.js','tests/safari.*.js','tests/opera.*.js','tests/ie.*.js']
+        test: ['tests/gen/*', 'tests/results/*']
       },
 
       copy: {
@@ -217,6 +218,21 @@ module.exports = function(grunt) {
       }
     });
 
+  grunt.registerTask('compileresults', function () {
+    var i, j;
+    var output = '';
+
+    for (i = 0; i < testBrowsers.length; i++) {
+      var browser = testBrowsers[i];
+      for (j = 0; j < testUnits.length; j++) {
+        var unit = testUnits[j];
+        var data = grunt.file.read('tests/results/' + browser + '/' + unit + '.js');
+        output += data;
+      }
+    }
+
+    grunt.file.write('tests/compile.xml', output);
+  });
 
     grunt.registerTask('versionise', 'Adds version meta intormation', function() {
         var done = this.async(),

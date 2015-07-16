@@ -9,7 +9,7 @@ module.exports = function (config) {
 
     files: ['../../publish/adapter.debug.js', 'globals.js'],
 
-    reporters: ['mocha'],
+    reporters: ['mocha', 'xml'],
 
     port: 9876, // default port
 
@@ -44,6 +44,6 @@ module.exports = function (config) {
       captureConsole: true
     },*/
 
-    plugins: ['karma-mocha', 'karma-mocha-reporter', 'karma-chai']
+    plugins: ['karma-mocha', 'karma-mocha-reporter', 'karma-chai', 'karma-xml-reporter']
   });
 };

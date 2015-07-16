@@ -24,3 +24,5 @@ killall -e osascript
 # Open and kill them all (Mac)
 osascript -e 'open app "Safari"'
 osascript -e 'quit app "Safari"'
+
+grunt compileresults

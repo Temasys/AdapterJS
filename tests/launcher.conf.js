@@ -8,4 +8,8 @@ module.exports = function(config) {
 
   // generate random port
   config.port = @@port;
+
+  config.xmlReporter = {
+	   outputFile: '@@testResult'
+  };
 };
