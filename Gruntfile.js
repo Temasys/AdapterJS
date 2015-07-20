@@ -43,7 +43,16 @@ module.exports = function(grunt) {
       }
     };
 
-    var testBrowsers = ['chrome', 'firefox', 'ie', 'safari', 'opera'];
+    // TODO: merge with the karma.browsers
+    var testBrowsers = [
+      'Chrome',
+      // 'ChromeCanary',
+      'Safari',
+      // 'Firefox',
+      // 'Opera',
+      // 'PhantomJS',
+      // 'IE'
+    ];
 
     var testUnits = [
       'RTCPeerConnection.constraints.spec.js',
@@ -218,7 +227,7 @@ module.exports = function(grunt) {
       }
     });
 
-  grunt.registerTask('compileresults', function () {
+  grunt.registerTask('compilexmlresults', function () {
     var i, j;
     var output = '';
 
@@ -226,12 +235,12 @@ module.exports = function(grunt) {
       var browser = testBrowsers[i];
       for (j = 0; j < testUnits.length; j++) {
         var unit = testUnits[j];
-        var data = grunt.file.read('tests/results/' + browser + '/' + unit + '.js');
+        var data = grunt.file.read('tests/results/' + browser + '/' + unit + ".xml");
         output += data;
       }
     }
 
-    grunt.file.write('tests/compile.xml', output);
+    grunt.file.write('tests/results/compile.xml', output);
   });
 
     grunt.registerTask('versionise', 'Adds version meta intormation', function() {

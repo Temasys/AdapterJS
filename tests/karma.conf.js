@@ -37,7 +37,15 @@ module.exports = function (config) {
 
     //reportSlowerThan: 1000,
 
-    browsers: [],
+    browsers: [
+      'Chrome',
+      // 'ChromeCanary',
+      'Safari',
+      // 'Firefox',
+      // 'Opera',
+      // 'PhantomJS',
+      // 'IE'
+    ],
 
     /*client: {
       useIframe: false,

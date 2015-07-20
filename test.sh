@@ -25,4 +25,4 @@ killall -e osascript
 osascript -e 'open app "Safari"'
 osascript -e 'quit app "Safari"'
 
-grunt compileresults
+grunt compilexmlresults

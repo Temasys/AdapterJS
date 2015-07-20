@@ -81,4 +81,5 @@ dwsync.xml
 .idea
 bamboo
 tests/gen
+tests/results
 
