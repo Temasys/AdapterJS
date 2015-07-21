@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-karma');
 
     var replaceTask = {
       production: {
@@ -47,7 +48,7 @@ module.exports = function(grunt) {
     var testBrowsers = [
       'Chrome',
       // 'ChromeCanary',
-      'Safari',
+      // 'Safari',
       // 'Firefox',
       // 'Opera',
       // 'PhantomJS',
@@ -80,7 +81,7 @@ module.exports = function(grunt) {
         replaceTask[key] = {
           options: {
             variables: {
-              'browser': '../browser.' + browser + '.conf.js',
+              'browser': 'browser.' + browser + '.conf.js',
               'unit': '../unit/' + unit,
               'port': parseInt('50' + i + j, 10),
               'testResult': '../results/' + browser + '/' + unit + '.xml'
@@ -90,14 +91,14 @@ module.exports = function(grunt) {
           files: [{
             expand: true,
             flatten: true,
-            src: ['tests/gen/' + key + '.conf.js'],
-            dest: 'tests/gen/'
+            src: ['tmp/gen/' + key + '.conf.js'],
+            dest: 'tmp/gen/'
           }]
         };
 
         concatTask[key] = {
-          src: ['tests/launcher.conf.js'],
-          dest: 'tests/gen/' + key + '.conf.js'
+          src: ['tmp/launcher.conf.js'],
+          dest: 'tmp/gen/' + key + '.conf.js'
         };
       }
     }
@@ -117,7 +118,7 @@ module.exports = function(grunt) {
       clean: {
         production: ['<%= production %>/'],
         bamboo: ['<%= bamboo %>/'],
-        test: ['tests/gen/*', 'tests/results/*']
+        test: ['tmp/gen/*', 'tmp/results/*']
       },
 
       copy: {
@@ -183,7 +184,7 @@ module.exports = function(grunt) {
                 node: true
             }, grunt.file.readJSON('.jshintrc')),
             src: [
-                'tests/*_test.js'
+                'tmp/*_test.js'
             ]
         },
         app: {
@@ -224,6 +225,21 @@ module.exports = function(grunt) {
             outdir: 'doc/'
           }
         }
+      },
+
+      karma: {
+        unit: {
+          configFile: 'tmp/karma.conf.js',
+          browsers: [
+            'Chrome',
+            // 'ChromeCanary',
+            // 'Safari',
+            // 'Firefox',
+            // 'Opera',
+            // 'PhantomJS',
+            // 'IE'
+          ]
+        }
       }
     });
 
@@ -235,12 +251,12 @@ module.exports = function(grunt) {
       var browser = testBrowsers[i];
       for (j = 0; j < testUnits.length; j++) {
         var unit = testUnits[j];
-        var data = grunt.file.read('tests/results/' + browser + '/' + unit + ".xml");
+        var data = grunt.file.read('tmp/results/' + browser + '/' + unit + ".xml");
         output += data;
       }
     }
 
-    grunt.file.write('tests/results/compile.xml', output);
+    grunt.file.write('tmp/results/compile.xml', output);
   });
 
     grunt.registerTask('versionise', 'Adds version meta intormation', function() {
