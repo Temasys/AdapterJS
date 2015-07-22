@@ -93,7 +93,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
         expect(remoteStream.getVideoTracks()).to.have.length(1);
       };
 
-      connect(peer1, peer2, null, constraints);
+      connect(peer1, peer2, constraints);
     });
 
   })({ offerToReceiveVideo: true, offerToReceiveAudio: false });
@@ -111,7 +111,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
         expect(remoteStream.getVideoTracks()).to.have.length(1);
       };
 
-      connect(peer1, peer2, null, constraints);
+      connect(peer1, peer2, constraints);
     });
 
   })({ offerToReceiveVideo: true });
@@ -129,7 +129,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
         expect(remoteStream.getVideoTracks()).to.have.length(0);
       };
 
-      connect(peer1, peer2, null, constraints);
+      connect(peer1, peer2, constraints);
     });
 
   })({ offerToReceiveVideo: false, offerToReceiveAudio: true });
@@ -147,7 +147,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
         expect(remoteStream.getVideoTracks()).to.have.length(0);
       };
 
-      connect(peer1, peer2, null, constraints);
+      connect(peer1, peer2, constraints);
     });
 
   })({ offerToReceiveAudio: true });
@@ -165,7 +165,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
         expect(remoteStream.getVideoTracks()).to.have.length(1);
       };
 
-      connect(peer1, peer2, null, constraints);
+      connect(peer1, peer2, constraints);
     });
 
   })({ offerToReceiveVideo: true, offerToReceiveAudio: true });
@@ -183,7 +183,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
         expect(remoteStream.getVideoTracks()).to.have.length(0);
       };
 
-      connect(peer1, peer2, null, constraints);
+      connect(peer1, peer2, constraints);
     });
 
   })({ offerToReceiveVideo: false, offerToReceiveAudio: false });
@@ -195,7 +195,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
       this.timeout(testItemTimeout);
 
       expect(function () {
-        connect(peer1, peer2, null, constraints);
+        connect(peer1, peer2, constraints);
       }).to.throw(Error);
     });
 

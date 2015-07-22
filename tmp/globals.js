@@ -132,8 +132,17 @@ var printJSON = function (obj, spaces) {
   return outputStr;
 };
 
+var isArrayEqual = function(array1, array2) {
+  if (array1.length != array2.length) 
+    return false
+  
+  return array1.every(function(element, index) {
+    return element === array2[index]; 
+  })
+};
+
 // Connect the RTCPeerConnection object
-var connect = function (peer1, peer2, defer, offerConstraints) {
+var connect = function (peer1, peer2, offerConstraints) {
 
   var offer = null;
   var answer = null;
@@ -147,69 +156,55 @@ var connect = function (peer1, peer2, defer, offerConstraints) {
     };
   }
 
+  // default onicecandidate function
+  peer1.onicecandidate = peer1.onicecandidate || function (event) {
+    var candidate = event.candidate;
 
-  peer1.onicecandidate = function () {
-    var candidate = event.candidate || event;
-
-    if (candiate.candiate !== null) {
+    if (candidate) {
       peer2.addIceCandidate(candidate, function () { }, function (error) {
         throw error;
       });
     }
   };
 
-  peer2.onicecandidate = function () {
-    var candidate = event.candidate || event;
+  // default onicecandidate function
+  peer2.onicecandidate = peer2.onicecandidate || function (event) {
+    var candidate = event.candidate;
 
-    if (candiate.candiate !== null) {
+    if (candidate) {
       peer1.addIceCandidate(candidate, function () { }, function (error) {
         throw error;
       });
     }
   };
 
-  var remoteAnswerCb = function () {
-    console.log('Signaling state has completed');
-
-    if (typeof defer === 'function') {
-      setTimeout(defer, timeout);
-    }
-  };
-
-  var localAnswerCb = function () {
-    peer1.setRemoteDescription(answer, remoteAnswerCb, function (error) {
-      throw error;
-    });r
-  };
-
-  var localOfferCb = function () {
-    peer2.setLocalDescription(answer, function() {}, function (error) {
-      throw error;
-    });
-  };
-
-  var answerCb = function (answer) {
+  // create offer
+  var peer1OfferCb = function (o) {
+    offer = o;
     peer1.setLocalDescription(offer, function() {}, function (error) {
       throw error;
     });
-  };
-
-  var remoteOfferCb = function () {
-    peer2.createAnswer(answerCb, function (error) {
+    peer2.setRemoteDescription(offer, function() {}, function (error) {
       throw error;
     });
-  // Peer 2 - Remote offer
+    peer2.createAnswer(peer2AnswerCb, function (error) {
+      throw error;
+    });  
   };
 
-  // create offer
-  var offerCb = function (offer) {
-    peer2.setRemoteDescription(offer, remoteOfferCb, function (error) {
+  // create answer
+  var peer2AnswerCb = function (a) {
+    answer = a;
+    peer2.setLocalDescription(answer, function() {}, function (error) {
+      throw error;
+    });
+    peer1.setRemoteDescription(answer, function() {}, function (error) {
       throw error;
     });
   };
 
   // start
-  peer1.createOffer(offerCb, function (error) {
+  peer1.createOffer(peer1OfferCb, function (error) {
     throw error;
   }, offerConstraints);
 };

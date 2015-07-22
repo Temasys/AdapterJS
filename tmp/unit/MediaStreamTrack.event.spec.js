@@ -51,7 +51,7 @@ describe('MediaStreamTrack | EventHandler', function() {
 
 		}, function (data) {
 			stream = data;
-			track = data.polygetAudioTracks()[0];
+			track = data.getAudioTracks()[0];
 
 			done();
 
@@ -68,7 +68,7 @@ describe('MediaStreamTrack | EventHandler', function() {
 
 	it.skip('MediaStreamTrack.onoverconstrained :: emit', function () {});
 
-	it('MediaStreamTrack.onended :: emit < When > MediaStreamTrack.polystop()', function (done) {
+	it('MediaStreamTrack.onended :: emit < When > MediaStreamTrack.stop()', function (done) {
 		this.timeout(testItemTimeout);
 
 		var hasTriggered = false;
@@ -77,10 +77,10 @@ describe('MediaStreamTrack | EventHandler', function() {
 		  done();
 		};
 
-		track.polystop();
+		track.stop();
 	});
 
-	it('MediaStreamTrack.onended :: emit < When > MediaStream.polystop()', function (done) {
+	it('MediaStreamTrack.onended :: emit < When > MediaStream.stop()', function (done) {
 		this.timeout(testItemTimeout);
 
 		var i, j;
@@ -88,8 +88,8 @@ describe('MediaStreamTrack | EventHandler', function() {
 		var audioEndedTriggered = 0;
 		var videoEndedTriggered = 0;
 
-		var audioTracks = stream.polygetAudioTracks();
-		var videoTracks = stream.polygetVideoTracks();
+		var audioTracks = stream.getAudioTracks();
+		var videoTracks = stream.getVideoTracks();
 
 		var audioTriggeredFn = function () {
 			audioEndedTriggered += 1;
@@ -107,7 +107,7 @@ describe('MediaStreamTrack | EventHandler', function() {
 			videoTracks[j].onended = videoTriggeredFn;
 		}
 
-		stream.polystop();
+		stream.stop();
 
 		setTimeout(function () {
 			expect(audioEndedTriggered).to.equal(audioTracks.length);

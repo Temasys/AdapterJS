@@ -88,15 +88,29 @@ describe('RTCPeerConnection | EventHandler', function() {
   it('RTCPeerConnection.onicecandidate :: emit', function (done) {
     this.timeout(testItemTimeout);
 
+    var peer1IceCount = 0;
+    var peer2IceCount = 0;
     var peer1IceGathered = false;
     var peer2IceGathered = false;
 
-    peer1.onicecandidate = function () {
-      var candidate = event.candidate || event;
+    checkdone = function() {
+      // expect(peer1IceGathered).to.equal(true);
+      // expect(peer2IceGathered).to.equal(true);
+      if (peer1IceGathered && peer2IceGathered) {
+        assert.notEqual(peer1IceCount, 0);
+        assert.notEqual(peer2IceCount, 0);
+        done();
+      }
+    };
 
-      if (candiate.candiate === null) {
+    peer1.onicecandidate = function () {
+      var candidate = event.candidate;
+
+      if (candidate === null) {
         peer1IceGathered = true;
+        checkdone();
       } else {
+        ++peer1IceCount;
         peer2.addIceCandidate(candidate, function () {}, function (error) {
           throw error;
         });
@@ -104,177 +118,148 @@ describe('RTCPeerConnection | EventHandler', function() {
     };
 
     peer2.onicecandidate = function () {
-      var candidate = event.candidate || event;
+      var candidate = event.candidate;
 
-      if (candiate.candiate === null) {
+      if (candidate === null) {
         peer2IceGathered = true;
+        checkdone();
       } else {
+        ++peer2IceCount;
         peer1.addIceCandidate(candidate, function () {}, function (error) {
           throw error;
         });
       }
     };
 
-    connect(peer1, peer2, function () {
-      expect(peer1IceGathered).to.equal(true);
-      expect(peer2IceGathered).to.equal(true);
-      done();
-    });
+    connect(peer1, peer2);
   });
 
   it('RTCPeerConnection.onsignalingstatechange :: emit', function (done) {
+    //TODO(J-O): close connection at the end and check that 'closed' is in the array
+
     this.timeout(testItemTimeout);
 
     var array1 = [];
     var array2 = [];
 
+    var checkdone = function() {
+      if ( isArrayEqual( array1, ['stable', 'have-local-offer', 'stable'] )
+        && isArrayEqual( array2, ['stable', 'have-remote-offer', 'stable'] )) {
+        done();
+      }
+    }
+
     peer1.onsignalingstatechange = function () {
       array1.push(peer1.signalingState);
+      checkdone();
     };
 
     peer2.onsignalingstatechange = function () {
       array2.push(peer2.signalingState);
+      checkdone();
     };
 
-    connect(peer1, peer2, function () {
-      expect(array1).to.equal(['have-local-offer', 'stable']);
-      expect(array2).to.equal(['have-remote-offer', 'stable']);
-      done();
-    });
+    array1.push(peer1.signalingState);
+    array2.push(peer2.signalingState);
+
+    connect(peer1, peer2);
   });
 
   it('RTCPeerConnection.onaddstream :: emit', function (done) {
     this.timeout(testItemTimeout);
 
-    var remoteStream1 = null;
-    var remoteStream2 = null;
-
-    peer1.onaddstream = function (event) {
-      remoteStream1 = event.stream || event;
-    };
-
-    peer2.onaddstream = function () {
-      remoteStream2 = event.stream || event;
-    };
-
-    connect(peer1, peer2, function () {
-      expect(remoteStream1.getAudioTracks()).to.have.length(stream.getAudioTracks().length);
-      expect(remoteStream2.getAudioTracks()).to.have.length(stream.getAudioTracks().length);
-      expect(remoteStream1.getVideoTracks()).to.have.length(stream.getVideoTracks().length);
-      expect(remoteStream2.getVideoTracks()).to.have.length(stream.getVideoTracks().length);
+    peer2.onaddstream = function (event) {
+      var remoteStream = event.stream;
+      expect(remoteStream.getAudioTracks()).to.have.length(stream.getAudioTracks().length);
+      expect(remoteStream.getVideoTracks()).to.have.length(stream.getVideoTracks().length);
       done();
-    });
+    };
+
+    peer1.addStream(stream);
+
+    connect(peer1, peer2);
   });
 
-  it('RTCPeerConnection.onaddstream :: emit', function (done) {
+  it('RTCPeerConnection.onremovestream :: emit', function (done) {
     this.timeout(testItemTimeout);
 
-    var hasRemovedStream1 = false;
-    var hasRemovedStream2 = false;
-
-    peer1.onicecandidate = function () {
-      var candidate = event.candidate || event;
-
-      if (candiate.candiate !== null) {
-        peer2.addIceCandidate(candidate);
-      }
-    };
-
-    peer2.onicecandidate = function () {
-      var candidate = event.candidate || event;
-
-      if (candiate.candiate !== null) {
-        peer1.addIceCandidate(candidate);
-      }
-    };
-
-    peer1.onremovestream = function () {
-      hasRemovedStream1 = true;
+    peer2.onaddstream = function (event) {
+      peer1.removeStream(stream);
+      connect(peer1, peer2); // renegociate
     };
 
     peer2.onremovestream = function () {
-      hasRemovedStream2 = true;
+      done();
     };
 
-    connect(peer1, peer2, function () {
+    peer1.addStream(stream);
 
-      peer1.removeStream(stream);
-      peer2.removeStream(stream);
-
-      connect(peer1, peer2, function () {
-        expect(hasRemovedStream1).to.equal(true);
-        expect(hasRemovedStream2).to.equal(true);
-        expect(peer1.getRemoteStreams()).to.have.length(0);
-        expect(peer2.getRemoteStreams()).to.have.length(0);
-        done();
-      });
-    });
+    connect(peer1, peer2);
   });
 
   it('RTCPeerConnection.oniceconnectionstatechange :: emit', function (done) {
+    //TODO(J-O): close connection at the end and check that 'closed' is in the array
+
     this.timeout(testItemTimeout);
 
     var array1 = [];
     var array2 = [];
 
+    var checkdone = function() {
+      if ( isArrayEqual( array1, ['new', 'checking', 'completed', 'completed'/*, 'closed'*/] )
+        && isArrayEqual( array2, ['new', 'checking', 'connected'/*, 'completed', 'closed'*/] )) {
+        done();
+      }
+    }
+
     peer1.oniceconnectionstatechange = function () {
       array1.push(peer1.iceConnectionState);
+      checkdone();
     };
 
     peer2.oniceconnectionstatechange = function () {
       array2.push(peer2.iceConnectionState);
+      checkdone();
     };
 
-    connect(peer1, peer2, function () {
-      expect(array1).to.equal(['checking', 'connected', 'completed', 'closed']);
-      expect(array2).to.equal(['checking', 'connected', 'completed', 'closed']);
-      done();
-    });
+    array1.push(peer1.iceConnectionState);
+    array2.push(peer2.iceConnectionState);
+    connect(peer1, peer2);
   });
 
   it('RTCPeerConnection.onicegatheringstatechange :: emit', function (done) {
+    // Note(J-O) I'm not sure why this doesn't work
+
     this.timeout(testItemTimeout);
 
     var array1 = [];
     var array2 = [];
 
-    var hasGatheringCompleted1 = false;
-    var hasGatheringCompleted2 = false;
+    var checkdone = function() {
+      console.log(array1);
+      console.log(array2);
 
-    peer1.onicecandidate = function () {
-      var candidate = event.candidate || event;
+      assert.deepEqual(array1, ['new', 'gathering', 'complete']);
+      assert.deepEqual(array2, ['new', 'gathering', 'complete']);
 
-      if (candiate.candiate === null) {
-        hasGatheringCompleted1 = array1.indexOf('complete') === array1.length - 1;
-      } else {
-        peer2.addIceCandidate(candidate);
+      if ( isArrayEqual( array1, ['new', 'gathering', 'complete'] )
+        && isArrayEqual( array2, ['new', 'gathering', 'complete'] )) {
+        done();
       }
-    };
-
-    peer2.onicecandidate = function () {
-      var candidate = event.candidate || event;
-
-      if (candiate.candiate === null) {
-        hasGatheringCompleted2 = array2.indexOf('complete') === array2.length - 1;
-      } else {
-        peer1.addIceCandidate(candidate);
-      }
-    };
+    }
 
     peer1.onicegatheringstatechange = function () {
       array1.push(peer1.iceGatheringState);
+      checkdone();
     };
 
     peer2.onicegatheringstatechange = function () {
       array2.push(peer2.iceGatheringState);
+      checkdone();
     };
 
-    connect(peer1, peer2, function () {
-      expect(hasGatheringCompleted1).to.equal(true);
-      expect(hasGatheringCompleted2).to.equal(true);
-      expect(array1).to.equal(['new', 'gathering', 'complete']);
-      expect(array2).to.equal(['new', 'gathering', 'complete']);
-      done();
-    });
+    array1.push(peer1.iceGatheringState);
+    array2.push(peer2.iceGatheringState);
+    connect(peer1, peer2);
   });
 });
