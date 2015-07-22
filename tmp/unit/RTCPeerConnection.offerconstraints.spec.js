@@ -107,7 +107,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
       peer2.onaddstream = function (event) {
         var remoteStream = event.stream || event;
 
-        expect(remoteStream.getAudioTracks()).to.have.length(0);
+        expect(remoteStream.getAudioTracks()).to.have.length(1);
         expect(remoteStream.getVideoTracks()).to.have.length(1);
       };
 
@@ -194,9 +194,14 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
     it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      expect(function () {
-        connect(peer1, peer2, constraints);
-      }).to.throw(Error);
+      peer2.onaddstream = function (event) {
+        var remoteStream = event.stream || event;
+
+        expect(remoteStream.getAudioTracks()).to.have.length(1);
+        expect(remoteStream.getVideoTracks()).to.have.length(1);
+      };
+
+      connect(peer1, peer2, constraints);
     });
 
   })({});

@@ -26,7 +26,7 @@ module.exports = function(config) {
       {pattern: 'globals.js', included: true},
       // {pattern: 'browser.*.conf.js', included: true},
       // {pattern: 'gen/*.js', included: false},
-      {pattern: 'unit/RTCPeerConnection.offerconstraints.spec.js', included: false},
+      {pattern: 'unit/*.spec.js', included: false},
       // {pattern: 'unit/*.js', included: true},
       // 'test-main.js',
       // 'gen/*.js',

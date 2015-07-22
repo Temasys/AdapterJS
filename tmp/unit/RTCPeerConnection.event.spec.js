@@ -94,8 +94,6 @@ describe('RTCPeerConnection | EventHandler', function() {
     var peer2IceGathered = false;
 
     checkdone = function() {
-      // expect(peer1IceGathered).to.equal(true);
-      // expect(peer2IceGathered).to.equal(true);
       if (peer1IceGathered && peer2IceGathered) {
         assert.notEqual(peer1IceCount, 0);
         assert.notEqual(peer2IceCount, 0);
@@ -111,6 +109,7 @@ describe('RTCPeerConnection | EventHandler', function() {
         checkdone();
       } else {
         ++peer1IceCount;
+        // TODO(J-O): since we don't test addIceCandidate here, can we remove it ?
         peer2.addIceCandidate(candidate, function () {}, function (error) {
           throw error;
         });
@@ -125,6 +124,7 @@ describe('RTCPeerConnection | EventHandler', function() {
         checkdone();
       } else {
         ++peer2IceCount;
+        // TODO(J-O): since we don't test addIceCandidate here, can we remove it ?
         peer1.addIceCandidate(candidate, function () {}, function (error) {
           throw error;
         });
