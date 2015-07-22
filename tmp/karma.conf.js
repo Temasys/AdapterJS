@@ -22,11 +22,12 @@ module.exports = function(config) {
       // '../node_modules/karma-requirejs/lib/adapter.js',
 
 
-      {pattern: '../publish/adapter.debug.js', included: true},
+      {pattern: '../source/adapter.js', included: true},
       {pattern: 'globals.js', included: true},
-      {pattern: 'browser.*.conf.js', included: true},
+      // {pattern: 'browser.*.conf.js', included: true},
       // {pattern: 'gen/*.js', included: false},
-      {pattern: 'unit/*.js', included: true},
+      {pattern: 'unit/MediaStream.event.spec.js', included: true},
+      // {pattern: 'unit/*.js', included: true},
       // 'test-main.js',
       // 'gen/*.js',
     ],
@@ -59,7 +60,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_DEBUG,
+    logLevel: config.LOG_ERROR,
 
 
     // enable / disable watching file and executing tests whenever any file changes
@@ -68,11 +69,18 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    // browsers: ['Chrome'],
+
+    customLaunchers: {
+        ChromeUM: {
+          base: 'Chrome',
+          flags: ['--use-fake-ui-for-media-stream']
+        }
+    },
 
     transports: ['websocket', 'flashsocket', 'xhr-polling', 'jsonp-polling', 'polling'],
 
-        browserNoActivityTimeout: 4 * 60 * 1000, //default 10000
+    browserNoActivityTimeout: 4 * 60 * 1000, //default 10000
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
