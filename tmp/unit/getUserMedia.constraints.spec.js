@@ -5,54 +5,28 @@ var expect = chai.expect;
 var assert = chai.assert;
 var should = chai.should;
 
-// Test timeouts
-var testTimeout = 35000;
-
 // Get User Media timeout
-var gUMTimeout = 25000;
+var gUMTimeout = 2000;
 
 // Test item timeout
-var testItemTimeout = 4000;
+var testItemTimeout = 2000;
 
+// Init timeout
+var initTimeout = 10000;
 
 describe('getUserMedia | MediaStreamConstraints', function() {
-	this.timeout(testTimeout);
 
 	/* Attributes */
 	var stream = null;
 	var track = null;
 
-
 	/* Get User Media */
 	before(function (done) {
-		this.timeout(testItemTimeout);
+		this.timeout(initTimeout);
 
-		/*setTimeout(function(){
-			done();
-		},5000);*/
-
-		
-		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-			AdapterJS.onwebrtcreadyDone = true;
-		}
-
-		var init = function () {
-			if (document.readyState !== 'complete') {
-				document.onload = function () {
-					done();
-				};
-			} else {
-				done();
-			}
-		};
-
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = init;
-
-		} else {
-			init();
-		}
-		
+    AdapterJS.webRTCReady(function() {
+    	done();
+    });
 	});
 
 
@@ -127,7 +101,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			this.timeout(testItemTimeout + gUMTimeout);
 
 			window.getUserMedia(constraints, function (stream) {
-				expect(stream.getAudioTracks().length).to.equal(0);
+				expect(stream.getAudioTracks().length).to.equal(1);
 				expect(stream.getVideoTracks().length).to.equal(1);
 				done();
 
@@ -142,103 +116,78 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
 			this.timeout(testItemTimeout + gUMTimeout);
 
-			var isInvoked = false;
-
-			try {
-				window.getUserMedia(constraints, function (stream) {
-					isInvoked = true;
-					throw new Error('Stream is retrieved');
-
-				}, function (error) {
-					isInvoked = true;
-					done();
-				});
-			} catch (error) {
-				isInvoked = true;
+			window.getUserMedia(constraints, function (stream) {
+				expect(stream.getAudioTracks().length).to.equal(0);
+				expect(stream.getVideoTracks().length).to.equal(0);
 				done();
-			}
 
-			setTimeout(function () {
-				if (!isInvoked) {
-					done();
-				}
-			}, 2000);
+			}, function (error) {
+				throw error;
+			});
 		});
 	})({ audio: false, video: false });
 
 
 	(function (constraints) {
 		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
 			video.autoplay = 'autoplay';
 
-			video.onplay = function () {
-				expect(video.offsetWidth).to.be.at.least(357);
-				expect(video.offsetHeight).to.be.at.least(55);
+			video.onplaying = function () {
+				expect(video.videoWidth).to.be.at.least(1240);
+				expect(video.videoHeight).to.be.at.least(720);
 				done();
 			};
 
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
-				attachMediaStream(video, stream);
-
+				video = attachMediaStream(video, stream);
 			}, function (error) {
 				throw error;
 			});
 		});
-	})({ video: { mandatory: { minWidth: 357, minHeight: 55 } } });
+	})({ video: { mandatory: { minWidth: 1240, minHeight: 720 } } });
 
 
 	(function (constraints) {
 		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
 			video.autoplay = 'autoplay';
 
-			video.onplay = function () {
-				expect(video.offsetWidth).to.be.at.most(1357);
-				expect(video.offsetHeight).to.be.at.most(135);
+			video.onplaying = function () {
+				expect(video.videoWidth).to.be.at.most(600);
+				expect(video.videoHeight).to.be.at.most(300);
 				done();
 			};
 
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
-				attachMediaStream(video, stream);
-
+				video = attachMediaStream(video, stream);
 			}, function (error) {
 				throw error;
 			});
 		});
-	})({ video: { mandatory: { maxWidth: 1357, maxHeight: 135 } } });
+	})({ video: { mandatory: { maxWidth: 600, maxHeight: 300 } } });
 
 
 	(function (constraints) {
-		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-			var video = document.createElement('video');
-			video.autoplay = 'autoplay';
-
-			video.onplay = function () {
-				drawCanvas(video, function (isEmpty) {
-					expect(isEmpty).to.equal(false);
-					done();
-				});
-			};
-
-			document.body.appendChild(video);
+		it.skip('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			window.getUserMedia(constraints, function (stream) {
+				//TODO(J-O): check framerate
+				// Follow these bugs:
+				// https://code.google.com/p/webrtc/issues/detail?id=4807
+				// https://code.google.com/p/webrtc/issues/detail?id=2481
 
-				attachMediaStream(video, stream);
-
+				// var settings = stream.getVideoTracks()[0].getSettings();
+				// expect(setting.).to.be.at.most(600);
 			}, function (error) {
 				throw error;
 			});
@@ -247,25 +196,17 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 
 
 	(function (constraints) {
-		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
-
-			var video = document.createElement('video');
-			video.autoplay = 'autoplay';
-
-			video.onplay = function () {
-				drawCanvas(video, function (isEmpty) {
-					expect(isEmpty).to.equal(false);
-					done();
-				});
-			};
-
-			document.body.appendChild(video);
+		it.skip('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			window.getUserMedia(constraints, function (stream) {
+				//TODO(J-O): check framerate
+				// Follow these bugs:
+				// https://code.google.com/p/webrtc/issues/detail?id=4807
+				// https://code.google.com/p/webrtc/issues/detail?id=2481
 
-				attachMediaStream(video, stream);
-
+				// var settings = stream.getVideoTracks()[0].getSettings();
+				// expect(setting.).to.be.at.most(600);
 			}, function (error) {
 				throw error;
 			});
@@ -275,22 +216,20 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 
 	(function (constraints) {
 		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
 			video.autoplay = 'autoplay';
 
-			video.onplay = function () {
-				expect(video.offsetWidth / video.offsetHeight).to.be.at.least(16 / 10);
+			video.onplaying = function () {
+				expect(video.videoWidth / video.videoHeight).to.be.at.least(16 / 10);
 				done();
 			};
 
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
-				attachMediaStream(video, stream);
-
+				video = attachMediaStream(video, stream);
 			}, function (error) {
 				throw error;
 			});
@@ -300,22 +239,20 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 
 	(function (constraints) {
 		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
 			video.autoplay = 'autoplay';
 
-			video.onplay = function () {
-				expect(video.offsetWidth / video.offsetHeight).to.be.at.most(21 / 9);
+			video.onplaying = function () {
+				expect(video.videoWidth / video.videoHeight).to.be.at.most(21 / 9);
 				done();
 			};
 
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
-				attachMediaStream(video, stream);
-
+				video = attachMediaStream(video, stream);
 			}, function (error) {
 				throw error;
 			});
@@ -325,16 +262,14 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 
 	(function (constraints) {
 		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+			this.timeout(testItemTimeout + gUMTimeout);
 
+			var video = document.createElement('video');
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
 				assert.typeOf(stream, 'object');
-
 				done();
-
 			}, function (error) {
 				throw new Error('Optional constraint should not affect the retrieval of getUserMedia');
 			});
@@ -343,24 +278,22 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 
 
 	(function (constraints) {
-		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+		it.skip('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
 			video.autoplay = 'autoplay';
 
-			video.onplay = function () {
-				expect(video.offsetWidth).to.be.at.least(358);
-				expect(video.offsetHeight).to.be.at.least(59);
+			video.onplaying = function () {
+				expect(video.videoWidth).to.be.at.least(358);
+				expect(video.videoHeight).to.be.at.least(59);
 				done();
 			};
 
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
-				attachMediaStream(video, stream);
-
+				video = attachMediaStream(video, stream);
 			}, function (error) {
 				throw error;
 			});
@@ -369,24 +302,22 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 
 
 	(function (constraints) {
-		it('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
-			this.timeout(testItemTimeout + gUMTimeout + 5000);
+		it.skip('getUserMedia(MediaStreamConstraints = ' + printJSON(constraints) + ')', function (done) {
+			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
 			video.autoplay = 'autoplay';
 
-			video.onplay = function () {
-				expect(video.offsetWidth).to.be.at.most(1310);
-				expect(video.offsetHeight).to.be.at.most(120);
+			video.onplaying = function () {
+				expect(video.videoWidth).to.be.at.most(1310);
+				expect(video.videoHeight).to.be.at.most(120);
 				done();
 			};
 
 			document.body.appendChild(video);
 
 			window.getUserMedia(constraints, function (stream) {
-
-				attachMediaStream(video, stream);
-
+				video = attachMediaStream(video, stream);
 			}, function (error) {
 				throw error;
 			});
