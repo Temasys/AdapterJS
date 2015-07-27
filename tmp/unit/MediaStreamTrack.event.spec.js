@@ -26,18 +26,9 @@ describe('MediaStreamTrack | EventHandler', function() {
 	before(function (done) {
 		this.timeout(testItemTimeout);
 
-		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-			AdapterJS.onwebrtcreadyDone = true;
-		}
-
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = function () {
-				done();
-			};
-
-		} else {
+		AdapterJS.webRTCReady(function() {
 			done();
-		}
+		});
 	});
 
 	/* Get User Media */

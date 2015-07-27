@@ -22,18 +22,9 @@ describe('getUserMedia | Parameters', function() {
 	before(function (done) {
 		this.timeout(testItemTimeout);
 
-		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-			AdapterJS.onwebrtcreadyDone = true;
-		}
-
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = function () {
-				done();
-			};
-
-		} else {
-			done();
-		}
+	    AdapterJS.webRTCReady(function() {
+	    	done();
+	    });
 	});
 
 	it('getUserMedia(constraints) -> Error', function () {
