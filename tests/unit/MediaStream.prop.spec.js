@@ -28,39 +28,28 @@ describe('MediaStream | Properties', function() {
 	before(function (done) {
 		this.timeout(testItemTimeout);
 
-		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-			AdapterJS.onwebrtcreadyDone = true;
-		}
-
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = function () {
-				done();
-			};
-
-		} else {
+		AdapterJS.webRTCReady(function() {
 			done();
-		}
+		});
 	});
 
 	/* Get User Media */
-	before(function (done) {
+	beforeEach(function (done) {
 		this.timeout(gUMTimeout);
 
 		window.navigator.getUserMedia({
 			audio: true,
 			video: true
-
 		}, function (data) {
 			stream = data;
-			track = data.polygetAudioTracks()[0];
+			track = data.getAudioTracks()[0];
 			done();
-
 		}, function (error) {
 			throw error;
 		});
 	});
 
-	it('MediaStream.id :: string', function () {
+	it('MediaStream.id :: string', function (done) {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.id, 'string');
@@ -69,79 +58,93 @@ describe('MediaStream | Properties', function() {
 
 		expect(stream.id).to.have.length(36);
 		expect(stream.id).to.match(regex);
+
+		done();
 	});
 
-	it('MediaStream.ended :: boolean', function () {
+	it('MediaStream.ended :: boolean', function (done) {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.ended, 'boolean')
+
+		done();
 	});
 
-	it('MediaStream.clone :: method', function () {
+	it('MediaStream.clone :: method', function (done) {
 		this.timeout(testItemTimeout);
 
 		assert.typeOf(stream.clone, 'function');
 
 		var clone = stream.clone();
 		assert.typeOf(clone, 'object');
+
+		done();
 	});
 
-	it('MediaStream.polyremoveTrack -> MediaStream.removeTrack :: method', function () {
+	it('MediaStream.removeTrack -> MediaStream.removeTrack :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.polyremoveTrack, 'function');
+		assert.equal(typeof stream.removeTrack, 'function');
 
-		stream.polyremoveTrack(track);
+		stream.removeTrack(track);
 
 		checkRemoveTrackSuccess = stream.getAudioTracks().length === 0;
 
 		expect(stream.getAudioTracks()).to.have.length(0);
+
+		done();
 	});
 
-	it('MediaStream.polyaddTrack -> MediaStream.addTrack :: method', function () {
+	it('MediaStream.addTrack -> MediaStream.addTrack :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.polyaddTrack, 'function');
+		assert.equal(typeof stream.addTrack, 'function');
 
-		stream.polyaddTrack(track);
+		stream.addTrack(track);
 
 		if (!checkRemoveTrackSuccess) {
 			throw new Error('Remove track failed. Unable to proceed checking of addTrack');
 		}
 
 		expect(stream.getAudioTracks()).to.have.length(1);
+
+		done();
 	});
 
-	it('MediaStream.polygetTrackById -> MediaStream.getTrackById :: method', function () {
+	it('MediaStream.getTrackById -> MediaStream.getTrackById :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.polygetTrackById, 'function');
+		assert.equal(typeof stream.getTrackById, 'function');
 
-		var check = stream.polygetTrackById(track.id);
+		var check = stream.getTrackById(track.id);
 
-		expect(check).to.equal(track);
+		expect(check.id).to.equal(track.id);
+
+		done();
 	});
 
-	it('MediaStream.polygetTracks -> MediaStream.getTracks :: method', function () {
+	it('MediaStream.getTracks -> MediaStream.getTracks :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.polygetTracks, 'function');
+		assert.equal(typeof stream.getTracks, 'function');
 
-		var tracks = stream.polygetTracks(track.id);
+		var tracks = stream.getTracks(track.id);
 
 		if (!(tracks instanceof Array)) {
 			throw new Error('Received track type is not an array');
 		}
 
 		expect(tracks).to.have.length(2);
+
+		done();
 	});
 
-	it('MediaStream.polystop -> MediaStream.stop :: method', function (done) {
+	it('MediaStream.stop -> MediaStream.stop :: method', function (done) {
 		this.timeout(testItemTimeout + 2500);
 
-		assert.typeOf(stream.polystop, 'function');
+		assert.equal(typeof stream.stop, 'function');
 
-		stream.polystop();
+		stream.stop();
 
 		setTimeout(function () {
 			expect(stream.ended).to.equal(true);
@@ -149,15 +152,17 @@ describe('MediaStream | Properties', function() {
 		}, 2500);
 	});
 
-	it('MediaStream.addTrack && MediaStream.removeTrack -> Error < When > MediaStream.ended === true', function () {
+	it('MediaStream.addTrack && MediaStream.removeTrack -> Error < When > MediaStream.ended === true', function (done) {
 		this.timeout(testItemTimeout);
 
 		expect(function () {
-			stream.polyaddTrack(track);
+			stream.addTrack(track);
 		}).to.throw(Error);
 
 		expect(function () {
-			stream.polyremoveTrack(track);
+			stream.removeTrack(track);
 		}).to.throw(Error);
+
+		done();
 	});
 });

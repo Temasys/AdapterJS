@@ -48,60 +48,12 @@ module.exports = function(grunt) {
     var testBrowsers = [
       'ChromeUM',
       // 'ChromeCanary',
-      'Safari',
+      // 'Safari',
       // 'Firefox',
       // 'Opera',
       // 'PhantomJS',
       // 'IE'
     ];
-
-    var testUnits = [
-      'RTCPeerConnection.constraints.spec.js',
-      'RTCPeerConnection.offerconstraints.spec.js',
-      'RTCPeerConnection.param.spec.js',
-      'getUserMedia.constraints.spec.js',
-      'getUserMedia.param.spec.js',
-      'MediaStreamError.spec.js',
-      'MediaStream.event.spec.js',
-      'MediaStream.prop.spec.js',
-      'MediaStreamTrack.event.spec.js',
-      'MediaStreamTrack.prop.spec.js'
-    ];
-
-    var i, j;
-
-    for (i = 0; i < testBrowsers.length; i += 1) {
-      var browser = testBrowsers[i];
-
-      for (j = 0; j < testUnits.length; j += 1) {
-        var unit = testUnits[j];
-
-        var key = browser + '.' + unit;
-
-        replaceTask[key] = {
-          options: {
-            variables: {
-              'browser': '../browser.' + browser + '.conf.js',
-              'unit': '../unit/' + unit,
-              'port': parseInt('50' + i + j, 10),
-              'testResult': '../results/' + browser + '/' + unit + '.xml'
-            },
-            prefix: '@@'
-          },
-          files: [{
-            expand: true,
-            flatten: true,
-            src: ['tests/gen/' + key + '.conf.js'],
-            dest: 'tests/gen/'
-          }]
-        };
-
-        concatTask[key] = {
-          src: ['tests/launcher.conf.js'],
-          dest: 'tests/gen/' + key + '.conf.js'
-        };
-      }
-    }
 
     grunt.initConfig({
 
@@ -229,27 +181,11 @@ module.exports = function(grunt) {
 
       karma: {
         unit: {
-          configFile: 'tmp/karma.conf.js',
+          configFile: 'tests/karma.conf.js',
           browsers: testBrowsers
         }
       }
     });
-
-  grunt.registerTask('compilexmlresults', function () {
-    var i, j;
-    var output = '';
-
-    for (i = 0; i < testBrowsers.length; i++) {
-      var browser = testBrowsers[i];
-      for (j = 0; j < testUnits.length; j++) {
-        var unit = testUnits[j];
-        var data = grunt.file.read('tests/results/' + browser + '/' + unit + ".xml");
-        output += data;
-      }
-    }
-
-    grunt.file.write('tests/results/compile.xml', output);
-  });
 
     grunt.registerTask('versionise', 'Adds version meta intormation', function() {
         var done = this.async(),
@@ -328,13 +264,13 @@ module.exports = function(grunt) {
         'uglify'
     ]);
 
-    grunt.registerTask('test', [
-        'versionise',
-        'clean:test',
-        'concat',
-        'replace',
-        'uglify'
-    ]);
+    // grunt.registerTask('test', [
+    //     'versionise',
+    //     'clean:test',
+    //     'concat',
+    //     'replace',
+    //     'uglify'
+    // ]);
 
     grunt.registerTask('publish', [
         'versionise',

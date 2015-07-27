@@ -27,18 +27,9 @@ describe('MediaStreamTrack | Properties', function() {
 	before(function (done) {
 		this.timeout(testItemTimeout);
 
-		if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-			AdapterJS.onwebrtcreadyDone = true;
-		}
-
-		if (!AdapterJS.onwebrtcreadyDone) {
-			AdapterJS.onwebrtcready = function () {
-				done();
-			};
-
-		} else {
+		AdapterJS.webRTCReady(function() {
 			done();
-		}
+		});
 	});
 
 	/* Get User Media */
@@ -51,8 +42,8 @@ describe('MediaStreamTrack | Properties', function() {
 
 		}, function (data) {
 			stream = data;
-			videoTrack = stream.polygetVideoTracks()[0];
-			audioTrack = stream.polygetAudioTracks()[0];
+			videoTrack = stream.getVideoTracks()[0];
+			audioTrack = stream.getAudioTracks()[0];
 			done();
 
 		}, function (error) {
@@ -84,8 +75,8 @@ describe('MediaStreamTrack | Properties', function() {
 
 			window.navigator.getUserMedia(constraints, function (checkStream) {
 
-				var checkTrack = source1.kind === 'audio' ? checkStream.polygetAudioTracks()[0] :
-					checkStream.polygetVideoTracks()[0];
+				var checkTrack = source1.kind === 'audio' ? checkStream.getAudioTracks()[0] :
+					checkStream.getVideoTracks()[0];
 
 				expect(checkTrack.id).to.equal(source1.id);
 				done();
@@ -246,14 +237,14 @@ describe('MediaStreamTrack | Properties', function() {
 		expect(audioTrack.label).to.equal(clone.label);
 	});
 
-	it('MediaStreamTrack.polystop -> MediaStreamTrack.stop :: method', function (done) {
+	it('MediaStreamTrack.stop -> MediaStreamTrack.stop :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(audioTrack.polystop, 'function');
-		assert.typeOf(videoTrack.polystop, 'function');
+		assert.typeOf(audioTrack.stop, 'function');
+		assert.typeOf(videoTrack.stop, 'function');
 
-		audioTrack.polystop();
-		videoTrack.polystop();
+		audioTrack.stop();
+		videoTrack.stop();
 
 		setTimeout(function () {
 			expect(audioTrack.ended).to.equal(true);

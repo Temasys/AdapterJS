@@ -1,4 +1,4 @@
-var sharedConfig = require('@@browser');
+var sharedConfig = require(['base/@@browser'], function() {
 
 module.exports = function(config) {
 
@@ -13,3 +13,5 @@ module.exports = function(config) {
 	   outputFile: '@@testResult'
   };
 };
+
+});

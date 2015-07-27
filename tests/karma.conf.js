@@ -1,57 +1,81 @@
-module.exports = function (config) {
-  //'use strict';
+// Karma configuration
+// Generated on Tue Jul 21 2015 13:17:34 GMT+0800 (SGT)
 
+module.exports = function(config) {
   config.set({
 
+    // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-    frameworks: ['mocha', 'chai'],
 
-    files: ['../../publish/adapter.debug.js', 'globals.js'],
+    // frameworks to use
+    // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+    frameworks: ['mocha', 'requirejs', 'chai'],
 
+
+    // list of files / patterns to load in the browser
+    files: [
+      // config files
+      {pattern: 'karma.conf.js', included: true},
+      {pattern: 'test-main.js', included: true},
+      {pattern: '../source/adapter.js', included: true},
+      {pattern: 'globals.js', included: true},
+
+      // tests
+      {pattern: 'unit/*.spec.js', included: false},
+    ],
+
+
+    // list of files to exclude
+    exclude: [
+    ],
+
+    // preprocess matching files before serving them to the browser
+    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    preprocessors: {
+    },
+
+    // test results reporter to use
+    // possible values: 'dots', 'progress'
+    // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['mocha', 'xml'],
 
-    port: 9876, // default port
+    xmlReporter: {
+      outputFile: 'results/result.xml'
+    },
 
+    // web server port
+    port: 9876,
+
+    // enable / disable colors in the output (reporters and logs)
     colors: true,
 
-    autoWatch: false,
-
-    singleRun: true,
-
-    // Levels: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+    // level of logging
+    // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
     logLevel: config.LOG_DISABLE,
 
-    // set the timeout
-    //browserDisconnectTimeout: 10000, // default 2000
+    // enable / disable watching file and executing tests whenever any file changes
+    autoWatch: false,
 
-    //browserDisconnectTolerance: 2, // default 0
+    // start these browsers
+    // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+    // browsers: ['Chrome'],
 
-    //browserNoActivityTimeout: 4 * 60 * 1000, //default 10000
-
-    //captureTimeout: 4 * 60 * 1000, //default 60000
-
-    customLaunchers: {},
+    customLaunchers: {
+        ChromeUM: {
+          base: 'Chrome',
+          flags: ['--use-fake-ui-for-media-stream']
+        }
+    },
 
     transports: ['websocket', 'flashsocket', 'xhr-polling', 'jsonp-polling', 'polling'],
 
-    //reportSlowerThan: 1000,
+    browserNoActivityTimeout: 4 * 60 * 1000, //default 10000
 
-    browsers: [
-      'Chrome',
-      // 'ChromeCanary',
-      'Safari',
-      // 'Firefox',
-      // 'Opera',
-      // 'PhantomJS',
-      // 'IE'
-    ],
+    // Continuous Integration mode
+    // if true, Karma captures browsers, runs the tests and exits
+    singleRun: true,
 
-    /*client: {
-      useIframe: false,
-      captureConsole: true
-    },*/
-
-    plugins: ['karma-mocha', 'karma-mocha-reporter', 'karma-chai', 'karma-xml-reporter']
-  });
-};
+    plugins: ['karma-mocha', 'karma-mocha-reporter', 'karma-chai', 'karma-xml-reporter', 'karma-chrome-launcher', 'karma-safari-launcher', 'karma-requirejs']
+  })
+}

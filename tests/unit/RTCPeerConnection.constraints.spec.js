@@ -22,18 +22,9 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   before(function (done) {
     this.timeout(testItemTimeout);
 
-    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-      AdapterJS.onwebrtcreadyDone = true;
-    }
-
-    if (!AdapterJS.onwebrtcreadyDone) {
-      AdapterJS.onwebrtcready = function () {
-        done();
-      };
-
-    } else {
+    AdapterJS.webRTCReady(function() {
       done();
-    }
+    });
   });
 
   (function (constraints) {
@@ -127,7 +118,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
     it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
 
-  })( iceTransportPolicy: 'none' });
+  })({ iceTransportPolicy: 'none' });
 
 
   (function (constraints) {
