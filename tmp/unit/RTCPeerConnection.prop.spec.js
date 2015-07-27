@@ -12,7 +12,7 @@ var testTimeout = 35000;
 var gUMTimeout = 25000;
 
 // Test item timeout
-var testItemTimeout = 2000;
+var testItemTimeout = 5000;
 
 var err = new ReferenceError('This is a bad function.');
 

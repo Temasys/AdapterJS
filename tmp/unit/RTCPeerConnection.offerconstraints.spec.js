@@ -12,7 +12,7 @@ var testTimeout = 35000;
 var gUMTimeout = 25000;
 
 // Test item timeout
-var testItemTimeout = 2000;
+var testItemTimeout = 5000;
 
 
 describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
@@ -28,18 +28,18 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
   before(function (done) {
     this.timeout(testItemTimeout);
 
-    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-      AdapterJS.onwebrtcreadyDone = true;
-    }
-
-    if (!AdapterJS.onwebrtcreadyDone) {
-      AdapterJS.onwebrtcready = function () {
+    AdapterJS.webRTCReady(function() {
+      // get a reference stream for all tests
+      window.navigator.getUserMedia({
+        audio: true,
+        video: true
+      }, function (data) {
+        stream = data;
         done();
-      };
-
-    } else {
-      done();
-    }
+      }, function (error) {
+        throw error;
+      });
+    });
   });
 
   /* Create peer objects */
@@ -52,18 +52,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
       iceServers: []
     });
 
-    window.navigator.getUserMedia({
-      audio: true,
-      video: true
-
-    }, function (data) {
-      stream = data;
-      peer1.addStream(stream);
-      done();
-
-    }, function (error) {
-      throw error;
-    });
+    peer1.addStream(stream);
+    done();
   });
 
 
@@ -83,7 +73,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -91,6 +81,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(0);
         expect(remoteStream.getVideoTracks()).to.have.length(1);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
@@ -101,7 +93,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -109,6 +101,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(1);
         expect(remoteStream.getVideoTracks()).to.have.length(1);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
@@ -119,7 +113,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -127,6 +121,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(1);
         expect(remoteStream.getVideoTracks()).to.have.length(0);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
@@ -137,7 +133,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -145,6 +141,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(1);
         expect(remoteStream.getVideoTracks()).to.have.length(0);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
@@ -155,7 +153,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -163,6 +161,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(1);
         expect(remoteStream.getVideoTracks()).to.have.length(1);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
@@ -173,7 +173,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -181,6 +181,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(0);
         expect(remoteStream.getVideoTracks()).to.have.length(0);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
@@ -191,7 +193,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -199,6 +201,8 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
         expect(remoteStream.getAudioTracks()).to.have.length(1);
         expect(remoteStream.getVideoTracks()).to.have.length(1);
+
+        done();
       };
 
       connect(peer1, peer2, constraints);
