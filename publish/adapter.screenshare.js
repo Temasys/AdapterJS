@@ -1,4 +1,4 @@
-/*! adapterjs - v0.11.0 - 2015-06-24 */
+/*! adapterjs - v0.11.0 - 2015-07-30 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
