@@ -14,13 +14,13 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
       // config files
-      {pattern: 'karma.conf.js',          included: true},
-      {pattern: 'test-main.js',           included: true},
-      {pattern: '../source/adapter.js',   included: true},
-      {pattern: 'globals.js',             included: true},
+      {pattern: 'karma.conf.js',                  included: true},
+      {pattern: 'test-main.js',                   included: true},
+      {pattern: '../publish/adapter.debug.js',    included: true},
+      {pattern: 'globals.js',                     included: true},
 
       // tests
-      {pattern: 'unit/*.spec.js',         included: false},
+      {pattern: 'unit/*.spec.js',                 included: false},
     ],
 
 

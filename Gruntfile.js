@@ -275,4 +275,9 @@ module.exports = function(grunt) {
         'compress',
         'bamboovars'
     ]);
+
+    grunt.registerTask('test', [
+      'publish',
+      'karma'
+    ]);
 };

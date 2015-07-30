@@ -235,7 +235,7 @@ The adapter.js library development file
 
 ##### tests
 
-run `grunt karma` to run the automated test suite.
+run `grunt test` to generate the published versions of adapter.js (same as `grunt publish`) and run the automated test suite on it.
 You can configure the browser to test in `Gruntfile.js` (see the karma target).
 
 (Mac only) If you are testing the Temasys WebRTC Plugin, you can run `osascript tests/mac.watcher.scpt` to automatically validate the permission popup.
