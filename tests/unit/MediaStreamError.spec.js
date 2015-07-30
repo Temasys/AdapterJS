@@ -67,7 +67,7 @@ describe('MediaStreamError', function() {
 
 	it.skip('MediaStreamError.name === "PermissionDeniedError"', function () {});
 
-	it('MediaStreamError.name === "ConstraintNotSatisfiedError"', function () {
+	it('MediaStreamError.name === "ConstraintNotSatisfiedError"', function (done) {
 		this.timeout(testItemTimeout);
 
 		window.getUserMedia({
@@ -79,8 +79,8 @@ describe('MediaStreamError', function() {
 
 		}, function (error) {
 			expect(error.name).to.equal('ConstraintNotSatisfiedError');
-    	expect(error.constraintName).to.equal('minWidth');
-    	done();
+	    	expect(error.constraintName).to.equal('minWidth');
+	    	done();
 		});
 	});
 

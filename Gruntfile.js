@@ -44,17 +44,6 @@ module.exports = function(grunt) {
       }
     };
 
-    // TODO: merge with the karma.browsers
-    var testBrowsers = [
-      'ChromeUM',
-      // 'ChromeCanary',
-      // 'Safari',
-      // 'Firefox',
-      // 'Opera',
-      // 'PhantomJS',
-      // 'IE'
-    ];
-
     grunt.initConfig({
 
       pkg: grunt.file.readJSON('package.json'),
@@ -182,7 +171,15 @@ module.exports = function(grunt) {
       karma: {
         unit: {
           configFile: 'tests/karma.conf.js',
-          browsers: testBrowsers
+          browsers: [
+            'ChromeCustom',
+            // 'ChromeCanary',
+            'Safari',
+            'FirefoxCustom',
+            // 'Opera',
+            // 'PhantomJS',
+            // 'IE'
+          ]
         }
       }
     });
@@ -263,14 +260,6 @@ module.exports = function(grunt) {
         'replace',
         'uglify'
     ]);
-
-    // grunt.registerTask('test', [
-    //     'versionise',
-    //     'clean:test',
-    //     'concat',
-    //     'replace',
-    //     'uglify'
-    // ]);
 
     grunt.registerTask('publish', [
         'versionise',

@@ -7,22 +7,20 @@ module.exports = function(config) {
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
-
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['mocha', 'requirejs', 'chai'],
 
-
     // list of files / patterns to load in the browser
     files: [
       // config files
-      {pattern: 'karma.conf.js', included: true},
-      {pattern: 'test-main.js', included: true},
-      {pattern: '../source/adapter.js', included: true},
-      {pattern: 'globals.js', included: true},
+      {pattern: 'karma.conf.js',          included: true},
+      {pattern: 'test-main.js',           included: true},
+      {pattern: '../source/adapter.js',   included: true},
+      {pattern: 'globals.js',             included: true},
 
       // tests
-      {pattern: 'unit/*.spec.js', included: false},
+      {pattern: 'unit/*.spec.js',         included: false},
     ],
 
 
@@ -59,12 +57,20 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+    // Note: set from Grunt
     // browsers: ['Chrome'],
 
     customLaunchers: {
-        ChromeUM: {
+        ChromeCustom: {
           base: 'Chrome',
           flags: ['--use-fake-ui-for-media-stream']
+        },
+        FirefoxCustom: {
+          base: 'Firefox',
+          prefs: {
+            'media.navigator.permission.disabled': true,
+            'media.getusermedia.screensharing.enabled': true
+          } 
         }
     },
 
@@ -76,6 +82,15 @@ module.exports = function(config) {
     // if true, Karma captures browsers, runs the tests and exits
     singleRun: true,
 
-    plugins: ['karma-mocha', 'karma-mocha-reporter', 'karma-chai', 'karma-xml-reporter', 'karma-chrome-launcher', 'karma-safari-launcher', 'karma-requirejs']
+    plugins: ['karma-mocha', 
+              'karma-mocha-reporter', 
+              'karma-chai', 
+              'karma-xml-reporter', 
+              'karma-chrome-launcher', 
+              'karma-safari-launcher', 
+              'karma-firefox-launcher',
+              'karma-ie-launcher',
+              'karma-opera-launcher',
+              'karma-requirejs']
   })
 }
