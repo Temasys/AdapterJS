@@ -25,30 +25,23 @@ describe('MediaStreamTrack | Properties', function() {
 
 	/* WebRTC Object should be initialized in Safari/IE Plugin */
 	before(function (done) {
-		this.timeout(testItemTimeout);
+		this.timeout(testItemTimeout + gUMTimeout);
 
 		AdapterJS.webRTCReady(function() {
-			done();
-		});
-	});
+			window.navigator.getUserMedia({
+				audio: true,
+				video: true
 
-	/* Get User Media */
-	before(function (done) {
-		this.timeout(gUMTimeout);
+			}, function (data) {
+				stream = data;
+				videoTrack = stream.getVideoTracks()[0];
+				audioTrack = stream.getAudioTracks()[0];
+				done();
 
-		window.navigator.getUserMedia({
-			audio: true,
-			video: true
-
-		}, function (data) {
-			stream = data;
-			videoTrack = stream.getVideoTracks()[0];
-			audioTrack = stream.getAudioTracks()[0];
-			done();
-
-		}, function (error) {
-			throw error;
-			done();
+			}, function (error) {
+				throw error;
+				done();
+			});
 		});
 	});
 
