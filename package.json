@@ -1,7 +1,7 @@
 {
   "name": "adapterjs",
   "description": "Creating a common API for WebRTC in the browser",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "homepage": "https://temasys.github.io/",
   "author": {
     "name": "Temasys Communications Pte. Ltd.",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "chai": "2.1.1",
     "grunt": "0.4.5",
+    "grunt-cli": "^0.1.13",
     "grunt-contrib-clean": "0.6.0",
     "grunt-contrib-compress": "0.13.0",
     "grunt-contrib-concat": "0.5.1",

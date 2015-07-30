@@ -10,40 +10,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-karma');
 
-    var replaceTask = {
-      production: {
-        options: {
-          variables: {
-            'version': '<%= pkg.version %>'
-          },
-          prefix: '@@'
-        },
-        files: [{
-          expand: true,
-          flatten: true,
-          src: ['<%= production %>/*.js'],
-          dest: '<%= production %>/'
-        }]
-      }
-    };
-
-    var concatTask = {
-      options: {
-        separator: '\n',
-        stripBanners: false,
-        banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-          '<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
-      },
-      production: {
-        src: ['<%= source %>/*.adapter.js'/*, '<%= source %>/temasys.*.js'*/ ],
-        dest: '<%= production %>/adapter.debug.js'
-      },
-      screenshare: {
-        src: ['<%= source %>/adapter.js', '<%= source %>/adapter.screenshare.js'],
-        dest: '<%= production %>/adapter.screenshare.js'
-      }
-    };
-
     grunt.initConfig({
 
       pkg: grunt.file.readJSON('package.json'),
@@ -84,32 +50,64 @@ module.exports = function(grunt) {
         }
       },
 
-      concat: concatTask,
-
       uglify: {
-          options: {
-              mangle: false,
-              drop_console: true,
-              compress: {
-                  drop_console: true
-              },
-              banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-                  '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
-          },
-          production: {
-              files: {
-                  '<%= production %>/adapter.min.js': ['<%= production %>/adapter.debug.js']
-              }
-          },
-          screenshare: {
+        options: {
+            mangle: false,
+            drop_console: true,
+            compress: {
+                drop_console: true
+            },
+            banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+                '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
+        },
+        production: {
             files: {
-              '<%= production %>/adapter.screenshare.min.js': ['<%= production %>/adapter.screenshare.js']
+                '<%= production %>/adapter.min.js': ['<%= production %>/adapter.debug.js']
             }
-          }
+        },
+        screenshare: {
+          files: {
+            '<%= production %>/adapter.screenshare.min.js': ['<%= production %>/adapter.screenshare.js']
+          },
+        },
       },
 
-      replace: replaceTask,
+  		concat: {
+  			options: {
+  				separator: '\n',
+  				stripBanners: false,
+  				banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+  					'<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
+  			},
+  			production: {
+  				src: ['<%= source %>/adapter.js'],
+  				dest: '<%= production %>/adapter.debug.js'
+  			},
+  			screenshare: {
+  				src: ['<%= source %>/adapter.js', '<%= source %>/adapter.screenshare.js'],
+  				dest: '<%= production %>/adapter.screenshare.js'
+  			}
+  		},
 
+      replace: {
+        production: {
+          options: {
+            variables: {
+              'version': '<%= pkg.version %>'
+            },
+            prefix: '@@'
+          },
+          files: [{
+            expand: true,
+            flatten: true,
+            src: [
+              '<%= production %>/*.js'
+            ],
+            dest: '<%= production %>/'
+          }]
+        }
+      },
+      
       jshint: {
         build: {
             options: grunt.util._.merge({
