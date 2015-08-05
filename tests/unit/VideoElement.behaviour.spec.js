@@ -72,7 +72,7 @@ describe('VideoElement| Behaviour', function() {
     video.muted = true;
 
     expect(video.muted).to.equal(true);
-    expect(audioTrack.enabled).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
     video.muted = false;
 
@@ -130,7 +130,7 @@ describe('VideoElement| Behaviour', function() {
 
     expect(video.muted).to.equal(true);
     expect(video2.muted).to.equal(false);
-    expect(audioTrack.enabled).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
     video2 = attachMediaStream(video2, stream);
 
