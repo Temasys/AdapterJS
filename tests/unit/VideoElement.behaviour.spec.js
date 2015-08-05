@@ -25,32 +25,19 @@ describe('VideoElement| Behaviour', function() {
   before(function (done) {
     this.timeout(gUMTimeout);
 
-    var getMedia = function () {
-      window.navigator.getUserMedia({
-        audio: true,
-        video: true
-
+  	AdapterJS.webRTCReady(function() { 
+  		window.navigator.getUserMedia({
+          audio: true,
+          video: true
       }, function (data) {
         stream = data;
         videoTrack = stream.getVideoTracks()[0];
         audioTrack = stream.getAudioTracks()[0];
         done();
-
       }, function (error) {
         throw error;
       });
-    };
-
-    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-      AdapterJS.onwebrtcreadyDone = true;
-    }
-
-    if (!AdapterJS.onwebrtcreadyDone) {
-      AdapterJS.onwebrtcready = getMedia;
-
-    } else {
-      getMedia();
-    }
+  	});
   });
 
   beforeEach(function (done) {
@@ -106,7 +93,7 @@ describe('VideoElement| Behaviour', function() {
 
     expect(video.muted).to.equal(true);
     expect(video2.muted).to.equal(true);
-    //expect(audioTrack.enabled).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
     video.muted = false;
 

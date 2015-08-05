@@ -25,7 +25,7 @@ describe('VideoElement | Properties', function() {
   before(function (done) {
     this.timeout(gUMTimeout);
 
-    var getMedia = function () {
+    AdapterJS.webRTCReady(function() {
       window.navigator.getUserMedia({
         audio: true,
         video: true
@@ -39,18 +39,7 @@ describe('VideoElement | Properties', function() {
       }, function (error) {
         throw error;
       });
-    };
-
-    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-      AdapterJS.onwebrtcreadyDone = true;
-    }
-
-    if (!AdapterJS.onwebrtcreadyDone) {
-      AdapterJS.onwebrtcready = getMedia;
-
-    } else {
-      getMedia();
-    }
+    });
   });
 
   beforeEach(function (done) {
