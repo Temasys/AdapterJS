@@ -13,73 +13,71 @@ var testItemTimeout = 4000;
 
 
 describe('VideoElement | Properties', function() {
-	this.timeout(testTimeout);
+  this.timeout(testTimeout);
 
-	/* Attributes */
-	var video = null;
-	var stream = null;
-	var audioTrack = null;
-	var videoTrack = null;
+  /* Attributes */
+  var video = null;
+  var stream = null;
+  var audioTrack = null;
+  var videoTrack = null;
 
-	/* WebRTC Object should be initialized in Safari/IE Plugin */
-	before(function (done) {
-		this.timeout(testItemTimeout);
+/* WebRTC Object should be initialized in Safari/IE Plugin */
+  before(function (done) {
+    this.timeout(gUMTimeout);
 
-		AdapterJS.webRTCReady(function() {
-			done();
-		});
-	});
+    var getMedia = function () {
+      window.navigator.getUserMedia({
+        audio: true,
+        video: true
 
-	/* Get User Media */
-	before(function (done) {
-		this.timeout(gUMTimeout);
+      }, function (data) {
+        stream = data;
+        videoTrack = stream.getVideoTracks()[0];
+        audioTrack = stream.getAudioTracks()[0];
+        done();
 
-		window.navigator.getUserMedia({
-			audio: true,
-			video: true
+      }, function (error) {
+        throw error;
+      });
+    };
 
-		}, function (data) {
-			stream = data;
-			videoTrack = stream.getVideoTracks()[0];
-			audioTrack = stream.getAudioTracks()[0];
-			done();
+    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
+      AdapterJS.onwebrtcreadyDone = true;
+    }
 
-		}, function (error) {
-			throw error;
-			done();
-		});
-	});
+    if (!AdapterJS.onwebrtcreadyDone) {
+      AdapterJS.onwebrtcready = getMedia;
 
-	beforeEach(function (done) {
-		this.timeout(testTimeout);
+    } else {
+      getMedia();
+    }
+  });
 
-		video = document.createElement('video');
-		video.autoplay = 'autoplay';
-		document.body.appendChild(video);
-		video = attachMediaStream(video, stream);
-		done();
-	});
+  beforeEach(function (done) {
+    this.timeout(testTimeout);
 
-	afterEach(function (done) {
-		this.timeout(testTimeout);
+    video = document.createElement('video');
+    video.autoplay = 'autoplay';
+    document.body.appendChild(video);
+    video = attachMediaStream(video, stream);
+    done();
+  });
 
-		reattachMediaStream(null, video);
+  it('VideoElement.muted :: boolean', function(done) {
+    this.timeout(testItemTimeout);
 
-		done();
-	});
+    assert.typeOf(video.muted, 'boolean');
+    expect(video.muted).to.equal(false);
 
-	it('VideoElement.muted :: boolean', function(done) {
-		this.timeout(testItemTimeout);
+    video.muted = true;
+    expect(video.muted).to.equal(true);
 
-		assert.typeOf(video.muted, 'boolean');
-		expect(video.muted).to.equal(false);
+    done();
+  });
 
-		video.muted = true;
-		expect(video.muted).to.equal(true);
-
-		done();
-	});
-
+  afterEach(function () {
+    document.body.removeChild(video);
+  });
 });
 
-	
+  

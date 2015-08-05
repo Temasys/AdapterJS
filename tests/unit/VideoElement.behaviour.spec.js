@@ -13,135 +13,136 @@ var testItemTimeout = 4000;
 
 
 describe('VideoElement| Behaviour', function() {
-	this.timeout(testTimeout);
+  this.timeout(testTimeout);
 
-	/* Attributes */
-	var video = null;
-	var stream = null;
-	var audioTrack = null;
-	var videoTrack = null;
+  /* Attributes */
+  var video = null;
+  var stream = null;
+  var audioTrack = null;
+  var videoTrack = null;
 
-	/* WebRTC Object should be initialized in Safari/IE Plugin */
-	before(function (done) {
-		this.timeout(testItemTimeout);
+/* WebRTC Object should be initialized in Safari/IE Plugin */
+  before(function (done) {
+    this.timeout(gUMTimeout);
 
-		AdapterJS.webRTCReady(function() {
-			done();
-		});
-	});
+    var getMedia = function () {
+      window.navigator.getUserMedia({
+        audio: true,
+        video: true
 
-	/* Get User Media */
-	before(function (done) {
-		this.timeout(gUMTimeout);
+      }, function (data) {
+        stream = data;
+        videoTrack = stream.getVideoTracks()[0];
+        audioTrack = stream.getAudioTracks()[0];
+        done();
 
-		window.navigator.getUserMedia({
-			audio: true,
-			video: true
+      }, function (error) {
+        throw error;
+      });
+    };
 
-		}, function (data) {
-			stream = data;
-			videoTrack = stream.getVideoTracks()[0];
-			audioTrack = stream.getAudioTracks()[0];
-			done();
+    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
+      AdapterJS.onwebrtcreadyDone = true;
+    }
 
-		}, function (error) {
-			throw error;
-			// done();
-		});
-	});
+    if (!AdapterJS.onwebrtcreadyDone) {
+      AdapterJS.onwebrtcready = getMedia;
 
-	beforeEach(function (done) {
-		this.timeout(testTimeout);
+    } else {
+      getMedia();
+    }
+  });
 
-		video = document.createElement('video');
-		video.autoplay = 'autoplay';
-		document.body.appendChild(video);
-		video = attachMediaStream(video, stream);
-		done();
-	});
+  beforeEach(function (done) {
+    this.timeout(testTimeout);
 
-	afterEach(function (done) {
-		this.timeout(testTimeout);
+    video = document.createElement('video');
+    video.autoplay = 'autoplay';
+    document.body.appendChild(video);
+    video = attachMediaStream(video, stream);
+    done();
+  });
 
-		document.body.removeChild(video);
+  it('VideoElement.muted : mute one rendered stream', function (done) {
+    this.timeout(testItemTimeout);
 
-		done();
+    expect(video.muted).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
-	});
+    video.muted = true;
 
-	it('VideoElement.muted : mute one rendered stream', function (done) {
-		this.timeout(testItemTimeout);
+    expect(video.muted).to.equal(true);
+    expect(audioTrack.enabled).to.equal(false);
 
-		expect(video.muted).to.equal(false);
-		expect(audioTrack.enabled).to.equal(true);
+    video.muted = false;
 
-		video.muted = true;
+    expect(video.muted).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
-		expect(video.muted).to.equal(true);
-		expect(audioTrack.enabled).to.equal(false);
+    video.muted = true;
 
-		video.muted = false;
+    done();
+  });
 
-		expect(video.muted).to.equal(false);
-		expect(audioTrack.enabled).to.equal(true);
+  it('VideoElement.muted : mute stream rendered several times', function (done) {
+    this.timeout(testItemTimeout);
 
-		done();
-	});
+    var video2 = document.createElement('video');
+    video2.autoplay = 'autoplay';
+    document.body.appendChild(video2);
+    video2 = attachMediaStream(video2, stream);
 
-	it('VideoElement.muted : mute stream rendered several times', function (done) {
-		this.timeout(testItemTimeout);
+    expect(video.muted).to.equal(false);
+    expect(video2.muted).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
-		var video2 = document.createElement('video');
-		video2.autoplay = 'autoplay';
-		document.body.appendChild(video2);
-		video2 = attachMediaStream(video2, stream);
+    video.muted = true;
 
-		expect(video.muted).to.equal(false);
-		expect(video2.muted).to.equal(false);
-		expect(audioTrack.enabled).to.equal(true);
+    expect(video.muted).to.equal(true);
+    expect(video2.muted).to.equal(false);
+    expect(audioTrack.enabled).to.equal(true);
 
-		video.muted = true;
+    video2.muted = true;
 
-		expect(video.muted).to.equal(true);
-		expect(video2.muted).to.equal(false);
-		expect(audioTrack.enabled).to.equal(true);
+    expect(video.muted).to.equal(true);
+    expect(video2.muted).to.equal(true);
+    //expect(audioTrack.enabled).to.equal(false);
 
-		video2.muted = true;
+    video.muted = false;
 
-		expect(video.muted).to.equal(true);
-		expect(video2.muted).to.equal(true);
-		//expect(audioTrack.enabled).to.equal(false);
+    expect(video.muted).to.equal(false);
+    expect(video2.muted).to.equal(true);
+    expect(audioTrack.enabled).to.equal(true);
 
-		video.muted = false;
+    video.muted = true;
 
-		expect(video.muted).to.equal(false);
-		expect(video2.muted).to.equal(true);
-		expect(audioTrack.enabled).to.equal(true);
+    document.body.removeChild(video2);
+    done();
+  });
 
-		document.body.removeChild(video2);
-		console.log(audioTrack.enabled);
-		done();
-	});
+  it('VideoElement.muted : mute then attach other video to stream', function (done) {
+    var video2 = document.createElement('video');
+    video2.autoplay = 'autoplay';
+    document.body.appendChild(video2);
 
-	it('VideoElement.muted : mute then attach other video to stream', function (done) {
-		var video2 = document.createElement('video');
-		video2.autoplay = 'autoplay';
-		document.body.appendChild(video2);
+    expect(audioTrack.enabled).to.equal(true);
+    video.muted = true;
 
-		video.muted = true;
-		console.log(audioTrack.enabled);
+    expect(video.muted).to.equal(true);
+    expect(video2.muted).to.equal(false);
+    expect(audioTrack.enabled).to.equal(false);
 
-		expect(video.muted).to.equal(true);
-		expect(video2.muted).to.equal(false);
-		expect(audioTrack.enabled).to.equal(false);
+    video2 = attachMediaStream(video2, stream);
 
-		video2 = attachMediaStream(video2, stream);
+    expect(audioTrack.enabled).to.equal(true);
 
-		expect(audioTrack.enabled).to.equal(true);
+    document.body.removeChild(video2);
+    done();
+  });
 
-		document.body.removeChild(video2);
+  afterEach(function () {
+    document.body.removeChild(video);
+  });
 
-		done();
-	});
 
 });
