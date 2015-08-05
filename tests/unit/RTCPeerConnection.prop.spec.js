@@ -34,7 +34,7 @@ describe('RTCPeerConnection | Properties', function() {
   before(function (done) {
     this.timeout(testItemTimeout);
 
-    var getMedia = function () {
+    AdapterJS.webRTCReady(function() {
       window.navigator.getUserMedia({
         audio: true,
         video: true
@@ -46,18 +46,7 @@ describe('RTCPeerConnection | Properties', function() {
       }, function (error) {
         throw error;
       });
-    };
-
-    if (window.webrtcDetectedBrowser !== 'IE' && window.webrtcDetectedBrowser !== 'Safari') {
-      AdapterJS.onwebrtcreadyDone = true;
-    }
-
-    if (!AdapterJS.onwebrtcreadyDone) {
-      AdapterJS.onwebrtcready = getMedia;
-
-    } else {
-      getMedia();
-    }
+    });
   });
 
     /* Get User Media */
