@@ -1,57 +1,84 @@
 {
-    "name": "adapterjs",
-    "description": "Creating a common API for WebRTC in the browser",
-    "version": "0.11.1",
-    "homepage": "https://temasys.github.io/",
-    "author": {
-        "name": "Temasys Communications Pte. Ltd.",
-        "email": "info@temasys.com.sg"
-    },
-    "main": "publish/adapter.min.js",
-    "repository": {
-        "type": "git",
-        "url": "git@github.com:Temasys/AdapterJS.git"
-    },
-    "licenses": [{
-        "type": "Apache",
-        "url": "http://www.apache.org/licenses/LICENSE-2.0"
-    }],
-    "scripts": {
-        "test": "./test.sh;"
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-cli": "^0.1.13",
-        "grunt-contrib-compress": "^0.13.0",
-        "grunt-contrib-copy": "^0.7.0",
-        "grunt-contrib-clean": "^0.6.0",
-        "grunt-contrib-concat": "^0.5.0",
-        "grunt-contrib-jshint": "^0.10.0",
-        "grunt-contrib-uglify": "^0.6.0",
-        "grunt-replace": "^0.7.9",
-        "tape": "^3.0.0"
-    },
-    "testling": {
-        "files": "tests/*.js",
-        "browsers": [
-            "ie/9",
-            "chrome/30..latest",
-            "chrome/canary",
-            "firefox/26..latest",
-            "firefox/nightly",
-            "opera/17..latest",
-            "opera/next",
-            "safari/latest",
-            "iphone/latest",
-            "ipad/latest",
-            "android-browser/latest"
-        ]
-    },
-    "engines": {
-        "node": ">=0.10.26",
-        "npm": ">=1.4.6",
-        "grunt": ">=0.4.1"
-    },
-    "keywords": ["webrtc", "ortc", "adapter", "shim", "polyfill", "rtc"]
+  "name": "adapterjs",
+  "description": "Creating a common API for WebRTC in the browser",
+  "version": "0.11.1",
+  "homepage": "https://temasys.github.io/",
+  "author": {
+    "name": "Temasys Communications Pte. Ltd.",
+    "email": "info@temasys.com.sg"
+  },
+  "main": "publish/adapter.min.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Temasys/AdapterJS.git"
+  },
+  "licenses": [
+    {
+      "type": "Apache",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "scripts": {
+    "test": "./test.sh;"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "2.1.1",
+    "grunt": "0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-clean": "0.6.0",
+    "grunt-contrib-compress": "0.13.0",
+    "grunt-contrib-concat": "0.5.1",
+    "grunt-contrib-copy": "0.7.0",
+    "grunt-contrib-jshint": "0.11.2",
+    "grunt-contrib-uglify": "0.9.1",
+    "grunt-contrib-yuidoc": "0.7.0",
+    "grunt-karma": "^0.12.0",
+    "grunt-replace": "0.7.9",
+    "karma": "^0.13.2",
+    "karma-chai": "0.1.0",
+    "karma-chrome-launcher": "0.1.7",
+    "karma-cli": "0.0.4",
+    "karma-firefox-launcher": "0.1.4",
+    "karma-ie-launcher": "0.1.5",
+    "karma-mocha": "0.1.10",
+    "karma-mocha-reporter": "1.0.2",
+    "karma-opera-launcher": "0.1.0",
+    "karma-requirejs": "^0.2.2",
+    "karma-safari-launcher": "^0.1.1",
+    "karma-script-launcher": "0.1.0",
+    "karma-xml-reporter": "^0.1.4",
+    "mocha": "2.1.0",
+    "mocha-funnynyan-reporter": "0.0.1",
+    "requirejs": "^2.1.19"
+  },
+  "testling": {
+    "files": "tmp/*.js",
+    "browsers": [
+      "ie/9",
+      "chrome/30..latest",
+      "chrome/canary",
+      "firefox/26..latest",
+      "firefox/nightly",
+      "opera/17..latest",
+      "opera/next",
+      "safari/latest",
+      "iphone/latest",
+      "ipad/latest",
+      "android-browser/latest"
+    ]
+  },
+  "engines": {
+    "node": ">=0.10.26",
+    "npm": ">=1.4.6",
+    "grunt": ">=0.4.1"
+  },
+  "keywords": [
+    "webrtc",
+    "ortc",
+    "adapter",
+    "shim",
+    "polyfill",
+    "rtc"
+  ]
 }

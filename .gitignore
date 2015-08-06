@@ -80,4 +80,7 @@ dwsync.xml
 .CVS
 .idea
 bamboo
+doc
+tests/gen
+tests/results
 

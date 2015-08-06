@@ -219,7 +219,6 @@ window.navigator.getUserMedia({
 
 ## Development
 
-- Run `npm test` to execute jshint and run the tests in your local Chrome (Mac). You can configure this in the `test.sh` file.
 - Run `grunt jshint` to run jshint on its own.
 - Run `grunt publish` to create production debug and minified copies of adapter.js in `publish` folder
 
@@ -236,8 +235,11 @@ The adapter.js library development file
 
 ##### tests
 
-Tape tests. Run `test.sh` for windows and `npm test` for mac.
+run `grunt test` to generate the published versions of adapter.js (same as `grunt publish`) and run the automated test suite on it.
+You can configure the browser to test in `Gruntfile.js` (see the karma target).
+You can also run `grunt karma` to run the test and bypass the publish step.
 
+(Mac only) If you are testing the Temasys WebRTC Plugin, you can run `osascript tests/mac.watcher.scpt` to automatically validate the permission popup.
 
 ## License
 

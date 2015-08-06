@@ -1,4 +1,4 @@
-/*! adapterjs - v0.11.1 - 2015-07-28 */
+/*! adapterjs - v0.11.1 - 2015-07-30 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -341,20 +341,20 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         event.cancelBubble = true;
       } catch(error) { }
 
-        var pluginInstallInterval = setInterval(function(){
-            if(! isIE) {
-              navigator.plugins.refresh(false);
-            }
-            AdapterJS.WebRTCPlugin.isPluginInstalled(
-              AdapterJS.WebRTCPlugin.pluginInfo.prefix,
-              AdapterJS.WebRTCPlugin.pluginInfo.plugName,
-              AdapterJS.WebRTCPlugin.defineWebRTCInterface,
-              function() { //Does nothing because not used here
-              });
-          } , 500);
+      var pluginInstallInterval = setInterval(function(){
+        if(! isIE) {
+          navigator.plugins.refresh(false);
+        }
+        AdapterJS.WebRTCPlugin.isPluginInstalled(
+          AdapterJS.WebRTCPlugin.pluginInfo.prefix,
+          AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+          AdapterJS.WebRTCPlugin.defineWebRTCInterface,
+          function() { 
+            //Does nothing because not used here
+          });
+      } , 500);
     });   
-
-  }else {
+  } else {
     c.document.close();
   }
   AdapterJS.addEvent(c.document, 'click', function() {
@@ -1112,5 +1112,3 @@ if (navigator.mozGetUserMedia) {
     AdapterJS.WebRTCPlugin.defineWebRTCInterface,
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 }
-
-
