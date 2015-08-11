@@ -50,13 +50,18 @@ describe('VideoElement | EventHandler', function() {
     });
 
     video = document.createElement('video');
-    video.autoplay = 'autoplay'
+    video.autoplay = 'autoplay';
     document.body.appendChild(video);
 
   });
 
+  afterEach(function() {
+    document.body.removeChild(video);
+  });
+
   it('VideoElement.onplaying :: emit', function (done) {
     this.timeout(testItemTimeout);
+    video.id = 'id';
 
     video.onplaying = function(event) {
       done();
@@ -67,14 +72,26 @@ describe('VideoElement | EventHandler', function() {
 
   it('VideoElement.onplaying :: attributes', function (done) {
     this.timeout(testItemTimeout);
+    video.id = 'video';
+
+    var now = new Date().getTime();
 
     video.onplaying = function(event) {
-      expect(event.target).not.to.be.null;
-      expect(event.timeStamp).not.to.be.null;
+      expect(event.target).not.to.be.undefined;
+      expect(event.currentTarget).not.to.be.undefined;
+      expect(event.srcElement).not.to.be.undefined;
+      expect(event.timeStamp).not.to.be.undefined;
+
+      expect(event.timeStamp).to.be.above(0);
+      expect(event.timeStamp).to.be.within(now - 60000, now + 60000);
+      expect(event.target.id).to.equal('video');
+      expect(event.srcElement.id).to.equal('video');
+      expect(event.currentTarget.id).to.equal('video');
+
       done();
     }
 
-    video = attachMediaStream(video, stream);    
+    video = attachMediaStream(video, stream);
   });
 
   it('VideoElement.onplay :: emit', function (done) {
@@ -82,6 +99,12 @@ describe('VideoElement | EventHandler', function() {
 
     var onPlayCaught = 0;
     
+    video.onplay = function() {
+      if(++onPlayCaught == 2)
+      {
+        done();
+      }
+    }
 
     video = attachMediaStream(video, stream);
 
