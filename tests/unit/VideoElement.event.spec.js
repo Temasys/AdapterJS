@@ -14,6 +14,8 @@ var gUMTimeout = 25000;
 // Test item timeout
 var testItemTimeout = 4000;
 
+var timeStampMaxError = 60000;
+
 
 describe('VideoElement | EventHandler', function() {
   this.timeout(testTimeout);
@@ -33,8 +35,7 @@ describe('VideoElement | EventHandler', function() {
 
   /* Get User Media */
   beforeEach(function (done) {
-    this.slow(1000);
-    this.timeout(gUMTimeout + 1000);
+    this.timeout(gUMTimeout);
 
     window.navigator.getUserMedia({
       audio: true,
@@ -57,6 +58,7 @@ describe('VideoElement | EventHandler', function() {
 
   afterEach(function() {
     document.body.removeChild(video);
+    stream = null;
   });
 
   it('VideoElement.onplaying :: emit', function (done) {
@@ -83,13 +85,13 @@ describe('VideoElement | EventHandler', function() {
       expect(event.timeStamp).not.to.be.undefined;
 
       expect(event.timeStamp).to.be.above(0);
-      expect(event.timeStamp).to.be.within(now - 60000, now + 60000);
+      expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
       expect(event.target.id).to.equal('video');
       expect(event.srcElement.id).to.equal('video');
       expect(event.currentTarget.id).to.equal('video');
 
       done();
-    }
+    };
 
     video = attachMediaStream(video, stream);
   });
@@ -98,25 +100,43 @@ describe('VideoElement | EventHandler', function() {
     this.timeout(testItemTimeout);
 
     var onPlayCaught = 0;
-    
+    var expectedOnplayCaught = 2;
+
     video.onplay = function() {
-      if(++onPlayCaught == 2)
-      {
+      if(++onPlayCaught == expectedOnplayCaught) {
         done();
       }
     }
 
     video = attachMediaStream(video, stream);
 
-    video.addEventListener("play", function() {
-      if(++onPlayCaught == 2)
-      {
-        done();
-      }
-    }, false);
-
     video.pause();
     video.play();
+  });
+
+  it('VideoElement.onplay :: attributes', function(done) {
+    this.timeout(testItemTimeout);
+    video.id = 'video';
+
+    var now = new Date().getTime();
+
+    video.onplay = function(event) {
+      expect(event.target).not.to.be.undefined;
+      expect(event.currentTarget).not.to.be.undefined;
+      expect(event.srcElement).not.to.be.undefined;
+      expect(event.timeStamp).not.to.be.undefined;
+
+      expect(event.timeStamp).to.be.above(0);
+      expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
+      expect(event.target.id).to.equal('video');
+      expect(event.srcElement.id).to.equal('video');
+      expect(event.currentTarget.id).to.equal('video');
+
+      done();
+    };
+
+    video = attachMediaStream(video, stream);
+
   });
 
 });
