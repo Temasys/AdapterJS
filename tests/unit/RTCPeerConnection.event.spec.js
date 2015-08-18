@@ -56,7 +56,7 @@ describe('RTCPeerConnection | EventHandler', function() {
   });
 
 
-  it('RTCPeerConnection.onnegotiationneeded :: emit < When > RTCPeerConnection.addStream(stream)', function () {
+  it('RTCPeerConnection.onnegotiationneeded :: emit < When > RTCPeerConnection.addStream(stream)', function (done) {
     this.timeout(testItemTimeout);
 
     peer1.onnegotiationneeded = function () {
@@ -66,7 +66,7 @@ describe('RTCPeerConnection | EventHandler', function() {
     peer1.addStream(stream);
   });
 
-  it('RTCPeerConnection.onnegotiationneeded :: emit < When > RTCPeerConnection.removeStream(stream)', function () {
+  it('RTCPeerConnection.onnegotiationneeded :: emit < When > RTCPeerConnection.removeStream(stream)', function (done) {
     this.timeout(testItemTimeout);
 
     peer1.onnegotiationneeded = function () {

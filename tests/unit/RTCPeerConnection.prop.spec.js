@@ -346,9 +346,10 @@ describe('RTCPeerConnection | Properties', function() {
       throw new Error('Offer Session Description is not yet created');
     }
 
-    peer2.setRemoteDescription(offer, function (done) {
+    peer2.setRemoteDescription(offer, function () {
 
-      expect(peer2.remoteDescription).to.equal(offer);
+      expect(peer2.remoteDescription.sdp).to.equal(offer.sdp);
+      expect(peer2.remoteDescription.type).to.equal(offer.type);
       done();
 
     }, function (error) {
@@ -430,7 +431,8 @@ describe('RTCPeerConnection | Properties', function() {
     peer1.createOffer(function(offer) {
       peer1.setLocalDescription(offer, function () {
 
-        expect(peer1.localDescription).to.deep.equal(offer);
+        expect(peer1.localDescription.sdp).to.deep.equal(offer.sdp);
+        expect(peer1.localDescription.type).to.deep.equal(offer.type);
         done();
 
       }, function (error) {
@@ -468,21 +470,18 @@ describe('RTCPeerConnection | Properties', function() {
 
     assert.equal(typeof peer2.setLocalDescription, 'function');
 
-    peer1.createOffer(function(offer) {
-      peer2.setRemoteDescription(offer);
-      peer2.createAnswer(function(answer) {
-        peer2.setLocalDescription(answer, function () {
-
-          expect(peer2.localDescription).to.deep.equal(answer);
-          done();
-
-        }, function (error) {
-          throw error;
-        });
-        
-      });
-    });
-
+    //TODO(anyone): this is unreadable...
+    peer1.createOffer(
+      function(offer) {
+        peer2.setRemoteDescription(offer);
+        peer2.createAnswer(function(answer) {
+          peer2.setLocalDescription(answer, function () {
+            expect(peer2.localDescription.sdp).to.deep.equal(answer.sdp);
+            expect(peer2.localDescription.type).to.deep.equal(answer.type);
+            done();
+          }, function (error) { throw error; }); // end of set local
+        }, function (error) { throw error; }); // end of create answer
+      }, function(error) { throw error; }); // enf of create offer
   });
 
   it('RTCPeerConnection.setRemoteDescription(answer) :: method', function (done) {
@@ -490,21 +489,19 @@ describe('RTCPeerConnection | Properties', function() {
 
     assert.equal(typeof peer1.setRemoteDescription, 'function');
 
-    peer1.createOffer(function(offer) {
-      peer1.setLocalDescription(offer);
-      peer2.setRemoteDescription(offer);
-      peer2.createAnswer(function(answer) {
-        peer1.setRemoteDescription(answer, function () {
-
-          expect(peer1.remoteDescription).to.deep.equal(answer);
-          done();
-
-        }, function (error) {
-          throw error;
-        });
-        
-      });
-    });
+    //TODO(anyone): this is unreadable...
+    peer1.createOffer(
+      function(offer) {
+        peer1.setLocalDescription(offer);
+        peer2.setRemoteDescription(offer);
+        peer2.createAnswer(function(answer) {
+          peer1.setRemoteDescription(answer, function () {
+            expect(peer1.remoteDescription.sdp).to.deep.equal(answer.sdp);
+            expect(peer1.remoteDescription.type).to.deep.equal(answer.type);
+            done();
+          }, function (error) { throw error; });
+        }, function (error) { throw error; });
+      }, function(error) { throw error; });
   });
 
   it('RTCPeerConnection.addIceCandidate :: method', function (done) {
@@ -607,43 +604,11 @@ describe('RTCPeerConnection | Properties', function() {
     peer2.close();
 
     setTimeout(function () {
-      expect(peer1.iceConnectionState).to.equal('close');
-      expect(peer2.iceConnectionState).to.equal('close');
-      expect(peer1.signalingState).to.equal('close');
-      expect(peer2.signalingState).to.equal('close');
-
-      expect(function () {
-        peer1.removeStream(stream);
-      }).to.throw(Error);
-
-      expect(function () {
-        peer2.removeStream(stream);
-      }).to.throw(Error);
-
-      expect(function () {
-        peer1.addStream(stream);
-      }).to.throw(Error);
-
-      expect(function () {
-        peer2.addStream(stream);
-      }).to.throw(Error);
-
-      expect(function () {
-        peer1.createOffer(function () {}, function () {});
-      }).to.throw(Error);
-
-      expect(function () {
-        peer2.createOffer(function () {}, function () {});
-      }).to.throw(Error);
-
-      expect(function () {
-        peer1.createAnswer(function () {}, function () {});
-      }).to.throw(Error);
-
-      expect(function () {
-        peer2.createAnswer(function () {}, function () {});
-      }).to.throw(Error);
-
+      expect(peer1.iceConnectionState).to.equal('closed');
+      expect(peer2.iceConnectionState).to.equal('closed');
+      expect(peer1.signalingState).to.equal('closed');
+      expect(peer2.signalingState).to.equal('closed');
+      
       done();
     }, 2000);
   });
