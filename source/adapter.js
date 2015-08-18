@@ -74,7 +74,7 @@ AdapterJS.WebRTCPlugin.TAGS = {
   NONE  : 'none',
   AUDIO : 'audio',
   VIDEO : 'video'
-}
+};
 
 // Unique identifier of each opened page
 AdapterJS.WebRTCPlugin.pageId = Math.random().toString(36).slice(2);
