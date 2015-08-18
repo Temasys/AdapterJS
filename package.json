@@ -48,6 +48,7 @@
     "karma-safari-launcher": "^0.1.1",
     "karma-script-launcher": "0.1.0",
     "karma-xml-reporter": "^0.1.4",
+    "karma-cdash-reporter": "^0.1.4",
     "mocha": "2.1.0",
     "mocha-funnynyan-reporter": "0.0.1",
     "requirejs": "^2.1.19"
