@@ -352,9 +352,12 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         AdapterJS.WebRTCPlugin.isPluginInstalled(
           AdapterJS.WebRTCPlugin.pluginInfo.prefix,
           AdapterJS.WebRTCPlugin.pluginInfo.plugName,
-          AdapterJS.WebRTCPlugin.defineWebRTCInterface,
+          function() { // plugin now installed
+            clearInterval(pluginInstallInterval);
+            AdapterJS.WebRTCPlugin.defineWebRTCInterface();
+          },
           function() { 
-            //Does nothing because not used here
+            // still no plugin detected, nothing to do
           });
       } , 500);
     });   
@@ -877,6 +880,12 @@ if (navigator.mozGetUserMedia) {
   };
 
   AdapterJS.WebRTCPlugin.defineWebRTCInterface = function () {
+    if (AdapterJS.WebRTCPlugin.pluginState ===
+        AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
+      console.error("AdapterJS - WebRTC interface has already been defined");
+      return;
+    }
+
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INITIALIZING;
 
     AdapterJS.isDefined = function (variable) {
