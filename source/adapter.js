@@ -731,6 +731,28 @@ if (navigator.mozGetUserMedia) {
   };
 
   AdapterJS.maybeThroughWebRTCReady();
+} else if (navigator.mediaDevices && navigator.userAgent.match(
+    /Edge\/(\d+).(\d+)$/)) {
+  webrtcDetectedBrowser = 'edge';
+
+  webrtcDetectedVersion =
+    parseInt(navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)[2], 10);
+
+  // the minimum version still supported by adapter.
+  webrtcMinimumVersion = 12;
+
+  getUserMedia = navigator.getUserMedia;
+
+  attachMediaStream = function(element, stream) {
+    element.srcObject = stream;
+    return element;
+  };
+  reattachMediaStream = function(to, from) {
+    to.srcObject = from.srcObject;
+    return to;
+  };
+
+  AdapterJS.maybeThroughWebRTCReady();
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
