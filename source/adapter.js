@@ -982,9 +982,10 @@ if (navigator.mozGetUserMedia) {
       }
 
       var elementId = element.id.length === 0 ? Math.random().toString(36).slice(2) : element.id;
-      if (!element.isWebRTCPlugin || !element.isWebRTCPlugin()) {
+      var nodeName = element.nodeName.toLowerCase();
+      if (nodeName !== 'object') { // not a plugin <object> tag yet
         var tag;
-        switch(element.nodeName.toLowerCase()) {
+        switch(nodeName) {
           case 'audio':
             tag = AdapterJS.WebRTCPlugin.TAGS.AUDIO;
             break;
@@ -1035,7 +1036,7 @@ if (navigator.mozGetUserMedia) {
         frag.width = width;
         frag.height = height;
         element.parentNode.removeChild(element);
-      } else {
+      } else { // already an <object> tag, just change the stream id
         var children = element.children;
         for (var i = 0; i !== children.length; ++i) {
           if (children[i].name === 'streamId') {
