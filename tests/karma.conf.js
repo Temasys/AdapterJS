@@ -39,7 +39,8 @@ module.exports = function(config) {
     reporters: ['mocha', 'cdash'],
 
     cdashReporter: {
-      outputFile: 'results/cdash-result.xml'
+      outputFile: 'results/cdash-result.xml',
+      siteConfig: './cdash-site-config.json'
     },
 
     // web server port
