@@ -251,14 +251,6 @@ module.exports = function(grunt) {
         'uglify'
     ]);
 
-    grunt.registerTask('copy', [
-        'versionise',
-        'clean:production',
-        'concat',
-        'replace',
-        'uglify'
-    ]);
-
     grunt.registerTask('publish', [
         'versionise',
         'clean:production',
