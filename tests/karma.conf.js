@@ -39,7 +39,8 @@ module.exports = function(config) {
     reporters: ['mocha', 'cdash'],
 
     cdashReporter: {
-      outputFile: 'results/cdash-result.xml',
+      outputFolder: 'results',
+      // outputFileName: 'cdash-result.xml',
       siteConfig: './gen/cdash-site-config.json'
     },
 
