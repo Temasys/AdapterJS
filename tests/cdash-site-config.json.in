@@ -1,7 +1,7 @@
 {
   "site": {
     "BuildName": "@CTEST_BUILD_NAME@",
-    "BuildStamp": "@KARMA_CTEST_TAG@-@config@",
+    "BuildStamp": "@KARMA_CTEST_TAG@-@configName@",
     "Name": "@CTEST_SITE@",
     "Generator": "ctest-@CMAKE_VERSION@",
     "CompilerName": "",
