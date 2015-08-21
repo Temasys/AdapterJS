@@ -22,5 +22,5 @@
     "maxdepth": false,
     "maxstatements": false,
     "maxcomplexity": false,
-    "maxlen": 100
+    "maxlen": 250
 }

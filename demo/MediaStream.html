@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="../publish/adapter.debug.js"></script>
+</head>
+
+<body>
+	<video id="test" autoplay="autoplay"></video>
+
+	<script>
+		var data = null;
+		var video = document.getElementById('test');
+
+		getUserMedia({ audio: true, video: true }, function (stream) {
+			data = stream;
+
+			window.audioTrack = data.polygetVideoTracks()[0];
+
+			audioTrack.onended = function () {
+				console.log('Audio Track has ended:', data.polygetVideoTracks()[0].ended);
+			};
+
+			window.videoTrack = data.polygetAudioTracks()[0];
+
+			videoTrack.onended = function () {
+				console.log('Video Track has ended:', data.polygetAudioTracks()[0].ended);
+			};
+
+			data.onended = function () {
+				console.log('Stream has ended', data.ended);
+			}
+
+			//attachMediaStream(video, data);
+
+			//data.polystop();*/
+		}, function (error) {
+			throw error;
+		});
+
+
+	</script>
+</body>
+</html>
