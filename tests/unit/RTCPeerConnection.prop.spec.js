@@ -465,6 +465,30 @@ describe('RTCPeerConnection | Properties', function() {
     done();
   });
 
+  it('RTCPeerConnection.setLocalDescription(offer) :: method < When > RTCPeerConnection.setLocalDescription(RTCPeerConnection.localDescription)', function (done) {
+    this.timeout(testItemTimeout);
+
+    assert.equal(typeof peer1.setLocalDescription, 'function');
+
+    var localSDP;
+    var localType;
+
+    peer1.createOffer(function(offer) {
+      peer1.setLocalDescription(offer, function () {
+        // Store expected values
+        localSDP  = offer.sdp;
+        localType = offer.type;
+
+        peer1.setLocalDescription(peer1.localDescription, function() {
+          // After self setting description, the description should not have changed
+          expect(peer1.localDescription.sdp).to.deep.equal(localSDP);
+          expect(peer1.localDescription.type).to.deep.equal(localType);
+          done();
+        }, function (error) { throw error; });
+      }, function (error) { throw error; });
+    }, function (error) { throw error; });
+  });
+
   it('RTCPeerConnection.setLocalDescription(answer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
@@ -482,6 +506,30 @@ describe('RTCPeerConnection | Properties', function() {
           }, function (error) { throw error; }); // end of set local
         }, function (error) { throw error; }); // end of create answer
       }, function(error) { throw error; }); // enf of create offer
+  });
+
+  it('RTCPeerConnection.setRemoteDescription(answer) :: method < When > RTCPeerConnection.setRemoteDescription(RTCPeerConnection.remoteDescription)', function (done) {
+    this.timeout(testItemTimeout);
+
+    assert.equal(typeof peer2.setLocalDescription, 'function');
+
+    var offer, answer;
+    var sdp;
+    var type;
+
+    peer1.createOffer(function(offer) {
+      // Store expected values
+      sdp  = offer.sdp;
+      type = offer.type;
+
+      peer2.setRemoteDescription(offer, function() {
+        peer2.setRemoteDescription(peer2.remoteDescription, function() {
+          expect(peer2.remoteDescription.sdp).to.deep.equal(offer.sdp);
+          expect(peer2.remoteDescription.type).to.deep.equal(offer.type);
+          done();
+        }, function (error) { throw error; });
+      }, function (error) { throw error; });
+    }, function (error) { throw error; });
   });
 
   it('RTCPeerConnection.setRemoteDescription(answer) :: method', function (done) {
