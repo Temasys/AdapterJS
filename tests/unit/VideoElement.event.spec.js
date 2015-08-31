@@ -106,12 +106,11 @@ describe('VideoElement | EventHandler', function() {
       if(++onPlayCaught == expectedOnplayCaught) {
         done();
       }
+      video.pause();
+      video.play();
     }
 
     video = attachMediaStream(video, stream);
-
-    video.pause();
-    video.play();
   });
 
   it('VideoElement.onplay :: attributes', function(done) {
