@@ -1073,6 +1073,7 @@ if (navigator.mozGetUserMedia) {
       newElement.onclick   = (element.onclick)   ? element.onclick   : function (arg) {};
       if (isIE) { // on IE the event needs to be plugged manually
         newElement.attachEvent('onplaying', newElement.onplaying);
+        newElement.attachEvent('onplay', newElement.onplay);
         newElement._TemOnClick = function (id) {
           var arg = {
             srcElement : document.getElementById(id)
