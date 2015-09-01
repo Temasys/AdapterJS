@@ -14,6 +14,11 @@ var gUMTimeout = 15000;
 // Test item timeout
 var testItemTimeout = 4000;
 
+// typeof webrtcObjectFunction
+// Init in before
+// Equals 'object' if IE + plugin
+// Equals 'function' otherwise
+var FUNCTION_TYPE = null;
 
 describe('MediaStreamTrack | Properties', function() {
 	this.timeout(testTimeout);
@@ -28,6 +33,8 @@ describe('MediaStreamTrack | Properties', function() {
 		this.timeout(testItemTimeout + gUMTimeout);
 
 		AdapterJS.webRTCReady(function() {
+			FUNCTION_TYPE = webrtcDetectedBrowser === 'IE' ? 'object' : 'function';
+
 			window.navigator.getUserMedia({
 				audio: true,
 				video: true
@@ -48,7 +55,7 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.getSources :: static method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(MediaStreamTrack.getSources, 'function');
+		assert.typeOf(MediaStreamTrack.getSources, FUNCTION_TYPE);
 
 		MediaStreamTrack.getSources(function (sources) {
 			expect(sources.length).to.be.at.least(1);
@@ -175,7 +182,7 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.getConstraints :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(videoTrack.getConstraints, 'function');
+		assert.typeOf(videoTrack.getConstraints, FUNCTION_TYPE);
 
 		var data = videoTrack.getConstraints();
 		assert.typeOf(data, 'object');
@@ -184,7 +191,7 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.applyConstraints :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(videoTrack.applyConstraints, 'function');
+		assert.typeOf(videoTrack.applyConstraints, FUNCTION_TYPE);
 
 		var newConstraints = {
 			mandantory: {
@@ -199,7 +206,7 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.getSettings :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(track.getSettings, 'function');
+		assert.typeOf(track.getSettings, FUNCTION_TYPE);
 
 		var check = videoTrack.getSettings();
 		assert.typeOf(check.facing, 'string');
@@ -209,8 +216,8 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.states :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(videoTrack.states, 'function');
-		assert.typeOf(audioTrack.states, 'function');
+		assert.typeOf(videoTrack.states, FUNCTION_TYPE);
+		assert.typeOf(audioTrack.states, FUNCTION_TYPE);
 
 		assert.typeOf(videoTrack.states(), 'object');
 		assert.typeOf(audioTrack.states(), 'object');
@@ -219,8 +226,8 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.clone :: method', function () {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(audioTrack.clone, 'function');
-		assert.typeOf(videoTrack.clone, 'function');
+		assert.typeOf(audioTrack.clone, FUNCTION_TYPE);
+		assert.typeOf(videoTrack.clone, FUNCTION_TYPE);
 
 		var clone = audioTrack.clone();
 		assert.typeOf(clone, 'object');
@@ -233,8 +240,8 @@ describe('MediaStreamTrack | Properties', function() {
 	it('MediaStreamTrack.stop -> MediaStreamTrack.stop :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(audioTrack.stop, 'function');
-		assert.typeOf(videoTrack.stop, 'function');
+		assert.typeOf(audioTrack.stop, FUNCTION_TYPE);
+		assert.typeOf(videoTrack.stop, FUNCTION_TYPE);
 
 		audioTrack.stop();
 		videoTrack.stop();

@@ -16,10 +16,14 @@ var testItemTimeout = 5000;
 
 var err = new ReferenceError('This is a bad function.');
 
+// typeof webrtcObjectFunction
+// Init in before
+// Equals 'object' if IE + plugin
+// Equals 'function' otherwise
+var FUNCTION_TYPE = null;
+
 describe('RTCPeerConnection | Properties', function() {
   this.timeout(testTimeout);
-
-  var FUNCTION_TYPE = null; // init in before
 
   var peer1 = null;
   var peer2 = null;

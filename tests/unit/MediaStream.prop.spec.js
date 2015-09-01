@@ -14,11 +14,14 @@ var gUMTimeout = 15000;
 // Test item timeout
 var testItemTimeout = 4000;
 
+// typeof webrtcObjectFunction
+// Init in before
+// Equals 'object' if IE + plugin
+// Equals 'function' otherwise
+var FUNCTION_TYPE = null;
 
 describe('MediaStream | Properties', function() {
 	this.timeout(testTimeout);
-
-  var FUNCTION_TYPE = null; // init in before
 
 	/* Attributes */
 	var stream = null;
