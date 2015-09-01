@@ -141,6 +141,10 @@
 
     getUserMedia = navigator.getUserMedia;
 
+  } else if (window.webrtcDetectedBrowser === 'edge') {
+    // nothing here because edge does not support screensharing
+    console.warn('Edge does not support screensharing feature in getUserMedia');
+
   } else {
     baseGetUserMedia = window.navigator.getUserMedia;
 
@@ -201,5 +205,7 @@
 
       iframe.contentWindow.postMessage(object, '*');
     };
+  } else if (window.webrtcDetectedBrowser === 'opera') {
+    console.warn('Opera does not support screensharing feature in getUserMedia');
   }
 })();
