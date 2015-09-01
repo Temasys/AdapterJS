@@ -56,6 +56,12 @@ describe('MediaStream | Properties', function() {
 		});
 	});
 
+  afterEach(function() {
+		stream.stop();
+		stream = null;
+		track = null;
+  });
+
 	it('MediaStream.id :: string', function (done) {
 		this.timeout(testItemTimeout);
 
