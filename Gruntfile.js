@@ -176,7 +176,7 @@ module.exports = function(grunt) {
             'FirefoxCustom',
             // 'Opera',
             // 'PhantomJS',
-            // 'IE'
+            'IE'
           ]
         }
       }
