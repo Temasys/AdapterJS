@@ -84,9 +84,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.removeTrack -> MediaStream.removeTrack :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		if (webrtcDetectedBrowser !== 'IE') {
-			assert.equal(typeof stream.removeTrack, 'function');
-		}
+		assert.equal(typeof stream.removeTrack, 'function');
 
 		stream.removeTrack(track);
 
@@ -100,9 +98,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.addTrack -> MediaStream.addTrack :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		if (webrtcDetectedBrowser !== 'IE') {
-			assert.equal(typeof stream.addTrack, 'function');
-		}
+		assert.equal(typeof stream.addTrack, 'function');
 
 		stream.addTrack(track);
 
@@ -118,9 +114,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.getTrackById -> MediaStream.getTrackById :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		if (webrtcDetectedBrowser !== 'IE') {
-			assert.equal(typeof stream.getTrackById, 'function');
-		}
+		assert.equal(typeof stream.getTrackById, 'function');
 
 		var check = stream.getTrackById(track.id);
 
@@ -132,9 +126,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.getTracks -> MediaStream.getTracks :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		if (webrtcDetectedBrowser !== 'IE') {
-			assert.equal(typeof stream.getTracks, 'function');
-		}
+		assert.equal(typeof stream.getTracks, 'function');
 
 		var tracks = stream.getTracks(track.id);
 
@@ -150,9 +142,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.stop -> MediaStream.stop :: method', function (done) {
 		this.timeout(testItemTimeout + 2500);
 
-		if (webrtcDetectedBrowser !== 'IE') {
-			assert.equal(typeof stream.stop, 'function');
-		}
+		assert.equal(typeof stream.stop, 'function');
 
 		stream.stop();
 
