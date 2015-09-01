@@ -19,6 +19,8 @@ var err = new ReferenceError('This is a bad function.');
 describe('RTCPeerConnection | Properties', function() {
   this.timeout(testTimeout);
 
+  var FUNCTION_TYPE = null; // init in before
+
   var peer1 = null;
   var peer2 = null;
   var stream = null;
@@ -35,6 +37,8 @@ describe('RTCPeerConnection | Properties', function() {
     this.timeout(testItemTimeout);
 
     AdapterJS.webRTCReady(function() {
+      FUNCTION_TYPE = webrtcDetectedBrowser === 'IE' ? 'object' : 'function';
+
       window.navigator.getUserMedia({
         audio: true,
         video: true
@@ -130,8 +134,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.getLocalStreams :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.getLocalStreams, 'function');
-    assert.equal(typeof peer2.getLocalStreams, 'function');
+    assert.equal(typeof peer1.getLocalStreams, FUNCTION_TYPE);
+    assert.equal(typeof peer2.getLocalStreams, FUNCTION_TYPE);
 
     var result1 = peer1.getLocalStreams();
     var result2 = peer2.getLocalStreams();
@@ -144,8 +148,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.getRemoteStreams :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.getRemoteStreams, 'function');
-    assert.equal(typeof peer2.getRemoteStreams, 'function');
+    assert.equal(typeof peer1.getRemoteStreams, FUNCTION_TYPE);
+    assert.equal(typeof peer2.getRemoteStreams, FUNCTION_TYPE);
 
     var result1 = peer1.getRemoteStreams();
     var result2 = peer2.getRemoteStreams();
@@ -158,8 +162,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.addStream :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.addStream, 'function');
-    assert.equal(typeof peer2.addStream, 'function');
+    assert.equal(typeof peer1.addStream, FUNCTION_TYPE);
+    assert.equal(typeof peer2.addStream, FUNCTION_TYPE);
 
     peer1.addStream(stream);
     peer2.addStream(stream);
@@ -199,8 +203,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.removeStream :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.removeStream, 'function');
-    assert.equal(typeof peer2.removeStream, 'function');
+    assert.equal(typeof peer1.removeStream, FUNCTION_TYPE);
+    assert.equal(typeof peer2.removeStream, FUNCTION_TYPE);
 
     peer1.removeStream(stream);
     peer2.removeStream(stream);
@@ -214,8 +218,8 @@ describe('RTCPeerConnection | Properties', function() {
     // Note(J-O) fails on Chrome
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.getConfiguration, 'function');
-    assert.equal(typeof peer2.getConfiguration, 'function');
+    assert.equal(typeof peer1.getConfiguration, FUNCTION_TYPE);
+    assert.equal(typeof peer2.getConfiguration, FUNCTION_TYPE);
 
     var result1 = peer1.getConfiguration();
     var result2 = peer1.getConfiguration();
@@ -230,8 +234,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.getStreamById :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.getStreamById, 'function');
-    assert.equal(typeof peer2.getStreamById, 'function');
+    assert.equal(typeof peer1.getStreamById, FUNCTION_TYPE);
+    assert.equal(typeof peer2.getStreamById, FUNCTION_TYPE);
 
     var result1 = peer1.getStreamById(stream.id);
     var result2 = peer2.getStreamById(stream.id);
@@ -254,8 +258,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.createDataChannel :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.createDataChannel, 'function');
-    assert.equal(typeof peer2.createDataChannel, 'function');
+    assert.equal(typeof peer1.createDataChannel, FUNCTION_TYPE);
+    assert.equal(typeof peer2.createDataChannel, FUNCTION_TYPE);
 
     var result1 = peer1.createDataChannel('Label');
     var result2 = peer2.createDataChannel('Label2');
@@ -275,8 +279,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.createDTMFSender :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.createDTMFSender, 'function');
-    assert.equal(typeof peer2.createDTMFSender, 'function');
+    assert.equal(typeof peer1.createDTMFSender, FUNCTION_TYPE);
+    assert.equal(typeof peer2.createDTMFSender, FUNCTION_TYPE);
 
     var track = stream.getAudioTracks()[0];
 
@@ -295,8 +299,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.createOffer :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.createOffer, 'function');
-    assert.equal(typeof peer2.createOffer, 'function');
+    assert.equal(typeof peer1.createOffer, FUNCTION_TYPE);
+    assert.equal(typeof peer2.createOffer, FUNCTION_TYPE);
 
     peer1.addStream(stream);
     peer2.addStream(stream);
@@ -340,7 +344,7 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.setRemoteDescription(offer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer2.setRemoteDescription, 'function');
+    assert.equal(typeof peer2.setRemoteDescription, FUNCTION_TYPE);
 
     if (offer === null) {
       throw new Error('Offer Session Description is not yet created');
@@ -382,8 +386,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.createAnswer :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.createAnswer, 'function');
-    assert.equal(typeof peer2.createAnswer, 'function');
+    assert.equal(typeof peer1.createAnswer, FUNCTION_TYPE);
+    assert.equal(typeof peer2.createAnswer, FUNCTION_TYPE);
 
     peer1.addStream(stream);
 
@@ -426,7 +430,7 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.setLocalDescription(offer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.setLocalDescription, 'function');
+    assert.equal(typeof peer1.setLocalDescription, FUNCTION_TYPE);
 
     peer1.createOffer(function(offer) {
       peer1.setLocalDescription(offer, function () {
@@ -468,7 +472,7 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.setLocalDescription(offer) :: method < When > RTCPeerConnection.setLocalDescription(RTCPeerConnection.localDescription)', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.setLocalDescription, 'function');
+    assert.equal(typeof peer1.setLocalDescription, FUNCTION_TYPE);
 
     var localSDP;
     var localType;
@@ -492,7 +496,7 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.setLocalDescription(answer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer2.setLocalDescription, 'function');
+    assert.equal(typeof peer2.setLocalDescription, FUNCTION_TYPE);
 
     //TODO(anyone): this is unreadable...
     peer1.createOffer(
@@ -511,7 +515,7 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.setRemoteDescription(answer) :: method < When > RTCPeerConnection.setRemoteDescription(RTCPeerConnection.remoteDescription)', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer2.setLocalDescription, 'function');
+    assert.equal(typeof peer2.setLocalDescription, FUNCTION_TYPE);
 
     var offer, answer;
     var sdp;
@@ -535,7 +539,7 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.setRemoteDescription(answer) :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.setRemoteDescription, 'function');
+    assert.equal(typeof peer1.setRemoteDescription, FUNCTION_TYPE);
 
     //TODO(anyone): this is unreadable...
     peer1.createOffer(
@@ -555,8 +559,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.addIceCandidate :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.addIceCandidate, 'function');
-    assert.equal(typeof peer2.addIceCandidate, 'function');
+    assert.equal(typeof peer1.addIceCandidate, FUNCTION_TYPE);
+    assert.equal(typeof peer2.addIceCandidate, FUNCTION_TYPE);
 
     var peer1IceCount = 0;
     var peer2IceCount = 0;
@@ -645,8 +649,8 @@ describe('RTCPeerConnection | Properties', function() {
   it('RTCPeerConnection.close :: method', function (done) {
     this.timeout(testItemTimeout);
 
-    assert.equal(typeof peer1.close, 'function');
-    assert.equal(typeof peer2.close, 'function');
+    assert.equal(typeof peer1.close, FUNCTION_TYPE);
+    assert.equal(typeof peer2.close, FUNCTION_TYPE);
 
     peer1.close();
     peer2.close();
