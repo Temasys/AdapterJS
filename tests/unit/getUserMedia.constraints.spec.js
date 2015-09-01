@@ -159,7 +159,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
-	    if (webrtcDetectedBrowser !== 'IE') {
+			if (webrtcDetectedBrowser !== 'IE') {
 				video.autoplay = 'autoplay';
 			}
 
@@ -223,7 +223,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
-	    if (webrtcDetectedBrowser !== 'IE') {
+			if (webrtcDetectedBrowser !== 'IE') {
 				video.autoplay = 'autoplay';
 			}
 
@@ -248,7 +248,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
-	    if (webrtcDetectedBrowser !== 'IE') {
+			if (webrtcDetectedBrowser !== 'IE') {
 				video.autoplay = 'autoplay';
 			}
 
@@ -290,7 +290,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
-	    if (webrtcDetectedBrowser !== 'IE') {
+			if (webrtcDetectedBrowser !== 'IE') {
 				video.autoplay = 'autoplay';
 			}
 
@@ -316,7 +316,7 @@ describe('getUserMedia | MediaStreamConstraints', function() {
 			this.timeout(testItemTimeout + gUMTimeout);
 
 			var video = document.createElement('video');
-	    if (webrtcDetectedBrowser !== 'IE') {
+			if (webrtcDetectedBrowser !== 'IE') {
 				video.autoplay = 'autoplay';
 			}
 			
