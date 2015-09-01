@@ -29,7 +29,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints);
@@ -40,7 +40,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints);
@@ -51,7 +51,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints);
@@ -62,7 +62,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints);
@@ -73,7 +73,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints);
@@ -84,7 +84,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints);
@@ -95,49 +95,49 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
 
   (function (constraints) {
 
-    it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
+    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
 
   })({ bundlePolicy: 'balanced' });
 
 
   (function (constraints) {
 
-    it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
+    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
 
   })({ bundlePolicy: 'max-compat' });
 
 
   (function (constraints) {
 
-    it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
+    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
 
   })({ bundlePolicy: 'max-bundle' });
 
 
   (function (constraints) {
 
-    it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
+    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
 
   })({ iceTransportPolicy: 'none' });
 
 
   (function (constraints) {
 
-    it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
+    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
 
   })({ iceTransportPolicy: 'relay' });
 
 
   (function (constraints) {
 
-    it.skip('new RTCPeerConnection(' + printJSON(constraints) + ')', function () {});
+    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
 
   })({ iceTransportPolicy: 'all' });
 
 
   (function (constraints, optional) {
 
-    it('new RTCPeerConnection(' + printJSON(constraints) + ', ' + printJSON(optional) + ')', function () {
+    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ', ' + JSON.stringify(optional) + ')', function () {
       this.timeout(testItemTimeout);
 
       var peer = new RTCPeerConnection(constraints, optional);
