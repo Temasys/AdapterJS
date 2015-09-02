@@ -141,7 +141,7 @@
 
     getUserMedia = navigator.getUserMedia;
 
-  } else if (window.webrtcDetectedBrowser === 'edge') {
+  } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 

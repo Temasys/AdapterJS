@@ -741,9 +741,7 @@ if (navigator.mozGetUserMedia) {
   // the minimum version still supported by adapter.
   webrtcMinimumVersion = 12;
 
-  window.getUserMedia = function (constraints, successCb, failureCb) {
-    navigator.getUserMedia(constraints, successCb, failureCb);
-  };
+  window.getUserMedia = navigator.getUserMedia.bind(navigator);
 
   attachMediaStream = function(element, stream) {
     element.srcObject = stream;

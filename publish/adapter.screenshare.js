@@ -1,4 +1,4 @@
-/*! adapterjs - v0.12.0 - 2015-09-01 */
+/*! adapterjs - v0.12.0 - 2015-09-02 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -743,9 +743,7 @@ if (navigator.mozGetUserMedia) {
   // the minimum version still supported by adapter.
   webrtcMinimumVersion = 12;
 
-  window.getUserMedia = function (constraints, successCb, failureCb) {
-    navigator.getUserMedia(constraints, successCb, failureCb);
-  };
+  window.getUserMedia = navigator.getUserMedia.bind(navigator);
 
   attachMediaStream = function(element, stream) {
     element.srcObject = stream;
@@ -1309,7 +1307,7 @@ if (navigator.mozGetUserMedia) {
 
     getUserMedia = navigator.getUserMedia;
 
-  } else if (window.webrtcDetectedBrowser === 'edge') {
+  } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
