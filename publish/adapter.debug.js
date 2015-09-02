@@ -1,4 +1,4 @@
-/*! adapterjs - v0.12.0 - 2015-08-19 */
+/*! adapterjs - v0.12.0 - 2015-09-02 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -743,7 +743,7 @@ if (navigator.mozGetUserMedia) {
   // the minimum version still supported by adapter.
   webrtcMinimumVersion = 12;
 
-  getUserMedia = navigator.getUserMedia;
+  window.getUserMedia = navigator.getUserMedia.bind(navigator);
 
   attachMediaStream = function(element, stream) {
     element.srcObject = stream;
@@ -1072,9 +1072,11 @@ if (navigator.mozGetUserMedia) {
       }
       var newElement = document.getElementById(elementId);
       newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
+      newElement.onplay    = (element.onplay)    ? element.onplay    : function (arg) {};
       newElement.onclick   = (element.onclick)   ? element.onclick   : function (arg) {};
       if (isIE) { // on IE the event needs to be plugged manually
         newElement.attachEvent('onplaying', newElement.onplaying);
+        newElement.attachEvent('onplay', newElement.onplay);
         newElement._TemOnClick = function (id) {
           var arg = {
             srcElement : document.getElementById(id)
