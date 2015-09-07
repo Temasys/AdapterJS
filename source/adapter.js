@@ -329,9 +329,10 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     'sans-serif; font-size: .9rem; padding: 4px; vertical-align: ' +
     'middle; cursor: default;">' + text + '</span>');
   if(buttonText && buttonLink) {
-    c.document.write('<button id="okay">' + buttonText + '</button><button>Cancel</button>');
+    c.document.write('<button id="okay">' + buttonText + '</button><button id="cancel">Cancel</button>');
     c.document.close();
 
+    // On click on okay
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
       if (!!displayRefreshBar) {
         AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
@@ -361,12 +362,14 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
           });
       } , 500);
     });   
+
+    // On click on Cancel
+    AdapterJS.addEvent(c.document.getElementById('cancel'), 'click', function(e) {
+      w.document.body.removeChild(i);
+    });
   } else {
     c.document.close();
   }
-  AdapterJS.addEvent(c.document, 'click', function() {
-    w.document.body.removeChild(i);
-  });
   setTimeout(function() {
     if(typeof i.style.webkitTransform === 'string') {
       i.style.webkitTransform = 'translateY(40px)';
@@ -741,7 +744,7 @@ if (navigator.mozGetUserMedia) {
   // the minimum version still supported by adapter.
   webrtcMinimumVersion = 12;
 
-  getUserMedia = navigator.getUserMedia;
+  window.getUserMedia = navigator.getUserMedia.bind(navigator);
 
   attachMediaStream = function(element, stream) {
     element.srcObject = stream;
@@ -1070,9 +1073,11 @@ if (navigator.mozGetUserMedia) {
       }
       var newElement = document.getElementById(elementId);
       newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
+      newElement.onplay    = (element.onplay)    ? element.onplay    : function (arg) {};
       newElement.onclick   = (element.onclick)   ? element.onclick   : function (arg) {};
       if (isIE) { // on IE the event needs to be plugged manually
         newElement.attachEvent('onplaying', newElement.onplaying);
+        newElement.attachEvent('onplay', newElement.onplay);
         newElement._TemOnClick = function (id) {
           var arg = {
             srcElement : document.getElementById(id)

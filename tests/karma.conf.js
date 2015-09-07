@@ -36,10 +36,12 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['mocha', 'xml'],
+    reporters: ['mocha', 'cdash'],
 
-    xmlReporter: {
-      outputFile: 'results/result.xml'
+    cdashReporter: {
+      outputFolder: 'results',
+      // outputFileName: 'cdash-result.xml',
+      siteConfig: './gen/cdash-site-config.json'
     },
 
     // web server port
@@ -85,7 +87,7 @@ module.exports = function(config) {
     plugins: ['karma-mocha', 
               'karma-mocha-reporter', 
               'karma-chai', 
-              'karma-xml-reporter', 
+              'karma-cdash-reporter',
               'karma-chrome-launcher', 
               'karma-safari-launcher', 
               'karma-firefox-launcher',
