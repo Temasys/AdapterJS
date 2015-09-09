@@ -24,7 +24,7 @@ if (navigator.userAgent.indexOf('Safari')) {
 }
 
 
-describe('VideoElement| Behaviour', function() {
+describe('ScreenSaver | Behaviour', function() {
   this.timeout(testTimeout);
 
   /* Attributes */
