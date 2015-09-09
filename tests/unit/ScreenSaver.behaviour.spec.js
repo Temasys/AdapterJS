@@ -14,15 +14,19 @@ var testItemTimeout = 4000;
 // Sleep Time
 var sleepTime = 500;
 
-if (navigator.userAgent.indexOf('Safari')) {
-  if (
-    Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
-    webrtcDetectedBrowser = 'safari';
-  } else {
-    webrtcDetectedBrowser = 'other'
-  }
-}
+var detectedBrowser = null;
 
+
+ if (navigator.userAgent.indexOf('Safari')) {
+   if (/*@cc_on!@*/ false || !!document.documentMode) {
+      detectedBrowser = 'IE';
+    } else if (
+      Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
+      detectedBrowser = 'safari';
+    } else {
+      detectedBrowser = 'other';
+    }
+  }
 
 describe('ScreenSaver | Behaviour', function() {
   this.timeout(testTimeout);
@@ -65,7 +69,7 @@ describe('ScreenSaver | Behaviour', function() {
 
   });
 
-  if(webrtcDetectedBrowser == 'safari') {
+  if(detectedBrowser == 'safari' || detectedBrowser == 'IE') {
   
     it('VideoElement.isPreventingSleep :: boolean', function(done) {
       this.timeout(testItemTimeout);
