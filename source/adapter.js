@@ -1044,16 +1044,13 @@ if (navigator.mozGetUserMedia) {
 
         var height = '';
         var width = '';
-        if (element.getBoundingClientRect) {
-          var rectObject = element.getBoundingClientRect();
-          width = rectObject.width + 'px';
-          height = rectObject.height + 'px';
+        if (element.clientWidth || element.clientHeight) {
+          width = element.clientWidth;
+          height = element.clientHeight;
         }
-        else if (element.width) {
+        else if (element.width || element.height) {
           width = element.width;
           height = element.height;
-        } else {
-          // TODO: What scenario could bring us here?
         }
 
         element.parentNode.insertBefore(frag, element);
