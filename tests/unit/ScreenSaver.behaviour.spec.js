@@ -14,63 +14,55 @@ var testItemTimeout = 4000;
 // Sleep Time
 var sleepTime = 500;
 
-var detectedBrowser = null;
+// !!! THIS TEST ONLY APPLIES FOR PLUGIN-BASED BROWSERS !!!
+if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
+  describe('ScreenSaver | Behaviour', function() {
+    this.timeout(testTimeout);
 
- if (navigator.userAgent.indexOf('Safari')) {
-   if (/*@cc_on!@*/ false || !!document.documentMode) {
-      detectedBrowser = 'IE';
-    } else if (
-      Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
-      detectedBrowser = 'safari';
-    } else {
-      detectedBrowser = 'other';
-    }
-  }
+    /* Attributes */
+    var video = null;
+    var stream = null;
+    var audioTrack = null;
+    var videoTrack = null;
 
-describe('ScreenSaver | Behaviour', function() {
-  this.timeout(testTimeout);
+    /* WebRTC Object should be initialized in Safari/IE Plugin */
+    before(function (done) {
+      this.timeout(gUMTimeout);
 
-  /* Attributes */
-  var video = null;
-  var stream = null;
-  var audioTrack = null;
-  var videoTrack = null;
-
-/* WebRTC Object should be initialized in Safari/IE Plugin */
-  before(function (done) {
-    this.timeout(gUMTimeout);
-
-  	AdapterJS.webRTCReady(function() { 
-      done();
-    });
-  });
-
-  beforeEach(function (done) {
-    this.timeout(gUMTimeout);
-
-    window.navigator.getUserMedia({
-      audio: true,
-      video: true
-
-    }, function (data) {
-      stream = data;
-      videoTrack = stream.getVideoTracks()[0];
-      audioTrack = stream.getAudioTracks()[0];
-      video = document.createElement('video');
-      video.autoplay = 'autoplay';
-      document.body.appendChild(video);
-      video = attachMediaStream(video, stream);
-      done();
-
-    }, function (error) {
-      throw error;
+      AdapterJS.webRTCReady(function() { 
+        done();
+      });
     });
 
-  });
+    beforeEach(function (done) {
+      this.timeout(gUMTimeout);
 
-  if(detectedBrowser == 'safari' || detectedBrowser == 'IE') {
-  
+      window.navigator.getUserMedia({
+        audio: true,
+        video: true
+
+      }, function (data) {
+        stream = data;
+        videoTrack = stream.getVideoTracks()[0];
+        audioTrack = stream.getAudioTracks()[0];
+        video = document.createElement('video');
+        video.autoplay = 'autoplay';
+        document.body.appendChild(video);
+        video = attachMediaStream(video, stream);
+        done();
+
+      }, function (error) {
+        throw error;
+      });
+
+    });
+
+    afterEach(function () {
+      document.body.removeChild(video);
+      stream = null;
+    });
+
     it('VideoElement.isPreventingSleep :: boolean', function(done) {
       this.timeout(testItemTimeout);
 
@@ -186,12 +178,6 @@ describe('ScreenSaver | Behaviour', function() {
 
       done();
     });
-  }
 
-  afterEach(function () {
-    document.body.removeChild(video);
-    stream = null;
-  });
-
-
-});
+  }); // describe('ScreenSaver | Behaviour'
+} // if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') 
