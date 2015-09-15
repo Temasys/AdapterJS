@@ -92,7 +92,7 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
       expect(video.isPreventingSleep).to.equal(true);
 
-      video.pause()
+      video.pause();
       expect(video.isPreventingSleep).to.equal(false);
 
       video2 = attachMediaStream(video2, stream);
@@ -111,7 +111,7 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
       expect(video.isPreventingSleep).to.equal(true);
 
-      video.pause()
+      video.pause();
       expect(video.isPreventingSleep).to.equal(false);
 
       video2 = attachMediaStream(video2, stream);
@@ -125,22 +125,21 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
     });
 
     it('VideoElement.isPreventingSleep : stop stream', function (done) {
-      this.timeout(testItemTimeout);
+      this.timeout(testItemTimeout + sleepTime);
+      
 
       expect(video.isPreventingSleep).to.equal(true);
 
       stream.stop();
 
-      var startSleepTime = new Date().getTime();
-      while(new Date().getTime() < startSleepTime + sleepTime){ /* do nothing */ } 
-
-      expect(video.isPreventingSleep).to.equal(false);
-
-      done();
+      setTimeout(function () {
+        expect(video.isPreventingSleep).to.equal(false);
+        done();
+      }, sleepTime);
     });
 
     it('VideoElement.isPreventingSleep : attach two videos, stop stream', function (done) {
-      this.timeout(testItemTimeout);
+      this.timeout(testItemTimeout + sleepTime);
 
       var video2 = document.createElement('video');
       video2.autoplay = 'autoplay';
@@ -152,31 +151,31 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
       stream.stop();
 
-      var startSleepTime = new Date().getTime();
-      while(new Date().getTime() < startSleepTime + sleepTime){ /* do nothing */ } 
+      setTimeout(function () {
+        expect(video.isPreventingSleep).to.equal(false);
+        expect(video2.isPreventingSleep).to.equal(false);
 
-      expect(video.isPreventingSleep).to.equal(false);
-      expect(video2.isPreventingSleep).to.equal(false);
-
-      done();
+        document.body.removeChild(video2);
+        
+        done();
+      }, sleepTime);
     });
 
     it('VideoElement.isPreventingSleep : stop stream, then play video', function (done) {
-      this.timeout(testItemTimeout);
+      this.timeout(testItemTimeout + sleepTime);
 
       expect(video.isPreventingSleep).to.equal(true);
 
       stream.stop();
 
-      var startSleepTime = new Date().getTime();
-      while(new Date().getTime() < startSleepTime + sleepTime){ /* do nothing */ } 
+      setTimeout(function () {
+        expect(video.isPreventingSleep).to.equal(false);
 
-      expect(video.isPreventingSleep).to.equal(false);
+        video.play();
+        expect(video.isPreventingSleep).to.equal(false);
 
-      video.play();
-      expect(video.isPreventingSleep).to.equal(false);
-
-      done();
+        done();
+      }, sleepTime);      
     });
 
   }); // describe('ScreenSaver | Behaviour'
