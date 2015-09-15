@@ -51,7 +51,9 @@ describe('VideoElement | EventHandler', function() {
     });
 
     video = document.createElement('video');
-    video.autoplay = 'autoplay';
+    if (webrtcDetectedBrowser !== 'IE') {
+      video.autoplay = 'autoplay';
+    }
     document.body.appendChild(video);
 
   });

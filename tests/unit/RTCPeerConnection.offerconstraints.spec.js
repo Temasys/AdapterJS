@@ -59,21 +59,21 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it.skip('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {});
+    it.skip('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function () {});
 
   })({ iceRestart: true });
 
 
   (function (constraints) {
 
-    it.skip('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function () {});
+    it.skip('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function () {});
 
   })({ voiceActivityDetection: true });
 
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -93,7 +93,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -113,7 +113,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -133,7 +133,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -153,7 +153,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -173,7 +173,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {
@@ -193,7 +193,7 @@ describe('RTCPeerConnection.createOffer | RTCOfferOptions', function() {
 
   (function (constraints) {
 
-    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + printJSON(constraints) + ')', function (done) {
+    it('RTCPeerConnection.createOffer(successCb, failureCb, ' + JSON.stringify(constraints) + ')', function (done) {
       this.timeout(testItemTimeout);
 
       peer2.onaddstream = function (event) {

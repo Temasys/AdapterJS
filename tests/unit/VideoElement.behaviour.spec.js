@@ -44,7 +44,9 @@ describe('VideoElement| Behaviour', function() {
     this.timeout(testTimeout);
 
     video = document.createElement('video');
-    video.autoplay = 'autoplay';
+    if (webrtcDetectedBrowser !== 'IE') {
+      video.autoplay = 'autoplay';
+    }
     document.body.appendChild(video);
     video = attachMediaStream(video, stream);
     done();
@@ -75,7 +77,9 @@ describe('VideoElement| Behaviour', function() {
     this.timeout(testItemTimeout);
 
     var video2 = document.createElement('video');
-    video2.autoplay = 'autoplay';
+    if (webrtcDetectedBrowser !== 'IE') {
+      video2.autoplay = 'autoplay';
+    }
     document.body.appendChild(video2);
     video2 = attachMediaStream(video2, stream);
 
@@ -109,7 +113,9 @@ describe('VideoElement| Behaviour', function() {
 
   it('VideoElement.muted : mute then attach other video to stream', function (done) {
     var video2 = document.createElement('video');
-    video2.autoplay = 'autoplay';
+    if (webrtcDetectedBrowser !== 'IE') {
+      video2.autoplay = 'autoplay';
+    }    
     document.body.appendChild(video2);
 
     expect(audioTrack.enabled).to.equal(true);

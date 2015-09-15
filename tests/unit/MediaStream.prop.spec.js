@@ -14,6 +14,11 @@ var gUMTimeout = 15000;
 // Test item timeout
 var testItemTimeout = 4000;
 
+// typeof webrtcObjectFunction
+// Init in before
+// Equals 'object' if IE + plugin
+// Equals 'function' otherwise
+var FUNCTION_TYPE = null;
 
 describe('MediaStream | Properties', function() {
 	this.timeout(testTimeout);
@@ -26,6 +31,8 @@ describe('MediaStream | Properties', function() {
 
 	/* WebRTC Object should be initialized in Safari/IE Plugin */
 	before(function (done) {
+		FUNCTION_TYPE = webrtcDetectedBrowser === 'IE' ? 'object' : 'function';
+
 		this.timeout(testItemTimeout);
 
 		AdapterJS.webRTCReady(function() {
@@ -48,6 +55,12 @@ describe('MediaStream | Properties', function() {
 			throw error;
 		});
 	});
+
+  afterEach(function() {
+		stream.stop();
+		stream = null;
+		track = null;
+  });
 
 	it('MediaStream.id :: string', function (done) {
 		this.timeout(testItemTimeout);
@@ -73,7 +86,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.clone :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.clone, 'function');
+		assert.typeOf(stream.clone, FUNCTION_TYPE);
 
 		var clone = stream.clone();
 		assert.typeOf(clone, 'object');
@@ -84,7 +97,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.removeTrack -> MediaStream.removeTrack :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.equal(typeof stream.removeTrack, 'function');
+		assert.equal(typeof stream.removeTrack, FUNCTION_TYPE);
 
 		stream.removeTrack(track);
 
@@ -98,7 +111,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.addTrack -> MediaStream.addTrack :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.equal(typeof stream.addTrack, 'function');
+		assert.equal(typeof stream.addTrack, FUNCTION_TYPE);
 
 		stream.addTrack(track);
 
@@ -114,7 +127,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.getTrackById -> MediaStream.getTrackById :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.equal(typeof stream.getTrackById, 'function');
+		assert.equal(typeof stream.getTrackById, FUNCTION_TYPE);
 
 		var check = stream.getTrackById(track.id);
 
@@ -126,7 +139,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.getTracks -> MediaStream.getTracks :: method', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.equal(typeof stream.getTracks, 'function');
+		assert.equal(typeof stream.getTracks, FUNCTION_TYPE);
 
 		var tracks = stream.getTracks(track.id);
 
@@ -142,7 +155,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.stop -> MediaStream.stop :: method', function (done) {
 		this.timeout(testItemTimeout + 2500);
 
-		assert.equal(typeof stream.stop, 'function');
+		assert.equal(typeof stream.stop, FUNCTION_TYPE);
 
 		stream.stop();
 
