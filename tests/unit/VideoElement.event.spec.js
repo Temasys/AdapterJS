@@ -140,6 +140,30 @@ describe('VideoElement | EventHandler', function() {
 
   });
 
+  it('VideoElement.onloadedmetadata :: attributes', function (done) {
+    this.timeout(testItemTimeout);
+    video.id = 'video';
+
+    var now = new Date().getTime();
+
+    video.onloadedmetadata = function(event) {
+      expect(event.target).not.to.be.undefined;
+      expect(event.currentTarget).not.to.be.undefined;
+      expect(event.srcElement).not.to.be.undefined;
+      expect(event.timeStamp).not.to.be.undefined;
+
+      expect(event.timeStamp).to.be.above(0);
+      expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
+      expect(event.target.id).to.equal('video');
+      expect(event.srcElement.id).to.equal('video');
+      expect(event.currentTarget.id).to.equal('video');
+
+      done();
+    };
+
+    video = attachMediaStream(video, stream);
+  });
+
 });
 
 
