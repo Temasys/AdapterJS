@@ -140,6 +140,19 @@ describe('VideoElement | EventHandler', function() {
 
   });
 
+it('VideoElement.onloadedmetadata :: emit', function (done) {
+    this.timeout(testItemTimeout);
+    video.id = 'video';
+
+    var now = new Date().getTime();
+
+    video.onloadedmetadata = function(event) {
+      done();
+    };
+
+    video = attachMediaStream(video, stream);
+  });
+
   it('VideoElement.onloadedmetadata :: attributes', function (done) {
     this.timeout(testItemTimeout);
     video.id = 'video';
