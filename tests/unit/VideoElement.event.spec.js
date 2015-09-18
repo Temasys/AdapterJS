@@ -65,7 +65,6 @@ describe('VideoElement | EventHandler', function() {
 
   it('VideoElement.onplaying :: emit', function (done) {
     this.timeout(testItemTimeout);
-    video.id = 'id';
 
     video.onplaying = function(event) {
       done();
@@ -76,7 +75,8 @@ describe('VideoElement | EventHandler', function() {
 
   it('VideoElement.onplaying :: attributes', function (done) {
     this.timeout(testItemTimeout);
-    video.id = 'video';
+    var id = Math.random().toString(36).slice(2);
+    video.id = id;
 
     var now = new Date().getTime();
 
@@ -88,9 +88,9 @@ describe('VideoElement | EventHandler', function() {
 
       expect(event.timeStamp).to.be.above(0);
       expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
-      expect(event.target.id).to.equal('video');
-      expect(event.srcElement.id).to.equal('video');
-      expect(event.currentTarget.id).to.equal('video');
+      expect(event.target.id).to.equal(id);
+      expect(event.srcElement.id).to.equal(id);
+      expect(event.currentTarget.id).to.equal(id);
 
       done();
     };
@@ -117,7 +117,8 @@ describe('VideoElement | EventHandler', function() {
 
   it('VideoElement.onplay :: attributes', function(done) {
     this.timeout(testItemTimeout);
-    video.id = 'video';
+    var id = Math.random().toString(36).slice(2);
+    video.id = id;
 
     var now = new Date().getTime();
 
@@ -129,9 +130,9 @@ describe('VideoElement | EventHandler', function() {
 
       expect(event.timeStamp).to.be.above(0);
       expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
-      expect(event.target.id).to.equal('video');
-      expect(event.srcElement.id).to.equal('video');
-      expect(event.currentTarget.id).to.equal('video');
+      expect(event.target.id).to.equal(id);
+      expect(event.srcElement.id).to.equal(id);
+      expect(event.currentTarget.id).to.equal(id);
 
       done();
     };
@@ -142,7 +143,6 @@ describe('VideoElement | EventHandler', function() {
 
 it('VideoElement.onloadedmetadata :: emit', function (done) {
     this.timeout(testItemTimeout);
-    video.id = 'video';
 
     var now = new Date().getTime();
 
@@ -155,7 +155,8 @@ it('VideoElement.onloadedmetadata :: emit', function (done) {
 
   it('VideoElement.onloadedmetadata :: attributes', function (done) {
     this.timeout(testItemTimeout);
-    video.id = 'video';
+    var id = Math.random().toString(36).slice(2);
+    video.id = id;
 
     var now = new Date().getTime();
 
@@ -167,9 +168,9 @@ it('VideoElement.onloadedmetadata :: emit', function (done) {
 
       expect(event.timeStamp).to.be.above(0);
       expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
-      expect(event.target.id).to.equal('video');
-      expect(event.srcElement.id).to.equal('video');
-      expect(event.currentTarget.id).to.equal('video');
+      expect(event.target.id).to.equal(id);
+      expect(event.srcElement.id).to.equal(id);
+      expect(event.currentTarget.id).to.equal(id);
 
       done();
     };
