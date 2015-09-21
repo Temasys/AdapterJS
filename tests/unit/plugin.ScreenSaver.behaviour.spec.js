@@ -45,8 +45,6 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
       }, function (data) {
         stream = data;
-        videoTrack = stream.getVideoTracks()[0];
-        audioTrack = stream.getAudioTracks()[0];
         video = document.createElement('video');
         document.body.appendChild(video);
         video = attachMediaStream(video, stream);
