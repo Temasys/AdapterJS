@@ -23,8 +23,6 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
     /* Attributes */
     var video = null;
     var stream = null;
-    var audioTrack = null;
-    var videoTrack = null;
     var interval = null;
 
     /* WebRTC Object should be initialized in Safari/IE Plugin */
