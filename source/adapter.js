@@ -1069,14 +1069,20 @@ if (navigator.mozGetUserMedia) {
         element.setStreamId(streamId);
       }
       var newElement = document.getElementById(elementId);
-      newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
-      newElement.onplay    = (element.onplay)    ? element.onplay    : function (arg) {};
-      newElement.onloadedmetadata    = (element.onloadedmetadata)    ? element.onloadedmetadata    : function (arg) {};
-      newElement.onclick   = (element.onclick)   ? element.onclick   : function (arg) {};
+
+      for(var property in element) {
+        if(property.slice(0,2) == "on") {
+          newElement[property] = element[property];
+        }
+      }
+      newElement.onclick = (element.onclick) ? element.onclick : function (arg) {};
+
       if (isIE) { // on IE the event needs to be plugged manually
-        newElement.attachEvent('onplaying', newElement.onplaying);
-        newElement.attachEvent('onplay', newElement.onplay);
-        newElement.attachEvent('onloadedmetadata', newElement.onloadedmetadata);
+        for(var property in element) {
+          if(property.slice(0,2) == "on") {
+            newElement.attachEvent(property, newElement[property]);
+          }
+        }
         newElement._TemOnClick = function (id) {
           var arg = {
             srcElement : document.getElementById(id)
