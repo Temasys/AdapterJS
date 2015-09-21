@@ -1074,7 +1074,7 @@ if (navigator.mozGetUserMedia) {
         if(property.slice(0,2) == "on" && element[property] != null) {
           if (newElement.attachEvent) {
             //isIE
-            newElement.attachEvent(property, function(event){console.log(event)});
+            newElement.attachEvent(property, element[property]);
           } else {
             //other web browsers
             newElement.addEventListener(property.slice(2), element[property], false); 
