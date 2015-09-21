@@ -1081,17 +1081,6 @@ if (navigator.mozGetUserMedia) {
           }
         }
       }
-      newElement.onclick = (element.onclick) ? element.onclick : function (arg) {};
-
-      if (isIE) { // on IE the event needs to be plugged manually
-        newElement._TemOnClick = function (id) {
-          var arg = {
-            srcElement : document.getElementById(id)
-          };
-          newElement.onclick(arg);
-        };
-      }
-      
       return newElement;
     };
 
