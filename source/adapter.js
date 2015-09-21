@@ -1071,18 +1071,19 @@ if (navigator.mozGetUserMedia) {
       var newElement = document.getElementById(elementId);
 
       for(var property in element) {
-        if(property.slice(0,2) == "on") {
-          newElement[property] = element[property];
+        if(property.slice(0,2) == "on" && element[property] != null) {
+          if (newElement.attachEvent) {
+            //isIE
+            newElement.attachEvent(property, function(event){console.log(event)});
+          } else {
+            //other web browsers
+            newElement.addEventListener(property.slice(2), element[property], false); 
+          }
         }
       }
       newElement.onclick = (element.onclick) ? element.onclick : function (arg) {};
 
       if (isIE) { // on IE the event needs to be plugged manually
-        for(var property in element) {
-          if(property.slice(0,2) == "on") {
-            newElement.attachEvent(property, newElement[property]);
-          }
-        }
         newElement._TemOnClick = function (id) {
           var arg = {
             srcElement : document.getElementById(id)
