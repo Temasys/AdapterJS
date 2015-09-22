@@ -1070,17 +1070,23 @@ if (navigator.mozGetUserMedia) {
       }
       var newElement = document.getElementById(elementId);
 
+      //Event forwarding
       for(var property in element) {
         if(property.slice(0,2) == "on" && element[property] != null) {
-          if (newElement.attachEvent) {
-            //isIE
-            newElement.attachEvent(property, element[property]);
-          } else {
-            //other web browsers
-            newElement.addEventListener(property.slice(2), element[property], false); 
+          AdapterJS.addEvent(newElement, property.slice(2), element[property]);
+        }
+      }
+      if(!isIE) {
+        var nonEnumerablesToForward = ['onclick'];
+        
+        for(var event in nonEnumerablesToForward) {
+          var eventName = nonEnumerablesToForward[event]
+          if(element[eventName] != null) {
+            newElement.addEventListener(eventName.slice(2), element[eventName]);
           }
         }
       }
+
       return newElement;
     };
 
