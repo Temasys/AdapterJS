@@ -1069,23 +1069,17 @@ if (navigator.mozGetUserMedia) {
         element.setStreamId(streamId);
       }
       var newElement = document.getElementById(elementId);
+      var elemBuff = element;
 
-      //Event forwarding
-      for(var property in element) {
-        if(property.slice(0,2) == "on" && element[property] != null) {
-          AdapterJS.addEvent(newElement, property.slice(2), element[property]);
-        }
-      }
-      if(!isIE) {
-        var nonEnumerablesToForward = ['onclick'];
-        
-        for(var event in nonEnumerablesToForward) {
-          var eventName = nonEnumerablesToForward[event]
-          if(element[eventName] != null) {
-            newElement.addEventListener(eventName.slice(2), element[eventName]);
+      do {
+        properties = Object.getOwnPropertyNames( elemBuff );
+        for(prop in properties) {
+          propName = properties[prop];
+          if(propName.slice(0,2) == 'on' && element[propName] != null) {
+            AdapterJS.addEvent(newElement, propName.slice(2), element[propName]);
           }
         }
-      }
+      } while ( elemBuff = Object.getPrototypeOf( elemBuff ) );
 
       return newElement;
     };
