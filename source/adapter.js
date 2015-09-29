@@ -1069,17 +1069,7 @@ if (navigator.mozGetUserMedia) {
         element.setStreamId(streamId);
       }
       var newElement = document.getElementById(elementId);
-      var elemBuff = element;
-
-      do {
-        properties = Object.getOwnPropertyNames( elemBuff );
-        for(prop in properties) {
-          propName = properties[prop];
-          if(propName.slice(0,2) == 'on' && element[propName] != null) {
-            AdapterJS.addEvent(newElement, propName.slice(2), element[propName]);
-          }
-        }
-      } while ( elemBuff = Object.getPrototypeOf( elemBuff ) );
+      AdapterJS.forwardEventHandlers(newElement, element, Object.getPrototypeOf(element));
 
       return newElement;
     };
@@ -1101,6 +1091,27 @@ if (navigator.mozGetUserMedia) {
         console.log('Could not find the stream associated with this element');
       }
     };
+
+    AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
+
+      properties = Object.getOwnPropertyNames( prototype );
+
+      for(prop in properties) {
+        propName = properties[prop];
+        if(propName.slice(0,2) == 'on' && srcElem[propName] != null) {
+          if(isIE){
+            destElem.attachEvent(propName,srcElem[propName]);
+          } else {
+            destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+          }
+        }
+      }
+
+      var subPrototype = Object.getPrototypeOf(prototype)
+      if(subPrototype != null) {
+        AdapterJS.forwardEventHandlers(destElem, srcElem, subPrototype);
+      }
+    }
 
     RTCIceCandidate = function (candidate) {
       if (!candidate.sdpMid) {
