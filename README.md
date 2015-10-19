@@ -4,10 +4,10 @@
 
 Find the most recent version hosted on our CDN.
 
-- Minified version: `//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.min.js`
-- Debug version `//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.debug.js`
-- Minified version (with screensharing changes): `//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.screenshare.min.js`
-- Debug version (with screensharing changes)`//cdn.temasys.com.sg/adapterjs/0.11.x/adapter.screenshare.js`
+- Minified version: `//cdn.temasys.com.sg/adapterjs/0.12.x/adapter.min.js`
+- Debug version `//cdn.temasys.com.sg/adapterjs/0.12.x/adapter.debug.js`
+- Minified version (with screensharing changes): `//cdn.temasys.com.sg/adapterjs/0.12.x/adapter.screenshare.min.js`
+- Debug version (with screensharing changes)`//cdn.temasys.com.sg/adapterjs/0.12.x/adapter.screenshare.js`
 
 Part of the [Skylink WebRTC](http://skylink.io/web) toolkit.
 
@@ -190,7 +190,7 @@ expected values:
 
 #### Using screensharing functionality
 
-AdapterJS 0.11.0+ offers cross-browser screensharing in Chrome 34+, Firefox 33+ and with a licensed copy of our [Temasys WebRTC Plugin](http://skylink.io/plugin) in IE9+ and Safari 7.1+. (For plugin licensing interest please contact sales (a) temasys.com.sg)
+AdapterJS 0.12.0+ offers cross-browser screensharing in Chrome 34+, Firefox 33+ and with a licensed copy of our [Temasys WebRTC Plugin](http://skylink.io/plugin) in IE9+ and Safari 7.1+. (For plugin licensing interest please contact sales (a) temasys.com.sg)
 
 To use the screensharing functionality, reference `publish/adapter.screenshare.js` and add the `mediaSource: 'window'` setting to the video media constraints. Requires HTTPS!
 
