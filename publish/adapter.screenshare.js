@@ -1,4 +1,4 @@
-/*! adapterjs - v0.12.1 - 2015-09-07 */
+/*! adapterjs - v0.12.2 - 2015-10-19 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -17,7 +17,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.12.1';
+AdapterJS.VERSION = '0.12.2';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -1046,16 +1046,13 @@ if (navigator.mozGetUserMedia) {
 
         var height = '';
         var width = '';
-        if (element.getBoundingClientRect) {
-          var rectObject = element.getBoundingClientRect();
-          width = rectObject.width + 'px';
-          height = rectObject.height + 'px';
+        if (element.clientWidth || element.clientHeight) {
+          width = element.clientWidth;
+          height = element.clientHeight;
         }
-        else if (element.width) {
+        else if (element.width || element.height) {
           width = element.width;
           height = element.height;
-        } else {
-          // TODO: What scenario could bring us here?
         }
 
         element.parentNode.insertBefore(frag, element);
@@ -1074,20 +1071,8 @@ if (navigator.mozGetUserMedia) {
         element.setStreamId(streamId);
       }
       var newElement = document.getElementById(elementId);
-      newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
-      newElement.onplay    = (element.onplay)    ? element.onplay    : function (arg) {};
-      newElement.onclick   = (element.onclick)   ? element.onclick   : function (arg) {};
-      if (isIE) { // on IE the event needs to be plugged manually
-        newElement.attachEvent('onplaying', newElement.onplaying);
-        newElement.attachEvent('onplay', newElement.onplay);
-        newElement._TemOnClick = function (id) {
-          var arg = {
-            srcElement : document.getElementById(id)
-          };
-          newElement.onclick(arg);
-        };
-      }
-      
+      AdapterJS.forwardEventHandlers(newElement, element, Object.getPrototypeOf(element));
+
       return newElement;
     };
 
@@ -1108,6 +1093,27 @@ if (navigator.mozGetUserMedia) {
         console.log('Could not find the stream associated with this element');
       }
     };
+
+    AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
+
+      properties = Object.getOwnPropertyNames( prototype );
+
+      for(prop in properties) {
+        propName = properties[prop];
+        if(propName.slice(0,2) == 'on' && srcElem[propName] != null) {
+          if(isIE){
+            destElem.attachEvent(propName,srcElem[propName]);
+          } else {
+            destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+          }
+        }
+      }
+
+      var subPrototype = Object.getPrototypeOf(prototype)
+      if(subPrototype != null) {
+        AdapterJS.forwardEventHandlers(destElem, srcElem, subPrototype);
+      }
+    }
 
     RTCIceCandidate = function (candidate) {
       if (!candidate.sdpMid) {
