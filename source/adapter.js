@@ -605,7 +605,7 @@ if (navigator.mozGetUserMedia) {
 
   createIceServers = function (urls, username, password) {
     var iceServers = [];
-    for (i = 0; i < urls.length; i++) {
+    for (var i = 0; i < urls.length; i++) {
       var iceServer = createIceServer(urls[i], username, password);
       if (iceServer !== null) {
         iceServers.push(iceServer);
@@ -695,7 +695,7 @@ if (navigator.mozGetUserMedia) {
         'username' : username
       };
     } else {
-      for (i = 0; i < urls.length; i++) {
+      for (var i = 0; i < urls.length; i++) {
         var iceServer = createIceServer(urls[i], username, password);
         if (iceServer !== null) {
           iceServers.push(iceServer);
@@ -997,11 +997,10 @@ if (navigator.mozGetUserMedia) {
         return;
       }
 
-      var streamId
+      var streamId;
       if (stream === null) {
         streamId = '';
-      }
-      else {
+      } else {
         stream.enableSoundTracks(true); // TODO: remove on 0.12.0
         streamId = stream.id;
       }
