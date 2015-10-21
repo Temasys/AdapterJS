@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-karma');
 
     grunt.initConfig({
@@ -105,6 +106,22 @@ module.exports = function(grunt) {
             ],
             dest: '<%= production %>/'
           }]
+        }
+      },
+
+      includereplace: {
+        production: {
+          options: {
+            // Task-specific options go here. 
+            prefix: '@@',
+            includesDir: '<%= source %>/',
+          },
+          // Files to perform replacements and includes with 
+          src: [
+            '<%= production %>/*.js',
+            ],
+          // Destination directory to copy files to 
+          dest: './'
         }
       },
       
@@ -248,6 +265,7 @@ module.exports = function(grunt) {
         'clean:production',
         'concat',
         'replace:production',
+        'includereplace:production',
         'uglify'
     ]);
 
@@ -256,6 +274,7 @@ module.exports = function(grunt) {
         'clean:production',
         'concat',
         'replace',
+        'includereplace',
         'uglify',
         'yuidoc'
     ]);
