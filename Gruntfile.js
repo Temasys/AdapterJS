@@ -23,6 +23,9 @@ module.exports = function(grunt) {
 
       bamboo: 'bamboo',
 
+      pluginInfoRoot: grunt.option('pluginInfoRoot') || '<%= source %>',
+      pluginInfoFile: grunt.option('pluginInfoFile') || 'pluginInfo.js',
+
       clean: {
         production: ['<%= production %>/'],
         bamboo: ['<%= bamboo %>/'],
@@ -114,7 +117,7 @@ module.exports = function(grunt) {
           options: {
             // Task-specific options go here. 
             prefix: '@@',
-            includesDir: '<%= source %>/',
+            includesDir: '<%= pluginInfoRoot %>/',
           },
           // Files to perform replacements and includes with 
           src: [
@@ -260,7 +263,19 @@ module.exports = function(grunt) {
         grunt.log.writeln('bamboo/vars file successfully created');
     });
 
+    grunt.registerTask('CheckPluginInfo', 'Checks for existing config file', function() {
+      var fullPath = grunt.config.get('pluginInfoRoot') + '/' + grunt.config.get('pluginInfoFile');
+      grunt.verbose.writeln('Checking that the plugin info file exists.');
+      grunt.verbose.writeln('Privided Path : ' + fullPath);
+      if (grunt.file.exists(fullPath)) {
+        grunt.log.oklns('Plugin info file found.');
+      } else {
+        grunt.fail.fatal('Plugin info file does not exist : ' + fullPath);
+      }
+    });
+
     grunt.registerTask('dev', [
+        'CheckPluginInfo',
         'versionise',
         'clean:production',
         'concat',
@@ -270,6 +285,7 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('publish', [
+        'CheckPluginInfo',
         'versionise',
         'clean:production',
         'concat',
