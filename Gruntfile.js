@@ -8,6 +8,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-yuidoc');
     grunt.loadNpmTasks('grunt-replace');
+    grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-karma');
 
     grunt.initConfig({
@@ -21,6 +22,9 @@ module.exports = function(grunt) {
       production: 'publish',
 
       bamboo: 'bamboo',
+
+      pluginInfoRoot: grunt.option('pluginInfoRoot') || '<%= source %>',
+      pluginInfoFile: grunt.option('pluginInfoFile') || 'pluginInfo.js',
 
       clean: {
         production: ['<%= production %>/'],
@@ -105,6 +109,22 @@ module.exports = function(grunt) {
             ],
             dest: '<%= production %>/'
           }]
+        }
+      },
+
+      includereplace: {
+        production: {
+          options: {
+            // Task-specific options go here. 
+            prefix: '@@',
+            includesDir: '<%= pluginInfoRoot %>/',
+          },
+          // Files to perform replacements and includes with 
+          src: [
+            '<%= production %>/*.js',
+            ],
+          // Destination directory to copy files to 
+          dest: './'
         }
       },
       
@@ -243,19 +263,34 @@ module.exports = function(grunt) {
         grunt.log.writeln('bamboo/vars file successfully created');
     });
 
+    grunt.registerTask('CheckPluginInfo', 'Checks for existing config file', function() {
+      var fullPath = grunt.config.get('pluginInfoRoot') + '/' + grunt.config.get('pluginInfoFile');
+      grunt.verbose.writeln('Checking that the plugin info file exists.');
+      grunt.verbose.writeln('Privided Path : ' + fullPath);
+      if (grunt.file.exists(fullPath)) {
+        grunt.log.oklns('Plugin info file found.');
+      } else {
+        grunt.fail.fatal('Plugin info file does not exist : ' + fullPath);
+      }
+    });
+
     grunt.registerTask('dev', [
+        'CheckPluginInfo',
         'versionise',
         'clean:production',
         'concat',
         'replace:production',
+        'includereplace:production',
         'uglify'
     ]);
 
     grunt.registerTask('publish', [
+        'CheckPluginInfo',
         'versionise',
         'clean:production',
         'concat',
         'replace',
+        'includereplace',
         'uglify',
         'yuidoc'
     ]);
