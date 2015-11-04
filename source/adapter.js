@@ -986,7 +986,9 @@ if (navigator.mozGetUserMedia) {
       if (stream === null) {
         streamId = '';
       } else {
-        stream.enableSoundTracks(true); // TODO: remove on 0.12.0
+        if (typeof stream.enableSoundTracks !== 'undefined') {
+          stream.enableSoundTracks(true);
+        }
         streamId = stream.id;
       }
 
