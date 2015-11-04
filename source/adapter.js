@@ -1083,26 +1083,15 @@ if (navigator.mozGetUserMedia) {
       for(prop in properties) {
         propName = properties[prop];
 
-        if(propName.slice == undefined){
+        if(typeof(propName.slice) === function){
           if(propName.slice(0,2) == 'on' && srcElem[propName] != null) {
             if(isIE){
               destElem.attachEvent(propName,srcElem[propName]);
             } else {
               destElem.addEventListener(propName.slice(2), srcElem[propName], false)
             }
-          }
-        } else {
-          if(propName[0] == 'o' && propName[1] == 'n' && srcElem[propName] != null ) {
-            if(isIE){
-              destElem.attachEvent(propName,srcElem[propName]);
-            } else {
-              var propNameStr = "";
-              for( var i=2; i<propName.length ; i++)
-              {
-                propNameStr += propName[i];
-              }
-              destElem.addEventListener(propNameStr, srcElem[propName], false)
-            }
+          } else {
+            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
           }
         }
       }
