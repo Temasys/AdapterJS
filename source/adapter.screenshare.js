@@ -30,7 +30,7 @@
         // intercepting screensharing requests
 
         if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
-          throw new Error('Only "screen" and "window" option is available as mediaSource');
+          failureCb(new Error('Only "screen" and "window" option is available as mediaSource'));
         }
 
         var updatedConstraints = clone(constraints);
@@ -71,7 +71,7 @@
 
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
-          throw new Error('Current browser does not support screensharing');
+          failureCb(new Error('Current browser does not support screensharing'));
         }
 
         // would be fine since no methods
@@ -94,9 +94,9 @@
 
           } else {
             if (error === 'permission-denied') {
-              throw new Error('Permission denied for screen retrieval');
+              failureCb(new Error('Permission denied for screen retrieval'));
             } else {
-              throw new Error('Failed retrieving selected screen');
+              failureCb(new Error('Failed retrieving selected screen'));
             }
           }
         };
@@ -164,7 +164,7 @@
 
             delete updatedConstraints.video.mediaSource;
           } else {
-            throw new Error('Your WebRTC plugin does not support screensharing');
+            failureCb(new Error('Your WebRTC plugin does not support screensharing'));
           }
           baseGetUserMedia(updatedConstraints, successCb, failureCb);
         });

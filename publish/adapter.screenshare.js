@@ -1,4 +1,4 @@
-/*! adapterjs - v0.12.0 - 2015-08-19 */
+/*! adapterjs - v0.12.0 - 2015-11-06 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -1072,9 +1072,11 @@ if (navigator.mozGetUserMedia) {
       }
       var newElement = document.getElementById(elementId);
       newElement.onplaying = (element.onplaying) ? element.onplaying : function (arg) {};
+      newElement.onplay    = (element.onplay)    ? element.onplay    : function (arg) {};
       newElement.onclick   = (element.onclick)   ? element.onclick   : function (arg) {};
       if (isIE) { // on IE the event needs to be plugged manually
         newElement.attachEvent('onplaying', newElement.onplaying);
+        newElement.attachEvent('onplay', newElement.onplay);
         newElement._TemOnClick = function (id) {
           var arg = {
             srcElement : document.getElementById(id)
@@ -1194,7 +1196,7 @@ if (navigator.mozGetUserMedia) {
         // intercepting screensharing requests
 
         if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
-          throw new Error('Only "screen" and "window" option is available as mediaSource');
+          failureCb(new Error('Only "screen" and "window" option is available as mediaSource'));
         }
 
         var updatedConstraints = clone(constraints);
@@ -1235,7 +1237,7 @@ if (navigator.mozGetUserMedia) {
 
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
-          throw new Error('Current browser does not support screensharing');
+          failureCb(new Error('Current browser does not support screensharing'));
         }
 
         // would be fine since no methods
@@ -1258,9 +1260,9 @@ if (navigator.mozGetUserMedia) {
 
           } else {
             if (error === 'permission-denied') {
-              throw new Error('Permission denied for screen retrieval');
+              failureCb(new Error('Permission denied for screen retrieval'));
             } else {
-              throw new Error('Failed retrieving selected screen');
+              failureCb(new Error('Failed retrieving selected screen'));
             }
           }
         };
@@ -1328,7 +1330,7 @@ if (navigator.mozGetUserMedia) {
 
             delete updatedConstraints.video.mediaSource;
           } else {
-            throw new Error('Your WebRTC plugin does not support screensharing');
+            failureCb(new Error('Your WebRTC plugin does not support screensharing'));
           }
           baseGetUserMedia(updatedConstraints, successCb, failureCb);
         });
