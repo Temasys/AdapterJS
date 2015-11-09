@@ -140,7 +140,7 @@ AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
-  webrtcDetectedVersion = Adapter.WebRTCPlugin.plugin.version;
+  webrtcDetectedVersion = AdapterJS.WebRTCPlugin.plugin.version;
 
   if (document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
