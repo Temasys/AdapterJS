@@ -1083,9 +1083,9 @@ if (navigator.mozGetUserMedia) {
       for(prop in properties) {
         propName = properties[prop];
 
-        if(typeof(propName.slice) === function){
-          if(propName.slice(0,2) == 'on' && srcElem[propName] != null) {
-            if(isIE){
+        if (typeof(propName.slice) === 'function') {
+          if (propName.slice(0,2) == 'on' && srcElem[propName] != null) {
+            if (isIE) {
               destElem.attachEvent(propName,srcElem[propName]);
             } else {
               destElem.addEventListener(propName.slice(2), srcElem[propName], false)
