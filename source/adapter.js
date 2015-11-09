@@ -532,15 +532,119 @@ if ( navigator.mozGetUserMedia
   || (navigator.mediaDevices 
     && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) ) { 
 
-  // Inject Google's adapter.js content
+  ///////////////////////////////////////////////////////////////////
+  // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
+
   @@include('google.adapter.js', {})
 
+  // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
+  ///////////////////////////////////////////////////////////////////
+
+
+  // Add support for legacy functions createIceServer and createIceServers
+  if ( navigator.mozGetUserMedia ) {
+    createIceServer = function (url, username, password) {
+      console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
+      
+      var iceServer = null;
+      var url_parts = url.split(':');
+      if (url_parts[0].indexOf('stun') === 0) {
+        iceServer = { url : url };
+      } else if (url_parts[0].indexOf('turn') === 0) {
+        if (webrtcDetectedVersion < 27) {
+          var turn_url_parts = url.split('?');
+          if (turn_url_parts.length === 1 ||
+            turn_url_parts[1].indexOf('transport=udp') === 0) {
+            iceServer = {
+              url : turn_url_parts[0],
+              credential : password,
+              username : username
+            };
+          }
+        } else {
+          iceServer = {
+            url : url,
+            credential : password,
+            username : username
+          };
+        }
+      }
+      return iceServer;
+    };
+
+    createIceServers = function (urls, username, password) {
+      console.warn('createIceServers is deprecated. It should be replaced with an application level implementation.');
+
+      var iceServers = [];
+      for (i = 0; i < urls.length; i++) {
+        var iceServer = createIceServer(urls[i], username, password);
+        if (iceServer !== null) {
+          iceServers.push(iceServer);
+        }
+      }
+      return iceServers;
+    };
+  } else ( navigator.webkitGetUserMedia ) {
+    createIceServer = function (url, username, password) {
+      console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
+      
+      var iceServer = null;
+      var url_parts = url.split(':');
+      if (url_parts[0].indexOf('stun') === 0) {
+        iceServer = { 'url' : url };
+      } else if (url_parts[0].indexOf('turn') === 0) {
+        iceServer = {
+          'url' : url,
+          'credential' : password,
+          'username' : username
+        };
+      }
+      return iceServer;
+    };
+
+    createIceServers = function (urls, username, password) {
+      console.warn('createIceServers is deprecated. It should be replaced with an application level implementation.');
+
+      var iceServers = [];
+      if (webrtcDetectedVersion >= 34) {
+        iceServers = {
+          'urls' : urls,
+          'credential' : password,
+          'username' : username
+        };
+      } else {
+        for (i = 0; i < urls.length; i++) {
+          var iceServer = createIceServer(urls[i], username, password);
+          if (iceServer !== null) {
+            iceServers.push(iceServer);
+          }
+        }
+      }
+      return iceServers;
+    };
+  }
+
+  // adapter.js by Google currently doesn't suppport
+  // attachMediaStream and reattachMediaStream for Egde
+  if (navigator.mediaDevices && navigator.userAgent.match(
+      /Edge\/(\d+).(\d+)$/)) {
+    attachMediaStream = function(element, stream) {
+      element.srcObject = stream;
+      return element;
+    };
+    reattachMediaStream = function(to, from) {
+      to.srcObject = from.srcObject;
+      return to;
+    };
+  }
+
+  // Need to override attachMediaStream and reattachMediaStream 
+  // to support the plugin's logic
   attachMediaStream_base = attachMediaStream;
   attachMediaStream = function (element, stream) {
     attachMediaStream_base(element, stream);
     return element;
   };
-
   reattachMediaStream_base = reattachMediaStream;
   reattachMediaStream = function (to, from) {
     reattachMediaStream_base(to, from);
