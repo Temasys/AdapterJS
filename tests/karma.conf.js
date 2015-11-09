@@ -16,7 +16,7 @@ module.exports = function(config) {
       // config files
       {pattern: 'karma.conf.js',                  included: true},
       {pattern: 'test-main.js',                   included: true},
-      {pattern: '../publish/adapter.screenshare.js',    included: true},
+      {pattern: '../publish/adapter.debug.js',    included: true},
       {pattern: 'globals.js',                     included: true},
 
       // tests
@@ -52,7 +52,7 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_ERROR,
+    logLevel: config.LOG_DISABLE,
 
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: false,
@@ -65,7 +65,7 @@ module.exports = function(config) {
     customLaunchers: {
         ChromeCustom: {
           base: 'Chrome',
-          flags: ['--use-fake-ui-for-media-stream', '--load-extension chrome-extension://ljckddiekopnnjoeaiofddfhgnbdoafc/']
+          flags: ['--use-fake-ui-for-media-stream']
         },
         FirefoxCustom: {
           base: 'Firefox',
