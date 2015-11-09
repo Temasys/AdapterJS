@@ -29,8 +29,10 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
+        // Invalid mediaSource for firefox, only "screen" and "window" are supported
         if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
-          throw new Error('Only "screen" and "window" option is available as mediaSource');
+          failureCb(new Error('GetUserMedia: Only "screen" and "window" are supported as mediaSource constraints'));
+          return;
         }
 
         var updatedConstraints = clone(constraints);
@@ -68,10 +70,11 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
-          throw new Error('Current browser does not support screensharing');
+          // This is Opera, which does not support screensharing
+          failureCb(new Error('Current browser does not support screensharing'));
+          return;
         }
 
         // would be fine since no methods
@@ -92,11 +95,13 @@
 
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
 
-          } else {
+          } else { // GUM failed
             if (error === 'permission-denied') {
-              throw new Error('Permission denied for screen retrieval');
+              failureCb(new Error('Permission denied for screen retrieval'));
             } else {
-              throw new Error('Failed retrieving selected screen');
+              // NOTE(J-O): I don't think we ever pass in here. 
+              // A failure to capture the screen does not lead here.
+              failureCb(new Error('Failed retrieving selected screen'));
             }
           }
         };
@@ -158,8 +163,6 @@
           // check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
             !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
-
-
             // set the constraints
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
             updatedConstraints.video.optional.push({
@@ -168,7 +171,8 @@
 
             delete updatedConstraints.video.mediaSource;
           } else {
-            throw new Error('Your WebRTC plugin does not support screensharing');
+            failureCb(new Error('Your version of the WebRTC plugin does not support screensharing'));
+            return;
           }
           baseGetUserMedia(updatedConstraints, successCb, failureCb);
         });
@@ -180,6 +184,9 @@
     getUserMedia = window.navigator.getUserMedia;
   }
 
+  // For chrome, use an iframe to load the screensharing extension
+  // in the correct domain.
+  // Modify here for custom screensharing extension in chrome
   if (window.webrtcDetectedBrowser === 'chrome') {
     var iframe = document.createElement('iframe');
 
@@ -188,7 +195,6 @@
     };
 
     iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html';
-      //'https://temasys-cdn.s3.amazonaws.com/skylink/extensions/detection-script-dev/detectRTC.html';
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);
