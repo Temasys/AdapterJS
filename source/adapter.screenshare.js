@@ -29,6 +29,7 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
+        // invalid mediaSource for firefox as "screen" and "window" is only supported
         if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
           failureCb(new Error('Only "screen" and "window" option is available as mediaSource'));
           return;
@@ -69,7 +70,7 @@
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-
+      // Opera does not support screensharing. it uses webkitGetUserMedia.
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           failureCb(new Error('Current browser does not support screensharing'));
@@ -179,6 +180,8 @@
     getUserMedia = window.navigator.getUserMedia;
   }
 
+  // for chrome screensharing plugin to load the extension popup
+  // modify here for custom screensharing plugin in chrome
   if (window.webrtcDetectedBrowser === 'chrome') {
     var iframe = document.createElement('iframe');
 
