@@ -140,9 +140,10 @@ AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
+  webrtcDetectedVersion = Adapter.WebRTCPlugin.plugin.version;
+
   if (document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
-
     AdapterJS.maybeThroughWebRTCReady();
   } else {
     AdapterJS.WebRTCPlugin.documentReadyInterval = setInterval(function () {
@@ -150,7 +151,6 @@ __TemWebRTCReady0 = function () {
         // TODO: update comments, we wait for the document to be ready
         clearInterval(AdapterJS.WebRTCPlugin.documentReadyInterval);
         AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
-
         AdapterJS.maybeThroughWebRTCReady();
       }
     }, 100);
