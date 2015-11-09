@@ -584,7 +584,7 @@ if ( navigator.mozGetUserMedia
       }
       return iceServers;
     };
-  } else ( navigator.webkitGetUserMedia ) {
+  } else if ( navigator.webkitGetUserMedia ) {
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
       
