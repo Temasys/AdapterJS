@@ -31,6 +31,7 @@
 
         if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
           failureCb(new Error('Only "screen" and "window" option is available as mediaSource'));
+          return;
         }
 
         var updatedConstraints = clone(constraints);
@@ -72,6 +73,7 @@
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           failureCb(new Error('Current browser does not support screensharing'));
+          return;
         }
 
         // would be fine since no methods
@@ -165,6 +167,7 @@
             delete updatedConstraints.video.mediaSource;
           } else {
             failureCb(new Error('Your WebRTC plugin does not support screensharing'));
+            return;
           }
           baseGetUserMedia(updatedConstraints, successCb, failureCb);
         });
