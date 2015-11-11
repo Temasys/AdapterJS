@@ -373,11 +373,6 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
 // - 'plugin': Using the plugin implementation.
 webrtcDetectedType = null;
 
-// Detected webrtc datachannel support. Types are:
-// - 'SCTP': SCTP datachannel support.
-// - 'RTP': RTP datachannel support.
-webrtcDetectedDCSupport = null;
-
 // Set the settings for creating DataChannels, MediaStream for
 // Cross-browser compability.
 // - This is only for SCTP based support browsers.
@@ -677,7 +672,6 @@ if ( navigator.mozGetUserMedia
     /* jshint +W020 */
   }
   webrtcDetectedType = 'plugin';
-  webrtcDetectedDCSupport = 'plugin';
   AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
