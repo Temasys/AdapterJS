@@ -538,6 +538,17 @@ if ( navigator.mozGetUserMedia
 
   // Add support for legacy functions createIceServer and createIceServers
   if ( navigator.mozGetUserMedia ) {
+    // Shim for MediaStreamTrack.getSources.
+    MediaStreamTrack.getSources = function(successCb) {
+      setTimeout(function() {
+        var infos = [
+          { kind: 'audio', id: 'default', label:'', facing:'' },
+          { kind: 'video', id: 'default', label:'', facing:'' }
+        ];
+        successCb(infos);
+      }, 0);
+    };
+
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
       
