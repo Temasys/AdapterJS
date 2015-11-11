@@ -658,6 +658,11 @@ if ( navigator.mozGetUserMedia
     return to;
   };
 
+  // Removed Google defined promises when promise is not defined
+  if (typeof Promise === 'undefined') {
+    requestUserMedia = null;
+  }
+
   AdapterJS.maybeThroughWebRTCReady();
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
@@ -893,6 +898,25 @@ if ( navigator.mozGetUserMedia
       });
     };
     window.navigator.getUserMedia = window.getUserMedia;
+
+    // Defined mediaDevices when promises are available
+    if ( !navigator.mediaDevices 
+      && typeof Promise !== 'undefined') {
+      navigator.mediaDevices = {getUserMedia: requestUserMedia,
+                                enumerateDevices: function() {
+        return new Promise(function(resolve) {
+          var kinds = {audio: 'audioinput', video: 'videoinput'};
+          return MediaStreamTrack.getSources(function(devices) {
+            resolve(devices.map(function(device) {
+              return {label: device.label,
+                      kind: kinds[device.kind],
+                      deviceId: device.id,
+                      groupId: ''};
+            }));
+          });
+        });
+      }};
+    }
 
     attachMediaStream = function (element, stream) {
       if (!element || !element.parentNode) {
