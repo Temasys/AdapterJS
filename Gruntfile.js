@@ -118,6 +118,9 @@ module.exports = function(grunt) {
             // Task-specific options go here. 
             prefix: '@@',
             includesDir: '<%= pluginInfoRoot %>/',
+            processIncludeContents: function (includeContents, localVars, filePath) {
+              return includeContents.replace(/if \(typeof module \!\=\= 'undefined'\) \{(.|\n)*\}/gm,"");
+            },
           },
           // Files to perform replacements and includes with 
           src: [
