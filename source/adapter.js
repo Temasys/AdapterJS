@@ -535,7 +535,7 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
-  @@include('google.adapter.js', {})
+@@include('google.adapter.js', {})
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////

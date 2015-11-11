@@ -119,7 +119,15 @@ module.exports = function(grunt) {
             prefix: '@@',
             includesDir: '<%= pluginInfoRoot %>/',
             processIncludeContents: function (includeContents, localVars, filePath) {
-              return includeContents.replace(/if \(typeof module \!\=\= 'undefined'\) \{(.|\n)*\}/gm,"");
+              // Indent file and indent Google's exports
+              return includeContents
+                // Comment export
+                .replace(/if \(typeof module \!\=\= 'undefined'\) \{(.|\n)*\}\n/gm, function(content) {
+                return '/* Orginal exports removed in favor of AdapterJS custom export.\n' + content + '*/\n';
+                })
+                // Indent (2 spaces so far, to be updated as AJS evolves)
+                .replace(/.*\n/g, function(line) { return '  ' + line; });
+              
             },
           },
           // Files to perform replacements and includes with 
