@@ -1,4 +1,4 @@
-/*! adapterjs - v0.12.2 - 2015-10-19 */
+/*! adapterjs - v0.12.3 - 2015-11-16 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -17,7 +17,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.12.2';
+AdapterJS.VERSION = '0.12.3';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -607,7 +607,7 @@ if (navigator.mozGetUserMedia) {
 
   createIceServers = function (urls, username, password) {
     var iceServers = [];
-    for (i = 0; i < urls.length; i++) {
+    for (var i = 0; i < urls.length; i++) {
       var iceServer = createIceServer(urls[i], username, password);
       if (iceServer !== null) {
         iceServers.push(iceServer);
@@ -697,7 +697,7 @@ if (navigator.mozGetUserMedia) {
         'username' : username
       };
     } else {
-      for (i = 0; i < urls.length; i++) {
+      for (var i = 0; i < urls.length; i++) {
         var iceServer = createIceServer(urls[i], username, password);
         if (iceServer !== null) {
           iceServers.push(iceServer);
@@ -999,12 +999,13 @@ if (navigator.mozGetUserMedia) {
         return;
       }
 
-      var streamId
+      var streamId;
       if (stream === null) {
         streamId = '';
-      }
-      else {
-        stream.enableSoundTracks(true); // TODO: remove on 0.12.0
+      } else {
+        if (typeof stream.enableSoundTracks !== 'undefined') {
+          stream.enableSoundTracks(true);
+        }
         streamId = stream.id;
       }
 
@@ -1100,11 +1101,16 @@ if (navigator.mozGetUserMedia) {
 
       for(prop in properties) {
         propName = properties[prop];
-        if(propName.slice(0,2) == 'on' && srcElem[propName] != null) {
-          if(isIE){
-            destElem.attachEvent(propName,srcElem[propName]);
+
+        if (typeof(propName.slice) === 'function') {
+          if (propName.slice(0,2) == 'on' && srcElem[propName] != null) {
+            if (isIE) {
+              destElem.attachEvent(propName,srcElem[propName]);
+            } else {
+              destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+            }
           } else {
-            destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
           }
         }
       }

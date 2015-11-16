@@ -53,22 +53,7 @@ AdapterJS.webRTCReady = function (callback) {
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
 
 // The object to store plugin information
-AdapterJS.WebRTCPlugin.pluginInfo = {
-  prefix : 'Tem',
-  plugName : 'TemWebRTCPlugin',
-  pluginId : 'plugin0',
-  type : 'application/x-temwebrtcplugin',
-  onload : '__TemWebRTCReady0',
-  portalLink : 'http://skylink.io/plugin/',
-  downloadLink : null, //set below
-  companyName: 'Temasys'
-};
-if(!!navigator.platform.match(/^Mac/i)) {
-  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1n77hco';
-}
-else if(!!navigator.platform.match(/^Win/i)) {
-  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = 'http://bit.ly/1kkS4FN';
-}
+@@include('pluginInfo.js', {})
 
 AdapterJS.WebRTCPlugin.TAGS = {
   NONE  : 'none',
@@ -605,7 +590,7 @@ if (navigator.mozGetUserMedia) {
 
   createIceServers = function (urls, username, password) {
     var iceServers = [];
-    for (i = 0; i < urls.length; i++) {
+    for (var i = 0; i < urls.length; i++) {
       var iceServer = createIceServer(urls[i], username, password);
       if (iceServer !== null) {
         iceServers.push(iceServer);
@@ -695,7 +680,7 @@ if (navigator.mozGetUserMedia) {
         'username' : username
       };
     } else {
-      for (i = 0; i < urls.length; i++) {
+      for (var i = 0; i < urls.length; i++) {
         var iceServer = createIceServer(urls[i], username, password);
         if (iceServer !== null) {
           iceServers.push(iceServer);
@@ -997,12 +982,13 @@ if (navigator.mozGetUserMedia) {
         return;
       }
 
-      var streamId
+      var streamId;
       if (stream === null) {
         streamId = '';
-      }
-      else {
-        stream.enableSoundTracks(true); // TODO: remove on 0.12.0
+      } else {
+        if (typeof stream.enableSoundTracks !== 'undefined') {
+          stream.enableSoundTracks(true);
+        }
         streamId = stream.id;
       }
 
@@ -1098,11 +1084,16 @@ if (navigator.mozGetUserMedia) {
 
       for(prop in properties) {
         propName = properties[prop];
-        if(propName.slice(0,2) == 'on' && srcElem[propName] != null) {
-          if(isIE){
-            destElem.attachEvent(propName,srcElem[propName]);
+
+        if (typeof(propName.slice) === 'function') {
+          if (propName.slice(0,2) == 'on' && srcElem[propName] != null) {
+            if (isIE) {
+              destElem.attachEvent(propName,srcElem[propName]);
+            } else {
+              destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+            }
           } else {
-            destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
           }
         }
       }
