@@ -117,7 +117,7 @@ module.exports = function(grunt) {
           options: {
             // Task-specific options go here. 
             prefix: '@@',
-            includesDir: '<%= pluginInfoRoot %>/',
+            includesDir: '.',
             processIncludeContents: function (includeContents, localVars, filePath) {
               // Indent file and indent Google's exports
               return includeContents

@@ -53,7 +53,7 @@ AdapterJS.webRTCReady = function (callback) {
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
 
 // The object to store plugin information
-@@include('pluginInfo.js', {})
+@@include('source/pluginInfo.js', {})
 
 AdapterJS.WebRTCPlugin.TAGS = {
   NONE  : 'none',
@@ -530,11 +530,23 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
-@@include('google.adapter.js', {})
+@@include('third_party/adapter/adapter.js', {})
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////
 
+  ///////////////////////////////////////////////////////////////////
+  // EXTENSION OF CHROME, FIREFOX AND EDGE
+  // Includes legacy functions 
+  // -- createIceServer
+  // -- createIceServers
+  // -- MediaStreamTrack.getSources
+  //
+  // and additional shims
+  // -- attachMediaStream
+  // -- reattachMediaStream
+  // -- requestUserMedia
+  // -- a call to AdapterJS.maybeThroughWebRTCReady (notifies WebRTC is ready)
 
   // Add support for legacy functions createIceServer and createIceServers
   if ( navigator.mozGetUserMedia ) {
@@ -664,6 +676,10 @@ if ( navigator.mozGetUserMedia
   }
 
   AdapterJS.maybeThroughWebRTCReady();
+
+  // END OF EXTENSION OF CHROME, FIREFOX AND EDGE
+  ///////////////////////////////////////////////////////////////////
+
 } else { // TRY TO USE PLUGIN
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
