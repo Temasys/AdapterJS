@@ -19,6 +19,8 @@ module.exports = function(grunt) {
 
       source: 'source',
 
+      googleAdapterPath: 'third_party/adapter/adapter.js',
+
       production: 'publish',
 
       bamboo: 'bamboo',
@@ -119,15 +121,18 @@ module.exports = function(grunt) {
             prefix: '@@',
             includesDir: '.',
             processIncludeContents: function (includeContents, localVars, filePath) {
-              // Indent file and indent Google's exports
-              return includeContents
-                // Comment export
-                .replace(/if \(typeof module \!\=\= 'undefined'\) \{(.|\n)*\}\n/gm, function(content) {
-                return '/* Orginal exports removed in favor of AdapterJS custom export.\n' + content + '*/\n';
-                })
-                // Indent (2 spaces so far, to be updated as AJS evolves)
-                .replace(/.*\n/g, function(line) { return '  ' + line; });
-              
+              if (filePath.indexOf(grunt.config.get('googleAdapterPath')) != -1) {
+                // Indent file and indent Google's exports
+                return includeContents
+                  // Comment export
+                  .replace(/if \(typeof module \!\=\= 'undefined'\) \{(.|\n)*\}\n/gm, function(content) {
+                  return '/* Orginal exports removed in favor of AdapterJS custom export.\n' + content + '*/\n';
+                  })
+                  // Indent (2 spaces so far, to be updated as AJS evolves)
+                  .replace(/.*\n/g, function(line) { return '  ' + line; });
+              } else { // not Google's AJS
+                return includeContents;
+              }
             },
           },
           // Files to perform replacements and includes with 

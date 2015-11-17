@@ -536,7 +536,7 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
 
   ///////////////////////////////////////////////////////////////////
-  // EXTENSION OF CHROME, FIREFOX AND EDGE
+  // EXTENSION FOR CHROME, FIREFOX AND EDGE
   // Includes legacy functions 
   // -- createIceServer
   // -- createIceServers
