@@ -681,6 +681,28 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
 
 } else { // TRY TO USE PLUGIN
+
+  ///////////////////////////////////////////////////////////////////
+  // WEBRTC PLUGIN SHIM
+  // Will automatically check if the plugin is available and inject it
+  // into the DOM if it is.
+  // When the plugin is not available, will prompt a banner to suggest installing it
+  // Use AdapterJS.options.hidePluginInstallPrompt to prevent this banner from popping
+  //
+  // Shims the follwing:
+  // -- getUserMedia
+  // -- MediaStreamTrack
+  // -- MediaStreamTrack.getSources
+  // -- RTCPeerConnection
+  // -- RTCSessionDescription
+  // -- RTCIceCandidate
+  // -- createIceServer
+  // -- createIceServers
+  // -- attachMediaStream
+  // -- reattachMediaStream
+  // -- webrtcDetectedBrowser
+  // -- webrtcDetectedVersion
+
   // IE 9 is not offering an implementation of console.log until you open a console
   if (typeof console !== 'object' || typeof console.log !== 'function') {
     /* jshint -W020 */
@@ -1110,4 +1132,7 @@ if ( navigator.mozGetUserMedia
     AdapterJS.WebRTCPlugin.pluginInfo.plugName,
     AdapterJS.WebRTCPlugin.defineWebRTCInterface,
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
+
+  // END OF WEBRTC PLUGIN SHIM
+  ///////////////////////////////////////////////////////////////////
 }
