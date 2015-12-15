@@ -1118,6 +1118,12 @@ if ( navigator.mozGetUserMedia ||
     AdapterJS.reattachMediaStream = reattachMediaStream;
 
     AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
+      for (var property in srcElem) {
+        if (srcElem.hasOwnProperty(property)) {
+          destElem[property] = srcElem[property];
+        }
+      }
+
       properties = Object.getOwnPropertyNames( prototype );
       for(var prop in properties) {
         if (prop) {
@@ -1131,8 +1137,7 @@ if ( navigator.mozGetUserMedia ||
                 destElem.addEventListener(propName.slice(2), srcElem[propName], false);
               }
             }
-            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
-          }
+          } 
         }
       }
       var subPrototype = Object.getPrototypeOf(prototype);
