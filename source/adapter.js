@@ -32,6 +32,9 @@ AdapterJS.onwebrtcready = AdapterJS.onwebrtcready || function(isUsingPlugin) {
   // Override me and do whatever you want here
 };
 
+// New interface to store multiple callbacks, private
+AdapterJS._onwebrtcreadies = [];
+
 // Sets a callback function to be called when the WebRTC interface is ready.
 // The first argument is the function to callback.\
 // Throws an error if the first argument is not a function
@@ -45,7 +48,7 @@ AdapterJS.webRTCReady = function (callback) {
     callback(null !== AdapterJS.WebRTCPlugin.plugin);
   } else {
     // will be triggered automatically when your browser/plugin is ready.
-    AdapterJS.onwebrtcready = callback;
+    AdapterJS._onwebrtcreadies.push(callback);
   }
 };
 
@@ -161,7 +164,15 @@ AdapterJS.maybeThroughWebRTCReady = function() {
   if (!AdapterJS.onwebrtcreadyDone) {
     AdapterJS.onwebrtcreadyDone = true;
 
-    if (typeof(AdapterJS.onwebrtcready) === 'function') {
+    // If new interface for multiple callbacks used
+    if (AdapterJS._onwebrtcreadies.length) {
+      AdapterJS._onwebrtcreadies.forEach(function (callback) {
+        if (typeof(callback) === 'function') {
+          callback(AdapterJS.WebRTCPlugin.plugin !== null);
+        }
+      });
+    // Else if no callbacks on new interface assuming user used old(deprecated) way to set callback through AdapterJS.onwebrtcready = ...
+    } else if (typeof(AdapterJS.onwebrtcready) === 'function') {
       AdapterJS.onwebrtcready(AdapterJS.WebRTCPlugin.plugin !== null);
     }
   }
