@@ -1,0 +1,3 @@
+[submodule "third_party/adapter"]
+	path = third_party/adapter
+	url = https://github.com/webrtc/adapter.git
