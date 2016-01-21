@@ -208,3 +208,7 @@ var connect = function (peer1, peer2, offerConstraints) {
     throw error;
   }, offerConstraints);
 };
+
+// Plugin functions have different types depending on the interface (NPAPI VS ActiveX)
+FUNCTION_TYPE = webrtcDetectedBrowser === 'IE' ? 'object' : 'function';
+
