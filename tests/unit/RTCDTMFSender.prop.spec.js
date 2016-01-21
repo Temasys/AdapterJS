@@ -6,12 +6,12 @@ var should = chai.should;
 var testTimeout = 35000;
 
 // Get User Media timeout
-var gUMTimeout = 25000;
+var gUMTimeout = 5000;
 
 // Test item timeout
 var testItemTimeout = 2000;
 
-describe('RTCDTMFSender', function() {
+describe('RTCDTMFSender | prop', function() {
   this.timeout(testTimeout);
 
   var pc1 = null;
@@ -24,6 +24,8 @@ describe('RTCDTMFSender', function() {
   /* WebRTC Object should be initialized in Safari/IE Plugin */
   before(function (done) {
     this.timeout(testItemTimeout);
+
+    assert.isNotNull(AdapterJS.WebRTCPlugin.plugin);
 
     AdapterJS.webRTCReady(function() {
       window.navigator.getUserMedia({
@@ -47,8 +49,8 @@ describe('RTCDTMFSender', function() {
     pc1 = new RTCPeerConnection({ iceServers: [] });
     pc2 = new RTCPeerConnection({ iceServers: [] });
     pc1.oniceconnectionstatechange = function (state) {
-      dtmfSender = pc1.createDTMFSender(audioTrack);
       if(pc1.iceConnectionState === 'connected') {
+        dtmfSender = pc1.createDTMFSender(audioTrack);
         done();
       }
     };
@@ -58,12 +60,13 @@ describe('RTCDTMFSender', function() {
 
   /////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////
-  afterEach(function() {
+  afterEach(function(done) {
     pc1.close();
     pc2.close();
     pc1 = null;
     pc2 = null;
     dtmfSender = null;
+    done();
   });
 
   /////////////////////////////////////////////////////////////////////
