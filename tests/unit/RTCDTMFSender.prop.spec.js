@@ -74,6 +74,52 @@ describe('RTCDTMFSender', function() {
     done();
   });
 
+  /////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  it('RTCDTMFSender.insertDTMF :: success returns true', function (done) {
+    this.timeout(testItemTimeout);
+    assert.isTrue(dtmfSender.insertDTMF('', 100, 100));
+    assert.isTrue(dtmfSender.insertDTMF('13,1', 100, 100));
+    assert.isTrue(dtmfSender.insertDTMF(',,,', 200, 100));
+    done();
+  });
+
+  /////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  it('RTCDTMFSender.insertDTMF :: failure returns false', function (done) {
+    this.timeout(testItemTimeout);
+    assert.isFalse(dtmfSender.insertDTMF('13,1', 10, 100));
+    assert.isFalse(dtmfSender.insertDTMF('13,1', 100, 10));
+    done();
+  });
+
+  /////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  it('RTCDTMFSender.insertDTMF :: edge values', function (done) {
+    this.timeout(testItemTimeout);
+    assert.isTrue(dtmfSender.insertDTMF('1', 70, 100),    'on low duration egde');
+    assert.isTrue(dtmfSender.insertDTMF('1', 6000, 100),  'on high duration egde');
+    assert.isTrue(dtmfSender.insertDTMF('1', 100, 50),    'low gap edge');
+
+    assert.isFalse(dtmfSender.insertDTMF('1', 69, 100),   'under duration egde');
+    assert.isFalse(dtmfSender.insertDTMF('1', 6001, 100), 'over duration egde');
+    assert.isFalse(dtmfSender.insertDTMF('1', 100, 49),   'under gap edge');
+    done();
+  });
+
+  /////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  it('RTCDTMFSender.insertDTMF :: default arguments', function (done) {
+    this.timeout(testItemTimeout);
+    var e = 'Error calling method on NPObject.';
+    assert.doesNotThrow(function(){dtmfSender.insertDTMF('1', 100)}, e, 'default gap, does not throw');
+    assert.doesNotThrow(function(){dtmfSender.insertDTMF('1')}, e, 'default duration, does not throw');
+    assert.throws(function(){dtmfSender.insertDTMF()}, e, 'Missing tones, throws');
+    
+    assert.isTrue(dtmfSender.insertDTMF('1', 100), 'default gap');
+    assert.isTrue(dtmfSender.insertDTMF('1'), 'default duration');
+    done();
+  });
 
   /////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////
@@ -83,7 +129,6 @@ describe('RTCDTMFSender', function() {
     assert.isTrue(dtmfSender.canInsertDTMF);
     done();
   });
-
 
   /////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////
