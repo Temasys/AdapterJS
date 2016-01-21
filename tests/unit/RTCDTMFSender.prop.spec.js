@@ -111,11 +111,11 @@ describe('RTCDTMFSender', function() {
   /////////////////////////////////////////////////////////////////////
   it('RTCDTMFSender.insertDTMF :: default arguments', function (done) {
     this.timeout(testItemTimeout);
-    var e = 'Error calling method on NPObject.';
-    assert.doesNotThrow(function(){dtmfSender.insertDTMF('1', 100)}, e, 'default gap, does not throw');
-    assert.doesNotThrow(function(){dtmfSender.insertDTMF('1')}, e, 'default duration, does not throw');
-    assert.throws(function(){dtmfSender.insertDTMF()}, e, 'Missing tones, throws');
-    
+    var e = /.*/;
+    assert.doesNotThrow(function(){dtmfSender.insertDTMF('1', 100);}, e, 'default gap, does not throw');
+    assert.doesNotThrow(function(){dtmfSender.insertDTMF('1');}, e, 'default duration, does not throw');
+    assert.throws(function(){dtmfSender.insertDTMF();}, e, 'Missing tones, throws');
+
     assert.isTrue(dtmfSender.insertDTMF('1', 100), 'default gap');
     assert.isTrue(dtmfSender.insertDTMF('1'), 'default duration');
     done();
