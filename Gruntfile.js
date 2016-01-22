@@ -115,10 +115,10 @@ module.exports = function(grunt) {
       },
 
       includereplace: {
-        production: {
+        withGoogle: {
           options: {
             // Task-specific options go here. 
-            prefix: '@@',
+            prefix: '@Goo@',
             includesDir: '.',
             processIncludeContents: function (includeContents, localVars, filePath) {
               if (filePath.indexOf(grunt.config.get('googleAdapterPath')) != -1) {
@@ -141,7 +141,20 @@ module.exports = function(grunt) {
             ],
           // Destination directory to copy files to 
           dest: './'
-        }
+        },
+        withPluginInfo: {
+          options: {
+            // Task-specific options go here. 
+            prefix: '@Tem@',
+            includesDir: '<%= pluginInfoRoot %>/',
+          },
+          // Files to perform replacements and includes with 
+          src: [
+            '<%= production %>/*.js',
+            ],
+          // Destination directory to copy files to 
+          dest: './'
+        },
       },
       
       jshint: {

@@ -56,7 +56,7 @@ AdapterJS.webRTCReady = function (callback) {
 AdapterJS.WebRTCPlugin = AdapterJS.WebRTCPlugin || {};
 
 // The object to store plugin information
-@@include('source/pluginInfo.js', {})
+@Tem@include('pluginInfo.js', {})
 
 AdapterJS.WebRTCPlugin.TAGS = {
   NONE  : 'none',
@@ -541,7 +541,7 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
-@@include('third_party/adapter/adapter.js', {})
+@Goo@include('third_party/adapter/adapter.js', {})
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////
