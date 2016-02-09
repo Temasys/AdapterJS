@@ -319,6 +319,7 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
 
   var w = window;
   var i = document.createElement('iframe');
+  i.name = 'adapterjs-alert';
   i.style.position = 'fixed';
   i.style.top = '-41px';
   i.style.left = 0;
