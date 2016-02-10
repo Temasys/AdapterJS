@@ -907,27 +907,34 @@ if ( navigator.mozGetUserMedia
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      var iceServers = null;
-      if (servers) {
-        iceServers = servers.iceServers;
-        for (var i = 0; i < iceServers.length; i++) {
-          if (iceServers[i].urls && !iceServers[i].url) {
-            iceServers[i].url = iceServers[i].urls;
-          }
-          iceServers[i].hasCredentials = AdapterJS.
-            isDefined(iceServers[i].username) &&
-            AdapterJS.isDefined(iceServers[i].credential);
-        }
-      }
-      var mandatory = (constraints && constraints.mandatory) ?
-        constraints.mandatory : null;
-      var optional = (constraints && constraints.optional) ?
-        constraints.optional : null;
-
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
-      return AdapterJS.WebRTCPlugin.plugin.
-        PeerConnection(AdapterJS.WebRTCPlugin.pageId,
-        iceServers, mandatory, optional);
+
+      if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION && 
+          AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
+        // RTCPeerConnection prototype from the new spec
+        return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
+      } else {
+        // RTCPeerConnection prototype from the old spec
+        var iceServers;
+        if (servers) {
+          iceServers = servers.iceServers;
+          for (var i = 0; i < iceServers.length; i++) {
+            if (iceServers[i].urls && !iceServers[i].url) {
+              iceServers[i].url = iceServers[i].urls;
+            }
+            iceServers[i].hasCredentials = AdapterJS.
+              isDefined(iceServers[i].username) &&
+              AdapterJS.isDefined(iceServers[i].credential);
+          }
+        }
+        var mandatory = (constraints && constraints.mandatory) ?
+          constraints.mandatory : null;
+        var optional = (constraints && constraints.optional) ?
+          constraints.optional : null;
+        return AdapterJS.WebRTCPlugin.plugin.
+          PeerConnection(AdapterJS.WebRTCPlugin.pageId,
+          iceServers, mandatory, optional);
+      }
     };
 
     MediaStreamTrack = {};
