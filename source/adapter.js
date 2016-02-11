@@ -574,16 +574,16 @@ if ( navigator.mozGetUserMedia
 
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
-      
+      // Note: Google's import of AJS will auto-reverse to 'url': '...' for FF < 38
       var iceServer = null;
       var urlParts = url.split(':');
       if (urlParts[0].indexOf('stun') === 0) {
         iceServer = { urls : [url] };
       } else if (urlParts[0].indexOf('turn') === 0) {
         if (webrtcDetectedVersion < 27) {
-          var turn_urlParts = url.split('?');
-          if (turn_urlParts.length === 1 ||
-            turn_urlParts[1].indexOf('transport=udp') === 0) {
+          var turnUrlParts = url.split('?');
+          if (turnUrlParts.length === 1 ||
+            turnUrlParts[1].indexOf('transport=udp') === 0) {
             iceServer = {
               urls : [turn_urlParts[0]],
               credential : password,
