@@ -143,8 +143,6 @@ AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
-  webrtcDetectedVersion = AdapterJS.WebRTCPlugin.plugin.version;
-
   if (document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
@@ -228,45 +226,43 @@ AdapterJS.isDefined = null;
 //   - 'webkit': WebKit implementation of webRTC.
 //   - 'plugin': Using the plugin implementation.
 AdapterJS.parseWebrtcDetectedBrowser = function () {
-  var hasMatch, checkMatch = navigator.userAgent.match(
-    /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-  if (/trident/i.test(checkMatch[1])) {
-    hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
+  if ((!!window.opr && !!opr.addons) || 
+    !!window.opera || 
+    navigator.userAgent.indexOf(' OPR/') >= 0) {
+    // Opera 8.0+
+    webrtcDetectedBrowser = 'opera';
+    webrtcDetectedType    = 'webkit';
+    var hasMatch = /OPR\/(\d+)/i.exec(navigator.userAgent) || [];
+    webrtcDetectedVersion = parseInt(hasMatch[1], 10);
+  } else if (typeof InstallTrigger !== 'undefined') {
+    // Firefox 1.0+
+    // Bowser and Version set in Google's adapter
+    webrtcDetectedType    = 'moz';
+  } else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
+    // Safari
+    webrtcDetectedBrowser = 'safari';
+    webrtcDetectedType    = 'plugin';
+    var hasMatch = /version\/(\d+)/i.exec(navigator.userAgent) || [];
+    webrtcDetectedVersion = parseInt(hasMatch[1], 10);
+  } else if (/*@cc_on!@*/false || !!document.documentMode) {
+    // Internet Explorer 6-11
     webrtcDetectedBrowser = 'IE';
+    webrtcDetectedType    = 'plugin';
+    var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-  } else if (checkMatch[1] === 'Chrome') {
-    hasMatch = navigator.userAgent.match(/\bOPR\/(\d+)/);
-    if (hasMatch !== null) {
-      webrtcDetectedBrowser = 'opera';
-      webrtcDetectedVersion = parseInt(hasMatch[1], 10);
-    }
-  }
-  if (navigator.userAgent.indexOf('Safari')) {
-    if (typeof InstallTrigger !== 'undefined') {
-      webrtcDetectedBrowser = 'firefox';
-    } else if (/*@cc_on!@*/ false || !!document.documentMode) {
-      webrtcDetectedBrowser = 'IE';
-    } else if (
-      Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
-      webrtcDetectedBrowser = 'safari';
-    } else if (!!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
-      webrtcDetectedBrowser = 'opera';
-    } else if (!!window.chrome) {
-      webrtcDetectedBrowser = 'chrome';
-    }
-  }
-  if (!webrtcDetectedBrowser) {
-    webrtcDetectedVersion = checkMatch[1];
-  }
-  if (!webrtcDetectedVersion) {
-    try {
-      checkMatch = (checkMatch[2]) ? [checkMatch[1], checkMatch[2]] :
-        [navigator.appName, navigator.appVersion, '-?'];
-      if ((hasMatch = navigator.userAgent.match(/version\/(\d+)/i)) !== null) {
-        checkMatch.splice(1, 1, hasMatch[1]);
-      }
-      webrtcDetectedVersion = parseInt(checkMatch[1], 10);
-    } catch (error) { }
+  } else if (!!window.StyleMedia) {
+    // Edge 20+
+    // Bowser and Version set in Google's adapter
+    webrtcDetectedType    = '';
+  } else if (!!window.chrome && !!window.chrome.webstore) {
+    // Chrome 1+
+    // Bowser and Version set in Google's adapter
+    webrtcDetectedType    = 'webkit';
+  } else if ((webrtcDetectedBrowser === 'chrome'|| webrtcDetectedBrowser === 'opera') && 
+    !!window.CSS) {
+    // Blink engine detection
+    webrtcDetectedBrowser = 'blink';
+    // TODO: detected WebRTC version
   }
 };
 
@@ -546,6 +542,8 @@ if ( navigator.mozGetUserMedia
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////
 
+  AdapterJS.parseWebrtcDetectedBrowser();
+
   ///////////////////////////////////////////////////////////////////
   // EXTENSION FOR CHROME, FIREFOX AND EDGE
   // Includes legacy functions 
@@ -737,7 +735,6 @@ if ( navigator.mozGetUserMedia
     console.groupEnd = function (arg) {};
     /* jshint +W020 */
   }
-  webrtcDetectedType = 'plugin';
   AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
