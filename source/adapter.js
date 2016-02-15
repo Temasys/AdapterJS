@@ -149,10 +149,10 @@ __TemWebRTCReady0 = function () {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
   } else {
-    AdapterJS.WebRTCPlugin.documentReadyInterval = setInterval(function () {
+    var timer = setInterval(function () {
       if (document.readyState === 'complete') {
         // TODO: update comments, we wait for the document to be ready
-        clearInterval(AdapterJS.WebRTCPlugin.documentReadyInterval);
+        clearInterval(timer);
         AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
         AdapterJS.maybeThroughWebRTCReady();
       }
