@@ -254,6 +254,10 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcMinimumVersion  = 9;
     var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
+    if (!webrtcDetectedVersion) {
+      var hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
+      webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);      
+    }
   } else if (!!window.StyleMedia) {
     // Edge 20+
     // Bowser and Version set in Google's adapter
