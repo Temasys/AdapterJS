@@ -221,6 +221,7 @@ AdapterJS.isDefined = null;
 // This sets:
 // - webrtcDetectedBrowser: The browser agent name.
 // - webrtcDetectedVersion: The browser version.
+// - webrtcMinimumVersion: The minimum browser version still supported by AJS.
 // - webrtcDetectedType: The types of webRTC support.
 //   - 'moz': Mozilla implementation of webRTC.
 //   - 'webkit': WebKit implementation of webRTC.
@@ -232,6 +233,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     // Opera 8.0+
     webrtcDetectedBrowser = 'opera';
     webrtcDetectedType    = 'webkit';
+    webrtcMinimumVersion  = 26;
     var hasMatch = /OPR\/(\d+)/i.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1], 10);
   } else if (typeof InstallTrigger !== 'undefined') {
@@ -242,12 +244,14 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     // Safari
     webrtcDetectedBrowser = 'safari';
     webrtcDetectedType    = 'plugin';
+    webrtcMinimumVersion  = 7;
     var hasMatch = /version\/(\d+)/i.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1], 10);
   } else if (/*@cc_on!@*/false || !!document.documentMode) {
     // Internet Explorer 6-11
     webrtcDetectedBrowser = 'IE';
     webrtcDetectedType    = 'plugin';
+    webrtcMinimumVersion  = 9;
     var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
   } else if (!!window.StyleMedia) {
@@ -527,6 +531,9 @@ webrtcDetectedBrowser = null;
 
 // Detected browser version.
 webrtcDetectedVersion = null;
+
+// The minimum browser version still supported by AJS.
+webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
 if ( navigator.mozGetUserMedia
