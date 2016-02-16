@@ -92,7 +92,7 @@ describe('RTCPeerConnection | EventHandler', function() {
       }
     };
 
-    peer1.onicecandidate = function () {
+    peer1.onicecandidate = function (event) {
       var candidate = event.candidate;
 
       if (candidate === null) {
@@ -107,7 +107,7 @@ describe('RTCPeerConnection | EventHandler', function() {
       }
     };
 
-    peer2.onicecandidate = function () {
+    peer2.onicecandidate = function (event) {
       var candidate = event.candidate;
 
       if (candidate === null) {
