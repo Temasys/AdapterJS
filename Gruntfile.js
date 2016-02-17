@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 
       source: 'source',
 
-      googleAdapterPath: 'third_party/adapter/adapter.js',
+      googleAdapterPath: 'third_party/adapter/out/adapter.js',
 
       production: 'publish',
 
@@ -303,6 +303,19 @@ module.exports = function(grunt) {
       }
     });
 
+    grunt.registerTask('webrtc-adapter', 'Build the webrtc-adapter submodule', function() {
+      grunt.verbose.writeln('Spawning child process to compile webrtc-adapter subgrunt.');
+      var done = this.async();
+      var child = grunt.util.spawn({
+        grunt: true,
+        args: ['--gruntfile', './third_party/adapter/Gruntfile.js', 'build'],
+        opts: {stdio: 'inherit'},
+      }, function(error, result) {});
+      child.on('close', function (code) {
+        done(code === 0);
+      });
+    });
+
     grunt.registerTask('dev', [
         'CheckPluginInfo',
         'versionise',
@@ -315,6 +328,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('publish', [
         'CheckPluginInfo',
+        'webrtc-adapter',
         'versionise',
         'clean:production',
         'concat',

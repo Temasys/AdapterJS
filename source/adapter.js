@@ -541,7 +541,7 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
-@Goo@include('third_party/adapter/adapter.js', {})
+@Goo@include('third_party/adapter/out/adapter.js', {})
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////
