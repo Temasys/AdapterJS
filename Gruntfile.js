@@ -303,16 +303,6 @@ module.exports = function(grunt) {
       }
     });
 
-    grunt.registerTask('dev', [
-        'CheckPluginInfo',
-        'versionise',
-        'clean:production',
-        'concat',
-        'replace:production',
-        'includereplace:production',
-        'uglify'
-    ]);
-
     grunt.registerTask('publish', [
         'CheckPluginInfo',
         'versionise',
