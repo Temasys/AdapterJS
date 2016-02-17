@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 
       source: 'source',
 
-      googleAdapterPath: 'third_party/adapter/out/adapter.js',
+      googleAdapterPath: 'third_party/adapter/adapter.js',
 
       production: 'publish',
 
@@ -303,6 +303,7 @@ module.exports = function(grunt) {
       }
     });
 
+    // NOTE(J-O) Prep for webrtc-adapter 0.2.10, will need to be compiled
     grunt.registerTask('webrtc-adapter', 'Build the webrtc-adapter submodule', function() {
       grunt.verbose.writeln('Spawning child process to compile webrtc-adapter subgrunt.');
       var done = this.async();
@@ -328,7 +329,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('publish', [
         'CheckPluginInfo',
-        'webrtc-adapter',
+        // 'webrtc-adapter',
         'versionise',
         'clean:production',
         'concat',

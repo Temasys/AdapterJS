@@ -541,7 +541,7 @@ if ( navigator.mozGetUserMedia
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
-@Goo@include('third_party/adapter/out/adapter.js', {})
+@Goo@include('third_party/adapter/adapter.js', {})
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////
@@ -951,7 +951,7 @@ if ( navigator.mozGetUserMedia
     // Defined mediaDevices when promises are available
     if ( !navigator.mediaDevices 
       && typeof Promise !== 'undefined') {
-      navigator.mediaDevices = {getUserMedia: requestUserMedia,
+      navigator.mediaDevices = { //getUserMedia: requestUserMedia,
                                 enumerateDevices: function() {
         return new Promise(function(resolve) {
           var kinds = {audio: 'audioinput', video: 'videoinput'};
