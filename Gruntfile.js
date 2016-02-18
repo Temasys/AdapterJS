@@ -303,8 +303,23 @@ module.exports = function(grunt) {
       }
     });
 
+    // NOTE(J-O) Prep for webrtc-adapter 0.2.10, will need to be compiled
+    grunt.registerTask('webrtc-adapter', 'Build the webrtc-adapter submodule', function() {
+      grunt.verbose.writeln('Spawning child process to compile webrtc-adapter subgrunt.');
+      var done = this.async();
+      var child = grunt.util.spawn({
+        grunt: true,
+        args: ['--gruntfile', './third_party/adapter/Gruntfile.js', 'build'],
+        opts: {stdio: 'inherit'},
+      }, function(error, result) {});
+      child.on('close', function (code) {
+        done(code === 0);
+      });
+    });
+
     grunt.registerTask('publish', [
         'CheckPluginInfo',
+        // 'webrtc-adapter',
         'versionise',
         'clean:production',
         'concat',

@@ -959,7 +959,7 @@ if ( navigator.mozGetUserMedia
     // Defined mediaDevices when promises are available
     if ( !navigator.mediaDevices 
       && typeof Promise !== 'undefined') {
-      navigator.mediaDevices = {getUserMedia: requestUserMedia,
+      navigator.mediaDevices = { //getUserMedia: requestUserMedia,
                                 enumerateDevices: function() {
         return new Promise(function(resolve) {
           var kinds = {audio: 'audioinput', video: 'videoinput'};
