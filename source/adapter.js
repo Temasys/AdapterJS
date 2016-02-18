@@ -274,20 +274,6 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
   }
 };
 
-// To fix configuration as some browsers does not support
-// the 'urls' attribute.
-AdapterJS.maybeFixConfiguration = function (pcConfig) {
-  if (pcConfig === null) {
-    return;
-  }
-  for (var i = 0; i < pcConfig.iceServers.length; i++) {
-    if (pcConfig.iceServers[i].hasOwnProperty('urls')) {
-      pcConfig.iceServers[i].url = pcConfig.iceServers[i].urls;
-      delete pcConfig.iceServers[i].urls;
-    }
-  }
-};
-
 AdapterJS.addEvent = function(elem, evnt, func) {
   if (elem.addEventListener) { // W3C DOM
     elem.addEventListener(evnt, func, false);
