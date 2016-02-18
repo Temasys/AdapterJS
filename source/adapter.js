@@ -1089,9 +1089,8 @@ if ( navigator.mozGetUserMedia ||
               } else {
                 destElem.addEventListener(propName.slice(2), srcElem[propName], false);
               }
-            } else {
-              //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
             }
+            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
           }
         }
       }

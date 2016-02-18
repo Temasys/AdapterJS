@@ -58,7 +58,7 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
       document.body.removeChild(video);
       stream = null;
 
-      if(interval != null) {
+      if(interval !== null) {
         clearInterval(interval);
         interval = null;
       }

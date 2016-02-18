@@ -172,7 +172,8 @@ module.exports = function(grunt) {
                 node: true
             }, grunt.file.readJSON('.jshintrc')),
             src: [
-                'tests/*_test.js'
+              'tests/*.js',
+              'tests/unit/*.js'
             ]
         },
         app: {

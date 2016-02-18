@@ -42,12 +42,12 @@ describe('RTCDTMFSender | event', function() {
   /////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////
   beforeEach(function (done) {
-    this.timeout(testItemTimeout);
+    this.timeout(gUMTimeout);
 
     pc1 = new RTCPeerConnection({ iceServers: [] });
     pc2 = new RTCPeerConnection({ iceServers: [] });
-    pc1.oniceconnectionstatechange = function (state) {
-      if(pc1.iceConnectionState === 'connected') {
+    pc1.oniceconnectionstatechange = function (evt) {
+      if(pc1 && pc1.iceConnectionState === 'connected') {
         dtmfSender = pc1.createDTMFSender(audioTrack);
         done();
       }

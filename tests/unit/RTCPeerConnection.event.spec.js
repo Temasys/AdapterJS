@@ -134,11 +134,11 @@ describe('RTCPeerConnection | EventHandler', function() {
     var array2 = [];
 
     var checkdone = function() {
-      if ( isArrayEqual( array1, ['stable', 'have-local-offer', 'stable'] )
-        && isArrayEqual( array2, ['stable', 'have-remote-offer', 'stable'] )) {
+      if ( isArrayEqual( array1, ['stable', 'have-local-offer', 'stable'] ) && 
+           isArrayEqual( array2, ['stable', 'have-remote-offer', 'stable'])) {
         done();
       }
-    }
+    };
 
     peer1.onsignalingstatechange = function () {
       array1.push(peer1.signalingState);
@@ -197,11 +197,11 @@ describe('RTCPeerConnection | EventHandler', function() {
     var array2 = [];
 
     var checkdone = function() {
-      if ( isArrayEqual( array1, ['new', 'checking', 'completed', 'completed'/*, 'closed'*/] )
-        && isArrayEqual( array2, ['new', 'checking', 'connected'/*, 'completed', 'closed'*/] )) {
+      if ( isArrayEqual( array1, ['new', 'checking', 'completed', 'completed'/*, 'closed'*/] ) && 
+           isArrayEqual( array2, ['new', 'checking', 'connected'/*, 'completed', 'closed'*/] )) {
         done();
       }
-    }
+    };
 
     peer1.oniceconnectionstatechange = function () {
       array1.push(peer1.iceConnectionState);
@@ -233,11 +233,11 @@ describe('RTCPeerConnection | EventHandler', function() {
       assert.deepEqual(array1, ['new', 'gathering', 'complete']);
       assert.deepEqual(array2, ['new', 'gathering', 'complete']);
 
-      if ( isArrayEqual( array1, ['new', 'gathering', 'complete'] )
-        && isArrayEqual( array2, ['new', 'gathering', 'complete'] )) {
+      if ( isArrayEqual( array1, ['new', 'gathering', 'complete'] ) && 
+           isArrayEqual( array2, ['new', 'gathering', 'complete'] )) {
         done();
       }
-    }
+    };
 
     peer1.onicegatheringstatechange = function () {
       array1.push(peer1.iceGatheringState);

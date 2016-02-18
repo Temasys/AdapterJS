@@ -77,7 +77,7 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
           clearTimeout(timeout);
           done();
         }
-      }
+      };
       replaceVideoElement();
     });
 

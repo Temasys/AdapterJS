@@ -47,7 +47,6 @@ describe('MediaStreamTrack | Properties', function() {
 
 			}, function (error) {
 				throw error;
-				done();
 			});
 		});
 	});
