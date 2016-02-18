@@ -227,6 +227,7 @@ AdapterJS.isDefined = null;
 //   - 'webkit': WebKit implementation of webRTC.
 //   - 'plugin': Using the plugin implementation.
 AdapterJS.parseWebrtcDetectedBrowser = function () {
+  var hasMatch = null;
   if ((!!window.opr && !!opr.addons) || 
     !!window.opera || 
     navigator.userAgent.indexOf(' OPR/') >= 0) {
@@ -234,7 +235,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser = 'opera';
     webrtcDetectedType    = 'webkit';
     webrtcMinimumVersion  = 26;
-    var hasMatch = /OPR\/(\d+)/i.exec(navigator.userAgent) || [];
+    hasMatch = /OPR\/(\d+)/i.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1], 10);
   } else if (typeof InstallTrigger !== 'undefined') {
     // Firefox 1.0+
@@ -245,17 +246,17 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser = 'safari';
     webrtcDetectedType    = 'plugin';
     webrtcMinimumVersion  = 7;
-    var hasMatch = /version\/(\d+)/i.exec(navigator.userAgent) || [];
+    hasMatch = /version\/(\d+)/i.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1], 10);
   } else if (/*@cc_on!@*/false || !!document.documentMode) {
     // Internet Explorer 6-11
     webrtcDetectedBrowser = 'IE';
     webrtcDetectedType    = 'plugin';
     webrtcMinimumVersion  = 9;
-    var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
+    hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
     webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     if (!webrtcDetectedVersion) {
-      var hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
+      hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
       webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);      
     }
   } else if (!!window.StyleMedia) {
@@ -540,10 +541,10 @@ webrtcDetectedVersion = null;
 webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
-if ( navigator.mozGetUserMedia
-  || navigator.webkitGetUserMedia
-  || (navigator.mediaDevices 
-    && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) ) { 
+if ( navigator.mozGetUserMedia || 
+  navigator.webkitGetUserMedia || 
+  (navigator.mediaDevices && 
+    navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) ) { 
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -871,7 +872,7 @@ if ( navigator.mozGetUserMedia
   AdapterJS.WebRTCPlugin.defineWebRTCInterface = function () {
     if (AdapterJS.WebRTCPlugin.pluginState ===
         AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
-      console.error("AdapterJS - WebRTC interface has already been defined");
+      console.error('AdapterJS - WebRTC interface has already been defined');
       return;
     }
 
@@ -957,8 +958,8 @@ if ( navigator.mozGetUserMedia
     window.navigator.getUserMedia = window.getUserMedia;
 
     // Defined mediaDevices when promises are available
-    if ( !navigator.mediaDevices 
-      && typeof Promise !== 'undefined') {
+    if ( !navigator.mediaDevices &&
+      typeof Promise !== 'undefined') {
       navigator.mediaDevices = {getUserMedia: requestUserMedia,
                                 enumerateDevices: function() {
         return new Promise(function(resolve) {
@@ -1077,30 +1078,29 @@ if ( navigator.mozGetUserMedia
     };
 
     AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
-
       properties = Object.getOwnPropertyNames( prototype );
+      for(var prop in properties) {
+        if (prop) {
+          propName = properties[prop];
 
-      for(prop in properties) {
-        propName = properties[prop];
-
-        if (typeof(propName.slice) === 'function') {
-          if (propName.slice(0,2) == 'on' && srcElem[propName] != null) {
-            if (isIE) {
-              destElem.attachEvent(propName,srcElem[propName]);
+          if (typeof(propName.slice) === 'function') {
+            if (propName.slice(0,2) === 'on' && srcElem[propName] !== null) {
+              if (isIE) {
+                destElem.attachEvent(propName,srcElem[propName]);
+              } else {
+                destElem.addEventListener(propName.slice(2), srcElem[propName], false);
+              }
             } else {
-              destElem.addEventListener(propName.slice(2), srcElem[propName], false)
+              //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
             }
-          } else {
-            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
           }
         }
       }
-
-      var subPrototype = Object.getPrototypeOf(prototype)
-      if(subPrototype != null) {
+      var subPrototype = Object.getPrototypeOf(prototype);
+      if(!!subPrototype) {
         AdapterJS.forwardEventHandlers(destElem, srcElem, subPrototype);
       }
-    }
+    };
 
     RTCIceCandidate = function (candidate) {
       if (!candidate.sdpMid) {
