@@ -907,25 +907,26 @@ if ( navigator.mozGetUserMedia
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      AdapterJS.WebRTCPlugin.WaitForPluginReady();
+      if (!servers || 
+          typeof servers.iceServers !== 'object') {
+        throw new Error('new RTCPeerConnection: arg1.iceServers should be a non-null array');
+      }
 
+      AdapterJS.WebRTCPlugin.WaitForPluginReady();
       if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION && 
           AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
         // RTCPeerConnection prototype from the new spec
         return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
       } else {
         // RTCPeerConnection prototype from the old spec
-        var iceServers;
-        if (servers) {
-          iceServers = servers.iceServers;
-          for (var i = 0; i < iceServers.length; i++) {
-            if (iceServers[i].urls && !iceServers[i].url) {
-              iceServers[i].url = iceServers[i].urls;
-            }
-            iceServers[i].hasCredentials = AdapterJS.
-              isDefined(iceServers[i].username) &&
-              AdapterJS.isDefined(iceServers[i].credential);
+        var iceServers = servers.iceServers;
+        for (var i = 0; i < iceServers.length; i++) {
+          if (iceServers[i].urls && !iceServers[i].url) {
+            iceServers[i].url = iceServers[i].urls;
           }
+          iceServers[i].hasCredentials = AdapterJS.
+            isDefined(iceServers[i].username) &&
+            AdapterJS.isDefined(iceServers[i].credential);
         }
         var mandatory = (constraints && constraints.mandatory) ?
           constraints.mandatory : null;
