@@ -65,24 +65,6 @@ describe('MediaStreamTrack | Properties', function() {
 			assert.typeOf(source1.kind, 'string');
 			assert.typeOf(source1.facing, 'string');
 			assert.typeOf(source1.label, 'string');
-
-			var constraints = {};
-
-			constraints[source1.kind] = {
-				optional: [{ sourceId: source1.id }]
-			};
-
-			window.navigator.getUserMedia(constraints, function (checkStream) {
-
-				var checkTrack = source1.kind === 'audio' ? checkStream.getAudioTracks()[0] :
-					checkStream.getVideoTracks()[0];
-
-				expect(checkTrack.id).to.equal(source1.id);
-				done();
-
-			}, function (error) {
-				throw error;
-			});
 		});
 	});
 

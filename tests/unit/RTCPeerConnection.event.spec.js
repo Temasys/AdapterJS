@@ -29,7 +29,15 @@ describe('RTCPeerConnection | EventHandler', function() {
     this.timeout(testItemTimeout);
 
     AdapterJS.webRTCReady(function() {
-      done();
+      window.navigator.getUserMedia({
+        audio: true,
+        video: true
+      }, function (data) {
+        stream = data;
+        done();
+      }, function (error) {
+        throw error;
+      });
     });
   });
 
@@ -38,21 +46,10 @@ describe('RTCPeerConnection | EventHandler', function() {
     this.slow(1000);
     this.timeout(gUMTimeout + 1000);
 
-    window.navigator.getUserMedia({
-      audio: true,
-      video: true
+    peer1 = new RTCPeerConnection({ iceServers: [] });
+    peer2 = new RTCPeerConnection({ iceServers: [] });
 
-    }, function (data) {
-      stream = data;
-
-      peer1 = new RTCPeerConnection({ iceServers: [] });
-      peer2 = new RTCPeerConnection({ iceServers: [] });
-
-      done();
-
-    }, function (error) {
-      throw error;
-    });
+    done();
   });
 
 

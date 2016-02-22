@@ -14,9 +14,12 @@ var gUMTimeout = 25000;
 // Test item timeout
 var testItemTimeout = 2000;
 
+// TODO(J-O): Where are the assertions ? Is this even testing anything ?
 
 describe('RTCPeerConnection | RTCConfiguration', function() {
   this.timeout(testTimeout);
+
+  var peer = null;
 
   /* WebRTC Object should be initialized in Safari/IE Plugin */
   before(function (done) {
@@ -27,12 +30,19 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     });
   });
 
+  /////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  afterEach(function(done) {
+    peer = null;
+    done();
+  });
+
   (function (constraints) {
 
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      peer = new RTCPeerConnection(constraints);
     });
 
   })({ iceServers: [] });
@@ -43,7 +53,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      peer = new RTCPeerConnection(constraints);
     });
 
   })({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
@@ -54,7 +64,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      peer = new RTCPeerConnection(constraints);
     });
 
   })({ iceServers: [{ url: 'leticia.choo@temasys.com.sg@turn:numb.viagenie.ca', credential: 'xxxxx' }] });
@@ -65,7 +75,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      peer = new RTCPeerConnection(constraints);
     });
 
   })({ iceServers: [{ urls: ['turn:numb.viagenie.ca', 'turn:numb.viagenie.ca'], username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
@@ -76,7 +86,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      peer = new RTCPeerConnection(constraints);
     });
 
   })({ iceServers: [{ url: 'stun:stun.l.google.com:19302' }] });
@@ -87,7 +97,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      peer = new RTCPeerConnection(constraints);
     });
 
   })({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
@@ -140,7 +150,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     it('new RTCPeerConnection(' + JSON.stringify(constraints) + ', ' + JSON.stringify(optional) + ')', function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints, optional);
+      peer = new RTCPeerConnection(constraints, optional);
     });
 
   })({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
