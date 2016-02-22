@@ -301,7 +301,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab) {
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, displayRefreshBar) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -337,6 +337,11 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
 
     // On click on okay
     AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
+      if (!!displayRefreshBar) {
+        AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
+          AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
+          AdapterJS.TEXT.REFRESH.BUTTON, 'javascript:location.reload()'); // jshint ignore:line
+      }
       window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
 
       e.preventDefault();
