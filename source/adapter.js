@@ -311,7 +311,7 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
     i.style.transition = 'all .5s ease-out';
   }
   document.body.appendChild(i);
-  c = (i.contentWindow) ? i.contentWindow :
+  var c = (i.contentWindow) ? i.contentWindow :
     (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
   c.document.open();
   c.document.write('<span style="display: inline-block; font-family: Helvetica, Arial,' +
@@ -332,7 +332,7 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
 
       e.preventDefault();
       try {
-        event.cancelBubble = true;
+        e.cancelBubble = true;
       } catch(error) { }
 
       var pluginInstallInterval = setInterval(function(){
