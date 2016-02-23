@@ -681,6 +681,12 @@ if ( navigator.mozGetUserMedia ||
     return to;
   };
 
+  // Propagate attachMediaStream in window and AdapterJS
+  window.attachMediaStream      = attachMediaStream;
+  window.reattachMediaStream    = reattachMediaStream;
+  AdapterJS.attachMediaStream   = attachMediaStream;
+  AdapterJS.reattachMediaStream = reattachMediaStream;
+
   // Removed Google defined promises when promise is not defined
   if (typeof Promise === 'undefined') {
     requestUserMedia = null;
@@ -1066,6 +1072,12 @@ if ( navigator.mozGetUserMedia ||
         console.log('Could not find the stream associated with this element');
       }
     };
+
+    // Propagate attachMediaStream in window and AdapterJS
+    window.attachMediaStream      = attachMediaStream;
+    window.reattachMediaStream    = reattachMediaStream;
+    AdapterJS.attachMediaStream   = attachMediaStream;
+    AdapterJS.reattachMediaStream = reattachMediaStream;
 
     AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
       properties = Object.getOwnPropertyNames( prototype );
