@@ -907,9 +907,9 @@ if ( navigator.mozGetUserMedia
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      if (!servers || 
+      if (servers && 
           typeof servers.iceServers !== 'object') {
-        throw new Error('new RTCPeerConnection: arg1.iceServers should be a non-null array');
+        throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
