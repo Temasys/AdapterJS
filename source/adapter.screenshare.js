@@ -13,10 +13,14 @@
   };
 
   var clone = function(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
+    if (null === obj || 'object' !== typeof obj) {
+      return obj;
+    }
     var copy = obj.constructor();
     for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+      if (obj.hasOwnProperty(attr)) {
+        copy[attr] = obj[attr];
+      }
     }
     return copy;
   };
@@ -199,7 +203,7 @@
 
     (document.body || document.documentElement).appendChild(iframe);
 
-    var postFrameMessage = function (object) {
+    var postFrameMessage = function (object) { // jshint ignore:line
       object = object || {};
 
       if (!iframe.isLoaded) {

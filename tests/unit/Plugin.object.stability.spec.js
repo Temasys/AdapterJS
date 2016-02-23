@@ -61,23 +61,23 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
       this.timeout(testItemTimeout);
 
       var popCount = 0;
-      var timeout;
+      var t;
 
       var replaceVideoElement = function() {
-        clearTimeout(timeout);
+        clearTimeout(t);
         document.body.removeChild(video);
         video = document.createElement('video');
         document.body.appendChild(video);
         video.onplay = replaceVideoElement;
         video = attachMediaStream(video, stream);
-        timeout = setTimeout(replaceVideoElement, 500);
+        t = setTimeout(replaceVideoElement, 500);
 
         expect(video.valid).to.equal(true);
         if (++popCount >= POP_REQUESTS) {
-          clearTimeout(timeout);
+          clearTimeout(t);
           done();
         }
-      }
+      };
       replaceVideoElement();
     });
 

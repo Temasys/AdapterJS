@@ -94,5 +94,5 @@ module.exports = function(config) {
               'karma-ie-launcher',
               'karma-opera-launcher',
               'karma-requirejs']
-  })
-}
+  });
+};

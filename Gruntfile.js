@@ -121,7 +121,7 @@ module.exports = function(grunt) {
             prefix: '@Goo@',
             includesDir: '.',
             processIncludeContents: function (includeContents, localVars, filePath) {
-              if (filePath.indexOf(grunt.config.get('googleAdapterPath')) != -1) {
+              if (filePath.indexOf(grunt.config.get('googleAdapterPath')) !== -1) {
                 // Indent file and indent Google's exports
                 return includeContents
                   // Comment export
@@ -172,7 +172,8 @@ module.exports = function(grunt) {
                 node: true
             }, grunt.file.readJSON('.jshintrc')),
             src: [
-                'tests/*_test.js'
+              'tests/*.js',
+              'tests/unit/*.js'
             ]
         },
         app: {
