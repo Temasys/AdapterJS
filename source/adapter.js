@@ -908,7 +908,7 @@ if ( navigator.mozGetUserMedia
 
     RTCPeerConnection = function (servers, constraints) {
       if (servers && 
-          typeof servers.iceServers !== 'object') {
+          !Array.isArray(servers.iceServers)) {
         throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
@@ -919,14 +919,17 @@ if ( navigator.mozGetUserMedia
         return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
       } else {
         // RTCPeerConnection prototype from the old spec
-        var iceServers = servers.iceServers;
-        for (var i = 0; i < iceServers.length; i++) {
-          if (iceServers[i].urls && !iceServers[i].url) {
-            iceServers[i].url = iceServers[i].urls;
+        var iceServers = null;
+        if (servers && servers.iceServers) {
+          iceServers = servers.iceServers;
+          for (var i = 0; i < iceServers.length; i++) {
+            if (iceServers[i].urls && !iceServers[i].url) {
+              iceServers[i].url = iceServers[i].urls;
+            }
+            iceServers[i].hasCredentials = AdapterJS.
+              isDefined(iceServers[i].username) &&
+              AdapterJS.isDefined(iceServers[i].credential);
           }
-          iceServers[i].hasCredentials = AdapterJS.
-            isDefined(iceServers[i].username) &&
-            AdapterJS.isDefined(iceServers[i].credential);
         }
         var mandatory = (constraints && constraints.mandatory) ?
           constraints.mandatory : null;
