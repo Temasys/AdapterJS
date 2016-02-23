@@ -574,25 +574,25 @@ if ( navigator.mozGetUserMedia ||
 
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
-      
+      // Note: Google's import of AJS will auto-reverse to 'url': '...' for FF < 38
       var iceServer = null;
-      var url_parts = url.split(':');
-      if (url_parts[0].indexOf('stun') === 0) {
-        iceServer = { url : url };
-      } else if (url_parts[0].indexOf('turn') === 0) {
+      var urlParts = url.split(':');
+      if (urlParts[0].indexOf('stun') === 0) {
+        iceServer = { urls : [url] };
+      } else if (urlParts[0].indexOf('turn') === 0) {
         if (webrtcDetectedVersion < 27) {
-          var turn_url_parts = url.split('?');
-          if (turn_url_parts.length === 1 ||
-            turn_url_parts[1].indexOf('transport=udp') === 0) {
+          var turnUrlParts = url.split('?');
+          if (turnUrlParts.length === 1 ||
+            turnUrlParts[1].indexOf('transport=udp') === 0) {
             iceServer = {
-              url : turn_url_parts[0],
+              urls : [turn_urlParts[0]],
               credential : password,
               username : username
             };
           }
         } else {
           iceServer = {
-            url : url,
+            urls : [url],
             credential : password,
             username : username
           };
@@ -618,10 +618,10 @@ if ( navigator.mozGetUserMedia ||
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
       
       var iceServer = null;
-      var url_parts = url.split(':');
-      if (url_parts[0].indexOf('stun') === 0) {
+      var urlParts = url.split(':');
+      if (urlParts[0].indexOf('stun') === 0) {
         iceServer = { 'url' : url };
-      } else if (url_parts[0].indexOf('turn') === 0) {
+      } else if (urlParts[0].indexOf('turn') === 0) {
         iceServer = {
           'url' : url,
           'credential' : password,
@@ -874,13 +874,13 @@ if ( navigator.mozGetUserMedia ||
 
     createIceServer = function (url, username, password) {
       var iceServer = null;
-      var url_parts = url.split(':');
-      if (url_parts[0].indexOf('stun') === 0) {
+      var urlParts = url.split(':');
+      if (urlParts[0].indexOf('stun') === 0) {
         iceServer = {
           'url' : url,
           'hasCredentials' : false
         };
-      } else if (url_parts[0].indexOf('turn') === 0) {
+      } else if (urlParts[0].indexOf('turn') === 0) {
         iceServer = {
           'url' : url,
           'hasCredentials' : true,
