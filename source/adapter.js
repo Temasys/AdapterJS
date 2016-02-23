@@ -920,7 +920,7 @@ if ( navigator.mozGetUserMedia
       } else {
         // RTCPeerConnection prototype from the old spec
         var iceServers = null;
-        if (servers && servers.iceServers) {
+        if (servers && Array.isArray(servers.iceServers)) {
           iceServers = servers.iceServers;
           for (var i = 0; i < iceServers.length; i++) {
             if (iceServers[i].urls && !iceServers[i].url) {
