@@ -585,7 +585,7 @@ if ( navigator.mozGetUserMedia ||
           if (turnUrlParts.length === 1 ||
             turnUrlParts[1].indexOf('transport=udp') === 0) {
             iceServer = {
-              urls : [turn_urlParts[0]],
+              urls : [turnUrlParts[0]],
               credential : password,
               username : username
             };
