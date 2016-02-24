@@ -907,8 +907,11 @@ if ( navigator.mozGetUserMedia
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      if (servers && 
-          !Array.isArray(servers.iceServers)) {
+      // Throw error if servers is not either undefined, null, 
+      // or with servers.iceServers being an array
+      if (!(servers === undefined || 
+            servers === null || 
+            Array.isArray(servers.iceServers))) {
         throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
