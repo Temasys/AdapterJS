@@ -353,11 +353,11 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
             clearInterval(pluginInstallInterval);
             AdapterJS.WebRTCPlugin.defineWebRTCInterface();
           },
-          function() { 
+          function() {
             // still no plugin detected, nothing to do
           });
       } , 500);
-    });   
+    });
 
     // On click on Cancel
     AdapterJS.addEvent(c.document.getElementById('cancel'), 'click', function(e) {
@@ -535,8 +535,8 @@ webrtcDetectedVersion = null;
 // Check for browser types and react accordingly
 if ( navigator.mozGetUserMedia
   || navigator.webkitGetUserMedia
-  || (navigator.mediaDevices 
-    && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) ) { 
+  || (navigator.mediaDevices
+    && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) ) {
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -548,7 +548,7 @@ if ( navigator.mozGetUserMedia
 
   ///////////////////////////////////////////////////////////////////
   // EXTENSION FOR CHROME, FIREFOX AND EDGE
-  // Includes legacy functions 
+  // Includes legacy functions
   // -- createIceServer
   // -- createIceServers
   // -- MediaStreamTrack.getSources
@@ -574,7 +574,7 @@ if ( navigator.mozGetUserMedia
 
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
-      
+
       var iceServer = null;
       var url_parts = url.split(':');
       if (url_parts[0].indexOf('stun') === 0) {
@@ -616,7 +616,7 @@ if ( navigator.mozGetUserMedia
   } else if ( navigator.webkitGetUserMedia ) {
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
-      
+
       var iceServer = null;
       var url_parts = url.split(':');
       if (url_parts[0].indexOf('stun') === 0) {
@@ -668,7 +668,7 @@ if ( navigator.mozGetUserMedia
     };
   }
 
-  // Need to override attachMediaStream and reattachMediaStream 
+  // Need to override attachMediaStream and reattachMediaStream
   // to support the plugin's logic
   attachMediaStream_base = attachMediaStream;
   attachMediaStream = function (element, stream) {
@@ -907,16 +907,39 @@ if ( navigator.mozGetUserMedia
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      // Throw error if servers is not either undefined, null, 
+      // Throw error if servers is not either undefined, null,
       // or with servers.iceServers being an array
-      if (!(servers === undefined || 
-            servers === null || 
+      if (!(servers === undefined ||
+            servers === null ||
             Array.isArray(servers.iceServers))) {
         throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
+      var invalidConstraints = false;
+
+      // Not undefined, null and [], because they are allowed
+      if (typeof constraints !== 'undefined' && constraints !== null && !Array.isArray(constraints)) {
+        // Not object, incorrect
+        if (typeof constraints !== 'object') {
+          invalidConstraints = true;
+
+        } else {
+          // If optional key exists
+          if (constraints.hasOwnProperty('optional')) {
+            // Optional has to be []
+            if (!Array.isArray(constraints.optional)) {
+              invalidConstraints = true;
+            }
+          }
+        }
+      }
+
+      if (invalidConstraints) {
+        throw new Error('Failed to construct \'RTCPeerConnection\': Malformed constraints object');
+      }
+
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
-      if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION && 
+      if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION &&
           AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
         // RTCPeerConnection prototype from the new spec
         return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
@@ -963,7 +986,7 @@ if ( navigator.mozGetUserMedia
     window.navigator.getUserMedia = window.getUserMedia;
 
     // Defined mediaDevices when promises are available
-    if ( !navigator.mediaDevices 
+    if ( !navigator.mediaDevices
       && typeof Promise !== 'undefined') {
       navigator.mediaDevices = {getUserMedia: requestUserMedia,
                                 enumerateDevices: function() {

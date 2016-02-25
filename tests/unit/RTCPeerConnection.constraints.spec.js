@@ -75,9 +75,18 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   // EXPECT WORKING
   testRTCPCContruct();
   testRTCPCContruct(null);
+  testRTCPCContruct(null, []);
   testRTCPCContruct(null, {});
   testRTCPCContruct(null, null);
   testRTCPCContruct(null, null, null);
+  testRTCPCContruct(null, null, 0);
+  testRTCPCContruct(null, null, 1);
+  testRTCPCContruct(null, null, true);
+  testRTCPCContruct(null, null, false);
+  testRTCPCContruct(null, null, 'test');
+  testRTCPCContruct(null, null, {});
+  testRTCPCContruct(null, null, []);
+  testRTCPCContruct(null, null, { test: [] });
   testRTCPCContruct({ iceServers: [] });
   testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
   testRTCPCContruct({ iceServers: [{ url: 'leticia.choo@temasys.com.sg@turn:numb.viagenie.ca', credential: 'xxxxx' }] });
@@ -85,12 +94,30 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct({ iceServers: [{ url: 'stun:stun.l.google.com:19302' }] });
   testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
   testRTCPCContruct({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
+  testRTCPCContruct({ iceServers: [] }, { optional: [] });
 
   // EXPECT THROWNIG ERROR
+  testRTCPCContruct_throw(1);
+  testRTCPCContruct_throw(0);
+  testRTCPCContruct_throw(true);
+  testRTCPCContruct_throw(false);
+  testRTCPCContruct_throw('test');
   testRTCPCContruct_throw({});
   testRTCPCContruct_throw({ iceServers: null });
   testRTCPCContruct_throw({ iceServers: '' });
   testRTCPCContruct_throw({ iceServers: true });
+  testRTCPCContruct_throw(null, 1);
+  testRTCPCContruct_throw(null, 0);
+  testRTCPCContruct_throw(null, true);
+  testRTCPCContruct_throw(null, false);
+  testRTCPCContruct_throw(null, 'test');
+  testRTCPCContruct_throw(null, { optional: 1 });
+  testRTCPCContruct_throw(null, { optional: 0 });
+  testRTCPCContruct_throw(null, { optional: null });
+  testRTCPCContruct_throw(null, { optional: 'test' });
+  testRTCPCContruct_throw(null, { optional: true });
+  testRTCPCContruct_throw(null, { optional: false });
+  testRTCPCContruct_throw(null, { optional: {} }); // Should throw error as there are plugin failures
 
   // SKIP TEST
   testRTCPCContruct_skip({ bundlePolicy: 'balanced' });
