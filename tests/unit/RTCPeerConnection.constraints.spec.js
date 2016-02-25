@@ -27,121 +27,77 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
     });
   });
 
-  (function (constraints) {
+  var makeDesc = function (config, constraints) {
+    var description = 'new RTCPeerConnection(';
+    if (config !== undefined) {
+      description += JSON.stringify(config);
+    }
+    if (constraints !== undefined) {
+      description += ', ' + JSON.stringify(constraints);
+    }
+    description += ')';
 
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
+    return description;
+  };
+
+  var testRTCPCContruct = function (config, constraints) {
+    var description = makeDesc(config, constraints);
+    it(description, function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      var peer = new RTCPeerConnection(config, constraints);
     });
+  };
 
-  })({ iceServers: [] });
-
-
-  (function (constraints) {
-
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
+  var testRTCPCContruct_skip = function (config, constraints) {
+    var description = makeDesc(config, constraints);
+    it.skip(description, function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      var peer = new RTCPeerConnection(config, constraints);
     });
+  };
 
-  })({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
-
-
-  (function (constraints) {
-
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
+  var testRTCPCContruct_throw = function (config, constraints) {
+    var description = makeDesc(config, constraints);
+    description += ' -> Throws Error';
+    it(description, function () {
       this.timeout(testItemTimeout);
 
-      var peer = new RTCPeerConnection(constraints);
+      var fn = function() {
+        var peer = new RTCPeerConnection(config, constraints);
+      };
+
+      expect(fn).to.throw(Error);
     });
+  };
 
-  })({ iceServers: [{ url: 'leticia.choo@temasys.com.sg@turn:numb.viagenie.ca', credential: 'xxxxx' }] });
+  // EXPECT WORKING
+  testRTCPCContruct();
+  testRTCPCContruct(null);
+  testRTCPCContruct(null, {});
+  testRTCPCContruct(null, null);
+  testRTCPCContruct(null, null, null);
+  testRTCPCContruct({ iceServers: [] });
+  testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
+  testRTCPCContruct({ iceServers: [{ url: 'leticia.choo@temasys.com.sg@turn:numb.viagenie.ca', credential: 'xxxxx' }] });
+  testRTCPCContruct({ iceServers: [{ urls: ['turn:numb.viagenie.ca', 'turn:numb.viagenie.ca'], username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
+  testRTCPCContruct({ iceServers: [{ url: 'stun:stun.l.google.com:19302' }] });
+  testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
+  testRTCPCContruct({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
 
+  // EXPECT THROWNIG ERROR
+  testRTCPCContruct_throw({});
+  testRTCPCContruct_throw({ iceServers: null });
+  testRTCPCContruct_throw({ iceServers: '' });
+  testRTCPCContruct_throw({ iceServers: true });
 
-  (function (constraints) {
+  // SKIP TEST
+  testRTCPCContruct_skip({ bundlePolicy: 'balanced' });
+  testRTCPCContruct_skip({ bundlePolicy: 'max-compat' });
+  testRTCPCContruct_skip({ bundlePolicy: 'max-bundle' });
+  testRTCPCContruct_skip({ iceTransportPolicy: 'none' });
+  testRTCPCContruct_skip({ iceTransportPolicy: 'relay' });
+  testRTCPCContruct_skip({ iceTransportPolicy: 'all' });
 
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
-      this.timeout(testItemTimeout);
-
-      var peer = new RTCPeerConnection(constraints);
-    });
-
-  })({ iceServers: [{ urls: ['turn:numb.viagenie.ca', 'turn:numb.viagenie.ca'], username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }] });
-
-
-  (function (constraints) {
-
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
-      this.timeout(testItemTimeout);
-
-      var peer = new RTCPeerConnection(constraints);
-    });
-
-  })({ iceServers: [{ url: 'stun:stun.l.google.com:19302' }] });
-
-
-  (function (constraints) {
-
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {
-      this.timeout(testItemTimeout);
-
-      var peer = new RTCPeerConnection(constraints);
-    });
-
-  })({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
-
-
-  (function (constraints) {
-
-    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
-
-  })({ bundlePolicy: 'balanced' });
-
-
-  (function (constraints) {
-
-    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
-
-  })({ bundlePolicy: 'max-compat' });
-
-
-  (function (constraints) {
-
-    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
-
-  })({ bundlePolicy: 'max-bundle' });
-
-
-  (function (constraints) {
-
-    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
-
-  })({ iceTransportPolicy: 'none' });
-
-
-  (function (constraints) {
-
-    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
-
-  })({ iceTransportPolicy: 'relay' });
-
-
-  (function (constraints) {
-
-    it.skip('new RTCPeerConnection(' + JSON.stringify(constraints) + ')', function () {});
-
-  })({ iceTransportPolicy: 'all' });
-
-
-  (function (constraints, optional) {
-
-    it('new RTCPeerConnection(' + JSON.stringify(constraints) + ', ' + JSON.stringify(optional) + ')', function () {
-      this.timeout(testItemTimeout);
-
-      var peer = new RTCPeerConnection(constraints, optional);
-    });
-
-  })({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
 });
