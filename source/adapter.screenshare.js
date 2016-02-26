@@ -51,7 +51,7 @@
             clearInterval(checkIfReady);
 
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
-              if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
+              if (['PermissionDeniedError', 'SecurityError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                   AdapterJS.TEXT.EXTENSION.BUTTON_FF,
                   'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
