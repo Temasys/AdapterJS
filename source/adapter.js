@@ -915,6 +915,11 @@ if ( navigator.mozGetUserMedia
         throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
+      // TODO:
+      // Mandatory constraints should be an object or null/undefined
+      // Optional constraints should be an array or not be or null/undefined
+      // Refactor
+
       var invalidConstraints = false;
 
       // Not undefined, null and [], because they are allowed
