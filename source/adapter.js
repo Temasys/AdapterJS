@@ -916,18 +916,9 @@ if ( navigator.mozGetUserMedia
       }
 
       if (typeof constraints !== 'undefined' && constraints !== null) {
-        var invalidConstraints = false;
-        if (typeof constraints !== 'object') {
-          invalidConstraints = true;
-        } else if (constraints.hasOwnProperty('mandatory') &&
-          typeof constraints.mandatory !== 'object') {
-          invalidConstraints = true;
-        } else if (constraints.hasOwnProperty('optional') &&
-          !Array.isArray(constraints.optional)) {
-          invalidConstraints = true; 
-        }
-
-        if (invalidConstraints) {
+        if (typeof constraints !== 'object' ||
+          (constraints.hasOwnProperty('mandatory') && typeof constraints.mandatory !== 'object') ||
+          (constraints.hasOwnProperty('optional')  && !Array.isArray(constraints.optional))) {
           throw new Error('Failed to construct \'RTCPeerConnection\': Malformed constraints object');
         }
       }
