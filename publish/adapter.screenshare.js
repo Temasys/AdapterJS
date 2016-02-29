@@ -1,4 +1,4 @@
-/*! adapterjs - v0.13.2 - 2016-03-18 */
+/*! adapterjs - v0.13.2 - 2016-04-01 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -3085,40 +3085,44 @@ if ( navigator.mozGetUserMedia ||
           }
         };
 
-        var onIFrameCallback = function (event) {
-          if (!event.data) {
-            return;
-          }
-
-          if (event.data.chromeMediaSourceId) {
-            if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
-                chromeCallback('permission-denied');
-            } else {
-              chromeCallback(null, event.data.chromeMediaSourceId);
+        if (window.cef && window.cef.getScreenMedia) {
+            // Chromium Embedded Framework does not include these methods as standard
+            window.cef.getScreenMedia(chromeCallback);
+        } else { // Use Chrome extension
+          var onIFrameCallback = function (event) {
+            if (!event.data) {
+              return;
             }
-          }
 
-          if (event.data.chromeExtensionStatus) {
-            if (event.data.chromeExtensionStatus === 'not-installed') {
-              AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
-                AdapterJS.TEXT.EXTENSION.BUTTON_CHROME,
-                event.data.data, true, true);
-            } else {
-              chromeCallback(event.data.chromeExtensionStatus, null);
+            if (event.data.chromeMediaSourceId) {
+              if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
+                  chromeCallback('permission-denied');
+              } else {
+                chromeCallback(null, event.data.chromeMediaSourceId);
+              }
             }
-          }
 
-          // this event listener is no more needed
-          window.removeEventListener('message', onIFrameCallback);
-        };
+            if (event.data.chromeExtensionStatus) {
+              if (event.data.chromeExtensionStatus === 'not-installed') {
+                AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
+                  AdapterJS.TEXT.EXTENSION.BUTTON_CHROME,
+                  event.data.data, true, true);
+              } else {
+                chromeCallback(event.data.chromeExtensionStatus, null);
+              }
+            }
 
-        window.addEventListener('message', onIFrameCallback);
+            // this event listener is no more needed
+            window.removeEventListener('message', onIFrameCallback);
+          };
 
-        postFrameMessage({
-          captureSourceId: true
-        });
+          window.addEventListener('message', onIFrameCallback);
 
-      } else {
+          postFrameMessage({
+            captureSourceId: true
+          });
+        }
+      } else { // NOT a screensharing request
         baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
