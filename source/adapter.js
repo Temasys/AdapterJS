@@ -915,32 +915,21 @@ if ( navigator.mozGetUserMedia
         throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
-      // TODO:
-      // Mandatory constraints should be an object or null/undefined
-      // Optional constraints should be an array or not be or null/undefined
-      // Refactor
-
-      var invalidConstraints = false;
-
-      // Not undefined, null and [], because they are allowed
-      if (typeof constraints !== 'undefined' && constraints !== null && !Array.isArray(constraints)) {
-        // Not object, incorrect
+      if (typeof constraints !== 'undefined' && constraints !== null) {
+        var invalidConstraints = false;
         if (typeof constraints !== 'object') {
           invalidConstraints = true;
-
-        } else {
-          // If optional key exists
-          if (constraints.hasOwnProperty('optional')) {
-            // Optional has to be []
-            if (!Array.isArray(constraints.optional)) {
-              invalidConstraints = true;
-            }
-          }
+        } else if (constraints.hasOwnProperty('mandatory') &&
+          typeof constraints.mandatory !== 'object') {
+          invalidConstraints = true;
+        } else if (constraints.hasOwnProperty('optional') &&
+          !Array.isArray(constraints.optional)) {
+          invalidConstraints = true; 
         }
-      }
 
-      if (invalidConstraints) {
-        throw new Error('Failed to construct \'RTCPeerConnection\': Malformed constraints object');
+        if (invalidConstraints) {
+          throw new Error('Failed to construct \'RTCPeerConnection\': Malformed constraints object');
+        }
       }
 
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
