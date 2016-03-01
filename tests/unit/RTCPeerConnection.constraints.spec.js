@@ -94,9 +94,12 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct({ iceServers: [{ url: 'stun:stun.l.google.com:19302' }] });
   testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
   testRTCPCContruct({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
+  testRTCPCContruct({ iceServers: [] }, {});
   testRTCPCContruct({ iceServers: [] }, { optional: [] });
+  testRTCPCContruct({ iceServers: [] }, { optional: undefined });
   testRTCPCContruct({ iceServers: [] }, { optional: null });
   testRTCPCContruct({ iceServers: [] }, { mandatory: {} });
+  testRTCPCContruct({ iceServers: [] }, { mandatory: undefined });
   testRTCPCContruct({ iceServers: [] }, { mandatory: null });
   testRTCPCContruct({ iceServers: [] }, { optional: [], mandatory: {} });
   testRTCPCContruct({ iceServers: [] }, { optional: [], mandatory: null });
@@ -126,7 +129,6 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct_throw({ iceServers: [] }, { mandatory: 'test'});
   testRTCPCContruct_throw({ iceServers: [] }, { mandatory: 1 });
   testRTCPCContruct_throw({ iceServers: [] }, { mandatory: 0 });
-  testRTCPCContruct_throw({ iceServers: [] }, { mandatory: undefined });
   testRTCPCContruct_throw({ iceServers: [] }, { optional: 'test', mandatory: [] });
   testRTCPCContruct_throw({ iceServers: [] }, { optional: [], mandatory: 'test' });
 

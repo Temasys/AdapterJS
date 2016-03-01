@@ -907,21 +907,23 @@ if ( navigator.mozGetUserMedia
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      // Throw error if servers is not either undefined, null,
-      // or with servers.iceServers being an array
+      // Validate server argumenr
       if (!(servers === undefined ||
             servers === null ||
             Array.isArray(servers.iceServers))) {
         throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
       }
 
+      // Validate constraints argument
       if (typeof constraints !== 'undefined' && constraints !== null) {
         var invalidConstraits = false;
         invalidConstraits |= typeof constraints !== 'object';
         invalidConstraits |= constraints.hasOwnProperty('mandatory') && 
+                              constraints.mandatory !== undefined && 
                               constraints.mandatory !== null && 
                               constraints.mandatory.constructor !== Object;
         invalidConstraits |= constraints.hasOwnProperty('optional') && 
+                              constraints.optional !== undefined &&
                               constraints.optional !== null &&
                               !Array.isArray(constraints.optional);
         if (invalidConstraits) {
@@ -929,6 +931,7 @@ if ( navigator.mozGetUserMedia
         }
       }
 
+      // Call relevant PeerConnection constructor according to plugin version
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
       if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION &&
           AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
