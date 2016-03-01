@@ -964,6 +964,7 @@ if ( navigator.mozGetUserMedia ||
             resolve(devices.map(function(device) {
               return {label: device.label,
                       kind: kinds[device.kind],
+                      id: device.id,
                       deviceId: device.id,
                       groupId: ''};
             }));
