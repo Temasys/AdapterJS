@@ -95,6 +95,7 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
   testRTCPCContruct({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
   testRTCPCContruct({ iceServers: [] }, { optional: [] });
+  testRTCPCContruct({ iceServers: [] }, { optional: null });
   testRTCPCContruct({ iceServers: [] }, { mandatory: {} });
   testRTCPCContruct({ iceServers: [] }, { mandatory: null });
   testRTCPCContruct({ iceServers: [] }, { optional: [], mandatory: {} });
@@ -117,7 +118,6 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct_throw(null, 'test');
   testRTCPCContruct_throw(null, { optional: 1 });
   testRTCPCContruct_throw(null, { optional: 0 });
-  testRTCPCContruct_throw(null, { optional: null });
   testRTCPCContruct_throw(null, { optional: 'test' });
   testRTCPCContruct_throw(null, { optional: true });
   testRTCPCContruct_throw(null, { optional: false });

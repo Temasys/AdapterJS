@@ -922,6 +922,7 @@ if ( navigator.mozGetUserMedia
                               constraints.mandatory !== null && 
                               constraints.mandatory.constructor !== Object;
         invalidConstraits |= constraints.hasOwnProperty('optional') && 
+                              constraints.optional !== null &&
                               !Array.isArray(constraints.optional);
         if (invalidConstraits) {
           throw new Error('Failed to construct \'RTCPeerConnection\': Malformed constraints object');
