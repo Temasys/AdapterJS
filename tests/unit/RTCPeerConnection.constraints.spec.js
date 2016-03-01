@@ -95,6 +95,10 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct({ iceServers: [{ url: 'turn:numb.viagenie.ca', username: 'leticia.choo@temasys.com.sg', credential: 'xxxxx' }, { url: 'stun:stun.l.google.com:19302' }] });
   testRTCPCContruct({ iceServers: [] }, { optional: [{ DtlsSrtpKeyAgreement: true }] });
   testRTCPCContruct({ iceServers: [] }, { optional: [] });
+  testRTCPCContruct({ iceServers: [] }, { mandatory: {} });
+  testRTCPCContruct({ iceServers: [] }, { mandatory: null });
+  testRTCPCContruct({ iceServers: [] }, { optional: [], mandatory: {} });
+  testRTCPCContruct({ iceServers: [] }, { optional: [], mandatory: null });
 
   // EXPECT THROWNIG ERROR
   testRTCPCContruct_throw(1);
@@ -118,6 +122,13 @@ describe('RTCPeerConnection | RTCConfiguration', function() {
   testRTCPCContruct_throw(null, { optional: true });
   testRTCPCContruct_throw(null, { optional: false });
   testRTCPCContruct_throw(null, { optional: {} }); // Should throw error as there are plugin failures
+  testRTCPCContruct_throw({ iceServers: [] }, { mandatory: [] });
+  testRTCPCContruct_throw({ iceServers: [] }, { mandatory: 'test'});
+  testRTCPCContruct_throw({ iceServers: [] }, { mandatory: 1 });
+  testRTCPCContruct_throw({ iceServers: [] }, { mandatory: 0 });
+  testRTCPCContruct_throw({ iceServers: [] }, { mandatory: undefined });
+  testRTCPCContruct_throw({ iceServers: [] }, { optional: 'test', mandatory: [] });
+  testRTCPCContruct_throw({ iceServers: [] }, { optional: [], mandatory: 'test' });
 
   // SKIP TEST
   testRTCPCContruct_skip({ bundlePolicy: 'balanced' });
