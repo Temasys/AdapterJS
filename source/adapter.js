@@ -346,11 +346,11 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
             clearInterval(pluginInstallInterval);
             AdapterJS.WebRTCPlugin.defineWebRTCInterface();
           },
-          function() { 
+          function() {
             // still no plugin detected, nothing to do
           });
       } , 500);
-    });   
+    });
 
     // On click on Cancel
     AdapterJS.addEvent(c.document.getElementById('cancel'), 'click', function(e) {
@@ -548,7 +548,7 @@ if ( navigator.mozGetUserMedia ||
 
   ///////////////////////////////////////////////////////////////////
   // EXTENSION FOR CHROME, FIREFOX AND EDGE
-  // Includes legacy functions 
+  // Includes legacy functions
   // -- createIceServer
   // -- createIceServers
   // -- MediaStreamTrack.getSources
@@ -575,6 +575,7 @@ if ( navigator.mozGetUserMedia ||
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
       // Note: Google's import of AJS will auto-reverse to 'url': '...' for FF < 38
+
       var iceServer = null;
       var urlParts = url.split(':');
       if (urlParts[0].indexOf('stun') === 0) {
@@ -616,7 +617,7 @@ if ( navigator.mozGetUserMedia ||
   } else if ( navigator.webkitGetUserMedia ) {
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
-      
+
       var iceServer = null;
       var urlParts = url.split(':');
       if (urlParts[0].indexOf('stun') === 0) {
@@ -668,7 +669,7 @@ if ( navigator.mozGetUserMedia ||
     };
   }
 
-  // Need to override attachMediaStream and reattachMediaStream 
+  // Need to override attachMediaStream and reattachMediaStream
   // to support the plugin's logic
   attachMediaStream_base = attachMediaStream;
   attachMediaStream = function (element, stream) {
@@ -912,27 +913,58 @@ if ( navigator.mozGetUserMedia ||
     };
 
     RTCPeerConnection = function (servers, constraints) {
-      var iceServers = null;
-      if (servers) {
-        iceServers = servers.iceServers;
-        for (var i = 0; i < iceServers.length; i++) {
-          if (iceServers[i].urls && !iceServers[i].url) {
-            iceServers[i].url = iceServers[i].urls;
-          }
-          iceServers[i].hasCredentials = AdapterJS.
-            isDefined(iceServers[i].username) &&
-            AdapterJS.isDefined(iceServers[i].credential);
+      // Validate server argumenr
+      if (!(servers === undefined ||
+            servers === null ||
+            Array.isArray(servers.iceServers))) {
+        throw new Error('Failed to construct \'RTCPeerConnection\': Malformed RTCConfiguration');
+      }
+
+      // Validate constraints argument
+      if (typeof constraints !== 'undefined' && constraints !== null) {
+        var invalidConstraits = false;
+        invalidConstraits |= typeof constraints !== 'object';
+        invalidConstraits |= constraints.hasOwnProperty('mandatory') && 
+                              constraints.mandatory !== undefined && 
+                              constraints.mandatory !== null && 
+                              constraints.mandatory.constructor !== Object;
+        invalidConstraits |= constraints.hasOwnProperty('optional') && 
+                              constraints.optional !== undefined &&
+                              constraints.optional !== null &&
+                              !Array.isArray(constraints.optional);
+        if (invalidConstraits) {
+          throw new Error('Failed to construct \'RTCPeerConnection\': Malformed constraints object');
         }
       }
-      var mandatory = (constraints && constraints.mandatory) ?
-        constraints.mandatory : null;
-      var optional = (constraints && constraints.optional) ?
-        constraints.optional : null;
 
+      // Call relevant PeerConnection constructor according to plugin version
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
-      return AdapterJS.WebRTCPlugin.plugin.
-        PeerConnection(AdapterJS.WebRTCPlugin.pageId,
-        iceServers, mandatory, optional);
+      if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION &&
+          AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
+        // RTCPeerConnection prototype from the new spec
+        return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
+      } else {
+        // RTCPeerConnection prototype from the old spec
+        var iceServers = null;
+        if (servers && Array.isArray(servers.iceServers)) {
+          iceServers = servers.iceServers;
+          for (var i = 0; i < iceServers.length; i++) {
+            if (iceServers[i].urls && !iceServers[i].url) {
+              iceServers[i].url = iceServers[i].urls;
+            }
+            iceServers[i].hasCredentials = AdapterJS.
+              isDefined(iceServers[i].username) &&
+              AdapterJS.isDefined(iceServers[i].credential);
+          }
+        }
+        var mandatory = (constraints && constraints.mandatory) ?
+          constraints.mandatory : null;
+        var optional = (constraints && constraints.optional) ?
+          constraints.optional : null;
+        return AdapterJS.WebRTCPlugin.plugin.
+          PeerConnection(AdapterJS.WebRTCPlugin.pageId,
+          iceServers, mandatory, optional);
+      }
     };
 
     MediaStreamTrack = {};
@@ -956,7 +988,12 @@ if ( navigator.mozGetUserMedia ||
     // Defined mediaDevices when promises are available
     if ( !navigator.mediaDevices &&
       typeof Promise !== 'undefined') {
-      navigator.mediaDevices = { // getUserMedia: requestUserMedia,
+      requestUserMedia = function(constraints) {
+        return new Promise(function(resolve, reject) {
+          getUserMedia(constraints, resolve, reject);
+        });
+      };
+      navigator.mediaDevices = {getUserMedia: requestUserMedia,
                                 enumerateDevices: function() {
         return new Promise(function(resolve) {
           var kinds = {audio: 'audioinput', video: 'videoinput'};
