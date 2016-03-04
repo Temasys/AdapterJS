@@ -69,6 +69,7 @@
     };
 
     getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = requestUserMedia;
 
   } else if (window.navigator.webkitGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
@@ -187,6 +188,7 @@
     };
 
     getUserMedia = window.navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = requestUserMedia;
   }
 
   // For chrome, use an iframe to load the screensharing extension
