@@ -149,6 +149,7 @@
     };
 
     getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = requestUserMedia;
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // nothing here because edge does not support screensharing
