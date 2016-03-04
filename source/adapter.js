@@ -658,7 +658,7 @@ if ( navigator.mozGetUserMedia ||
   // attachMediaStream and reattachMediaStream for Egde
   if (navigator.mediaDevices && navigator.userAgent.match(
       /Edge\/(\d+).(\d+)$/)) {
-    window.getUserMedia = navigator.getUserMedia.bind(navigator);
+    getUserMedia = window.getUserMedia = navigator.getUserMedia.bind(navigator);
     attachMediaStream = function(element, stream) {
       element.srcObject = stream;
       return element;
@@ -974,7 +974,7 @@ if ( navigator.mozGetUserMedia ||
       });
     };
 
-    window.getUserMedia = function (constraints, successCallback, failureCallback) {
+    getUserMedia = window.getUserMedia = function (constraints, successCallback, failureCallback) {
       constraints.audio = constraints.audio || false;
       constraints.video = constraints.video || false;
 
