@@ -54,8 +54,7 @@
               if (['PermissionDeniedError', 'SecurityError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                   AdapterJS.TEXT.EXTENSION.BUTTON_FF,
-                  'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
-                //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
+                  'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', true, true);
               } else {
                 failureCb(error);
               }
