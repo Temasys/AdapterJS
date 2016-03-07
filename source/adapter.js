@@ -682,11 +682,13 @@ if ( navigator.mozGetUserMedia ||
     return to;
   };
 
-  // Propagate attachMediaStream in window and AdapterJS
+  // Propagate attachMediaStream and gUM in window and AdapterJS
   window.attachMediaStream      = attachMediaStream;
   window.reattachMediaStream    = reattachMediaStream;
+  window.getUserMedia           = getUserMedia;
   AdapterJS.attachMediaStream   = attachMediaStream;
   AdapterJS.reattachMediaStream = reattachMediaStream;
+  AdapterJS.getUserMedia        = getUserMedia;
 
   // Removed Google defined promises when promise is not defined
   if (typeof Promise === 'undefined') {
@@ -983,7 +985,7 @@ if ( navigator.mozGetUserMedia ||
           getUserMedia(constraints, successCallback, failureCallback);
       });
     };
-    window.navigator.getUserMedia = window.getUserMedia;
+    AdapterJS.getUserMedia = window.navigator.getUserMedia = window.getUserMedia;
 
     // Defined mediaDevices when promises are available
     if ( !navigator.mediaDevices &&
@@ -1111,11 +1113,13 @@ if ( navigator.mozGetUserMedia ||
       }
     };
 
-    // Propagate attachMediaStream in window and AdapterJS
+    // Propagate attachMediaStream and gUM in window and AdapterJS
     window.attachMediaStream      = attachMediaStream;
     window.reattachMediaStream    = reattachMediaStream;
+    window.getUserMedia           = getUserMedia;
     AdapterJS.attachMediaStream   = attachMediaStream;
     AdapterJS.reattachMediaStream = reattachMediaStream;
+    AdapterJS.getUserMedia        = getUserMedia;
 
     AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
       properties = Object.getOwnPropertyNames( prototype );
