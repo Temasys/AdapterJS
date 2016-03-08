@@ -295,7 +295,8 @@ module.exports = function(grunt) {
 
     grunt.registerTask('CheckSubmodules', 'Checks that third_party/adapter is properly checked out', function() {
       if(!grunt.file.exists(grunt.config.get('googleAdapterPath'))) {
-        grunt.fail.fatal("Couldn't find " + grunt.config.get('googleAdapterPath') + "; output would be incomplete.  Did you remember to initialize submodules?\nex: git submodule update --init");
+        grunt.fail.fatal('Couldn\'t find ' + grunt.config.get('googleAdapterPath') + '\n' +
+                      'Output would be incomplete. Did you remember to initialize submodules?\nPlease run: git submodule update --init');
       }
     });
 
