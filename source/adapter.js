@@ -1088,7 +1088,7 @@ if ( navigator.mozGetUserMedia ||
         element.setStreamId(streamId);
       }
       var newElement = document.getElementById(elementId);
-      AdapterJS.forwardEventHandlers(newElement, element, Object.getPrototypeOf(element));
+      AdapterJS.forwardAttributesAndEvents(newElement, element, Object.getPrototypeOf(element));
 
       return newElement;
     };
@@ -1117,7 +1117,7 @@ if ( navigator.mozGetUserMedia ||
     AdapterJS.attachMediaStream   = attachMediaStream;
     AdapterJS.reattachMediaStream = reattachMediaStream;
 
-    AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
+    AdapterJS.forwardAttributesAndEvents = function (destElem, srcElem, prototype) {
       for (var property in srcElem) {
         if (srcElem.hasOwnProperty(property)) {
           destElem[property] = srcElem[property];
@@ -1142,7 +1142,7 @@ if ( navigator.mozGetUserMedia ||
       }
       var subPrototype = Object.getPrototypeOf(prototype);
       if(!!subPrototype) {
-        AdapterJS.forwardEventHandlers(destElem, srcElem, subPrototype);
+        AdapterJS.forwardAttributesAndEvents(destElem, srcElem, subPrototype);
       }
     };
 
