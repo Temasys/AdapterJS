@@ -293,6 +293,12 @@ module.exports = function(grunt) {
         grunt.log.writeln('bamboo/vars file successfully created');
     });
 
+    grunt.registerTask('CheckSubmodules', 'Checks that third_party/adapter is properly checked out', function() {
+      if(!grunt.file.exists(grunt.config.get('googleAdapterPath'))) {
+        grunt.fail.fatal("Couldn't find " + grunt.config.get('googleAdapterPath') + "; output would be incomplete.  Did you remember to initialize submodules?\nex: git submodule update --init");
+      }
+    });
+
     grunt.registerTask('CheckPluginInfo', 'Checks for existing config file', function() {
       var fullPath = grunt.config.get('pluginInfoRoot') + '/' + grunt.config.get('pluginInfoFile');
       grunt.verbose.writeln('Checking that the plugin info file exists.');
@@ -319,6 +325,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('publish', [
+        'CheckSubmodules',
         'CheckPluginInfo',
         // 'webrtc-adapter',
         'versionise',
