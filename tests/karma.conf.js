@@ -21,6 +21,7 @@ module.exports = function(config) {
 
       // tests
       {pattern: 'unit/*.spec.js',                 included: false},
+      {pattern: 'unit/*.no-spec.js',              included: false},
     ],
 
 
