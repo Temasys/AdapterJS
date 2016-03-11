@@ -976,7 +976,7 @@ if ( navigator.mozGetUserMedia ||
       });
     };
 
-    window.getUserMedia = function (constraints, successCallback, failureCallback) {
+    getUserMedia = function (constraints, successCallback, failureCallback) {
       constraints.audio = constraints.audio || false;
       constraints.video = constraints.video || false;
 
@@ -985,7 +985,7 @@ if ( navigator.mozGetUserMedia ||
           getUserMedia(constraints, successCallback, failureCallback);
       });
     };
-    AdapterJS.getUserMedia = window.navigator.getUserMedia = window.getUserMedia;
+    window.navigator.getUserMedia = getUserMedia;
 
     // Defined mediaDevices when promises are available
     if ( !navigator.mediaDevices &&
