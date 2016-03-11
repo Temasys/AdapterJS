@@ -67,7 +67,12 @@
       }
     };
 
-    getUserMedia = navigator.getUserMedia;
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        window.getUserMedia(constraints, resolve, reject);
+      });
+    };
 
   } else if (window.navigator.webkitGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
@@ -147,7 +152,12 @@
       }
     };
 
-    getUserMedia = navigator.getUserMedia;
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        window.getUserMedia(constraints, resolve, reject);
+      });
+    };
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // nothing here because edge does not support screensharing
@@ -184,7 +194,9 @@
       }
     };
 
-    getUserMedia = window.navigator.getUserMedia;
+    AdapterJS.getUserMedia = getUserMedia = 
+       window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = requestUserMedia;
   }
 
   // For chrome, use an iframe to load the screensharing extension
