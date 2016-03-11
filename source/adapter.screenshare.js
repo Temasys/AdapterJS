@@ -67,7 +67,7 @@
       }
     };
 
-    AdapterJS.getUserMedia = getUserMedia = navigator.getUserMedia;
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
     navigator.mediaDevices.getUserMedia = requestUserMedia;
 
   } else if (window.navigator.webkitGetUserMedia) {
@@ -148,7 +148,7 @@
       }
     };
 
-    AdapterJS.getUserMedia = getUserMedia = navigator.getUserMedia;
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
     navigator.mediaDevices.getUserMedia = requestUserMedia;
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
