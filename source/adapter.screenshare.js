@@ -68,7 +68,11 @@
     };
 
     AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
-    navigator.mediaDevices.getUserMedia = requestUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        window.getUserMedia(constraints, resolve, reject);
+      });
+    };
 
   } else if (window.navigator.webkitGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
@@ -149,7 +153,11 @@
     };
 
     AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
-    navigator.mediaDevices.getUserMedia = requestUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        window.getUserMedia(constraints, resolve, reject);
+      });
+    };
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // nothing here because edge does not support screensharing
