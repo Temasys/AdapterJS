@@ -194,7 +194,8 @@
       }
     };
 
-    AdapterJS.getUserMedia = getUserMedia = window.navigator.getUserMedia;
+    AdapterJS.getUserMedia = getUserMedia = 
+       window.getUserMedia = navigator.getUserMedia;
     navigator.mediaDevices.getUserMedia = requestUserMedia;
   }
 
