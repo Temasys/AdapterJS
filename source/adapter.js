@@ -275,6 +275,10 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser = 'blink';
     // TODO: detected WebRTC version
   }
+
+  window.webrtcDetectedBrowser = webrtcDetectedBrowser;
+  window.webrtcDetectedVersion = webrtcDetectedVersion;
+  window.webrtcMinimumVersion  = webrtcMinimumVersion;
 };
 
 AdapterJS.addEvent = function(elem, evnt, func) {
@@ -1205,7 +1209,3 @@ if ( navigator.mozGetUserMedia ||
   // END OF WEBRTC PLUGIN SHIM
   ///////////////////////////////////////////////////////////////////
 }
-
-window.webrtcDetectedBrowser = webrtcDetectedBrowser;
-window.webrtcDetectedVersion = webrtcDetectedVersion;
-window.webrtcMinimumVersion = webrtcMinimumVersion;
