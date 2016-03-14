@@ -1205,3 +1205,7 @@ if ( navigator.mozGetUserMedia ||
   // END OF WEBRTC PLUGIN SHIM
   ///////////////////////////////////////////////////////////////////
 }
+
+window.webrtcDetectedBrowser = webrtcDetectedBrowser;
+window.webrtcDetectedVersion = webrtcDetectedVersion;
+window.webrtcMinimumVersion = webrtcMinimumVersion;
