@@ -673,7 +673,12 @@ if ( navigator.mozGetUserMedia ||
   // to support the plugin's logic
   attachMediaStream_base = attachMediaStream;
   attachMediaStream = function (element, stream) {
-    attachMediaStream_base(element, stream);
+    if (webrtcDetectedBrowser === 'chrome' && !stream) {
+      // Chrome does not support "src = null"
+      element.src = '';
+    } else {
+      attachMediaStream_base(element, stream);
+    }
     return element;
   };
   reattachMediaStream_base = reattachMediaStream;
