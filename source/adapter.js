@@ -1134,15 +1134,10 @@ if ( navigator.mozGetUserMedia ||
         if (prop) {
           propName = properties[prop];
 
-          if (typeof(propName.slice) === 'function') {
-            if (propName.slice(0,2) === 'on' && srcElem[propName] !== null) {
-              if (isIE) {
-                destElem.attachEvent(propName,srcElem[propName]);
-              } else {
-                destElem.addEventListener(propName.slice(2), srcElem[propName], false);
-              }
-            }
-            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
+          if (typeof propName.slice === 'function' &&
+              propName.slice(0,2) === 'on' && 
+              typeof srcElem[propName] === 'function') {
+              AdapterJS.addEvent(destElem, propName.slice(2), srcElem[propName]);
           }
         }
       }
