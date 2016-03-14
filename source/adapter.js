@@ -673,7 +673,14 @@ if ( navigator.mozGetUserMedia ||
   // to support the plugin's logic
   attachMediaStream_base = attachMediaStream;
   attachMediaStream = function (element, stream) {
-    attachMediaStream_base(element, stream);
+    if ((webrtcDetectedBrowser === 'chrome' ||
+         webrtcDetectedBrowser === 'opera') && 
+        !stream) {
+      // Chrome does not support "src = null"
+      element.src = '';
+    } else {
+      attachMediaStream_base(element, stream);
+    }
     return element;
   };
   reattachMediaStream_base = reattachMediaStream;
@@ -1127,15 +1134,10 @@ if ( navigator.mozGetUserMedia ||
         if (prop) {
           propName = properties[prop];
 
-          if (typeof(propName.slice) === 'function') {
-            if (propName.slice(0,2) === 'on' && srcElem[propName] !== null) {
-              if (isIE) {
-                destElem.attachEvent(propName,srcElem[propName]);
-              } else {
-                destElem.addEventListener(propName.slice(2), srcElem[propName], false);
-              }
-            }
-            //TODO (http://jira.temasys.com.sg/browse/TWP-328) Forward non-event properties ?
+          if (typeof propName.slice === 'function' &&
+              propName.slice(0,2) === 'on' && 
+              typeof srcElem[propName] === 'function') {
+              AdapterJS.addEvent(destElem, propName.slice(2), srcElem[propName]);
           }
         }
       }
