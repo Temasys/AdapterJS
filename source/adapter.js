@@ -275,6 +275,10 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser = 'blink';
     // TODO: detected WebRTC version
   }
+
+  window.webrtcDetectedBrowser = webrtcDetectedBrowser;
+  window.webrtcDetectedVersion = webrtcDetectedVersion;
+  window.webrtcMinimumVersion  = webrtcMinimumVersion;
 };
 
 AdapterJS.addEvent = function(elem, evnt, func) {
