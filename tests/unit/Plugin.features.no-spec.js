@@ -65,7 +65,6 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
         var base64 = video.getFrame();
         assert.isString(base64);
-        expect(base64).not.to.be.empty;
         expect(base64).to.have.length.above(1000);
 
         var img = new Image();
