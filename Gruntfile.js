@@ -115,13 +115,13 @@ module.exports = function(grunt) {
       },
 
       includereplace: {
-        production: {
+        withGoogle: {
           options: {
             // Task-specific options go here. 
-            prefix: '@@',
+            prefix: '@Goo@',
             includesDir: '.',
             processIncludeContents: function (includeContents, localVars, filePath) {
-              if (filePath.indexOf(grunt.config.get('googleAdapterPath')) != -1) {
+              if (filePath.indexOf(grunt.config.get('googleAdapterPath')) !== -1) {
                 // Indent file and indent Google's exports
                 return includeContents
                   // Comment export
@@ -141,7 +141,20 @@ module.exports = function(grunt) {
             ],
           // Destination directory to copy files to 
           dest: './'
-        }
+        },
+        withPluginInfo: {
+          options: {
+            // Task-specific options go here. 
+            prefix: '@Tem@',
+            includesDir: '<%= pluginInfoRoot %>/',
+          },
+          // Files to perform replacements and includes with 
+          src: [
+            '<%= production %>/*.js',
+            ],
+          // Destination directory to copy files to 
+          dest: './'
+        },
       },
       
       jshint: {
@@ -159,7 +172,8 @@ module.exports = function(grunt) {
                 node: true
             }, grunt.file.readJSON('.jshintrc')),
             src: [
-                'tests/*_test.js'
+              'tests/*.js',
+              'tests/unit/*.js'
             ]
         },
         app: {
@@ -279,6 +293,13 @@ module.exports = function(grunt) {
         grunt.log.writeln('bamboo/vars file successfully created');
     });
 
+    grunt.registerTask('CheckSubmodules', 'Checks that third_party/adapter is properly checked out', function() {
+      if(!grunt.file.exists(grunt.config.get('googleAdapterPath'))) {
+        grunt.fail.fatal('Couldn\'t find ' + grunt.config.get('googleAdapterPath') + '\n' +
+                      'Output would be incomplete. Did you remember to initialize submodules?\nPlease run: git submodule update --init');
+      }
+    });
+
     grunt.registerTask('CheckPluginInfo', 'Checks for existing config file', function() {
       var fullPath = grunt.config.get('pluginInfoRoot') + '/' + grunt.config.get('pluginInfoFile');
       grunt.verbose.writeln('Checking that the plugin info file exists.');
@@ -290,18 +311,24 @@ module.exports = function(grunt) {
       }
     });
 
-    grunt.registerTask('dev', [
-        'CheckPluginInfo',
-        'versionise',
-        'clean:production',
-        'concat',
-        'replace:production',
-        'includereplace:production',
-        'uglify'
-    ]);
+    // NOTE(J-O) Prep for webrtc-adapter 0.2.10, will need to be compiled
+    grunt.registerTask('webrtc-adapter', 'Build the webrtc-adapter submodule', function() {
+      grunt.verbose.writeln('Spawning child process to compile webrtc-adapter subgrunt.');
+      var done = this.async();
+      var child = grunt.util.spawn({
+        grunt: true,
+        args: ['--gruntfile', './third_party/adapter/Gruntfile.js', 'build'],
+        opts: {stdio: 'inherit'},
+      }, function(error, result) {});
+      child.on('close', function (code) {
+        done(code === 0);
+      });
+    });
 
     grunt.registerTask('publish', [
+        'CheckSubmodules',
         'CheckPluginInfo',
+        // 'webrtc-adapter',
         'versionise',
         'clean:production',
         'concat',

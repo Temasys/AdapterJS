@@ -13,10 +13,14 @@
   };
 
   var clone = function(obj) {
-    if (null == obj || "object" != typeof obj) return obj;
+    if (null === obj || 'object' !== typeof obj) {
+      return obj;
+    }
     var copy = obj.constructor();
     for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+      if (obj.hasOwnProperty(attr)) {
+        copy[attr] = obj[attr];
+      }
     }
     return copy;
   };
@@ -47,11 +51,10 @@
             clearInterval(checkIfReady);
 
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
-              if (error.name === 'PermissionDeniedError' && window.parent.location.protocol === 'https:') {
+              if (['PermissionDeniedError', 'SecurityError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                   AdapterJS.TEXT.EXTENSION.BUTTON_FF,
-                  'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname, false, true);
-                //window.location.href = 'http://skylink.io/screensharing/ff_addon.php?domain=' + window.location.hostname;
+                  'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', true, true);
               } else {
                 failureCb(error);
               }
@@ -64,7 +67,12 @@
       }
     };
 
-    getUserMedia = navigator.getUserMedia;
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        window.getUserMedia(constraints, resolve, reject);
+      });
+    };
 
   } else if (window.navigator.webkitGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
@@ -144,7 +152,12 @@
       }
     };
 
-    getUserMedia = navigator.getUserMedia;
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        window.getUserMedia(constraints, resolve, reject);
+      });
+    };
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // nothing here because edge does not support screensharing
@@ -181,7 +194,9 @@
       }
     };
 
-    getUserMedia = window.navigator.getUserMedia;
+    AdapterJS.getUserMedia = getUserMedia = 
+       window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = requestUserMedia;
   }
 
   // For chrome, use an iframe to load the screensharing extension
@@ -199,7 +214,7 @@
 
     (document.body || document.documentElement).appendChild(iframe);
 
-    var postFrameMessage = function (object) {
+    var postFrameMessage = function (object) { // jshint ignore:line
       object = object || {};
 
       if (!iframe.isLoaded) {

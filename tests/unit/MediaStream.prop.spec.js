@@ -78,7 +78,7 @@ describe('MediaStream | Properties', function() {
 	it('MediaStream.ended :: boolean', function (done) {
 		this.timeout(testItemTimeout);
 
-		assert.typeOf(stream.ended, 'boolean')
+		assert.typeOf(stream.ended, 'boolean');
 
 		done();
 	});

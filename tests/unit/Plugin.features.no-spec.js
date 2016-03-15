@@ -9,15 +9,12 @@ var testTimeout = 120000;
 var gUMTimeout = 15000;
 
 // Test item timeout
-var testItemTimeout = 120000;
-
-// Stress test, popping plugin elements in and out 'POP_REQUESTS' times
-var POP_REQUESTS = 100;
+var testItemTimeout = 5000;
 
 // !!! THIS TEST ONLY APPLIES FOR PLUGIN-BASED BROWSERS !!!
 if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
 
-  describe('Plugin Object | Stability', function() {
+  describe('Plugin Features | Out of spec', function() {
     this.timeout(testTimeout);
 
     /* Attributes */
@@ -57,28 +54,29 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
       stream = null;
     });
 
-    it('Pop element N times', function(done) {
-      this.timeout(testItemTimeout);
+    it('getFrame', function(done) {
+      this.timeout(testTimeout);
+      video.onplay = function(e) {
+        assert.isNotNull(video.getFrame);
+        // assert.typeOf(video.getFrame, 'function');
 
-      var popCount = 0;
-      var t;
+        var canvas = document.createElement('canvas');
+        document.body.appendChild(canvas);
 
-      var replaceVideoElement = function() {
-        clearTimeout(t);
-        document.body.removeChild(video);
-        video = document.createElement('video');
-        document.body.appendChild(video);
-        video.onplay = replaceVideoElement;
-        video = attachMediaStream(video, stream);
-        t = setTimeout(replaceVideoElement, 500);
+        var base64 = video.getFrame();
+        assert.isString(base64);
+        expect(base64).to.have.length.above(1000);
 
-        expect(video.valid).to.equal(true);
-        if (++popCount >= POP_REQUESTS) {
-          clearTimeout(t);
+        var img = new Image();
+        img.onload = function () {
+          canvas.getContext('2d').
+          drawImage(img, 0, 0, canvas.width, canvas.height);
           done();
-        }
+        };
+        img.setAttribute('src', 'data:image/png;base64,' + base64);
+        
       };
-      replaceVideoElement();
+      video = attachMediaStream(video, stream);
     });
 
   }); // describe('Plugin Object | Stability'

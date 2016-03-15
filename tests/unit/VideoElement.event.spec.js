@@ -68,7 +68,7 @@ describe('VideoElement | EventHandler', function() {
 
     video.onplaying = function(event) {
       done();
-    }
+    };
 
     video = attachMediaStream(video, stream);    
   });
@@ -81,10 +81,10 @@ describe('VideoElement | EventHandler', function() {
     var now = new Date().getTime();
 
     video.onplaying = function(event) {
-      expect(event.target).not.to.be.undefined;
-      expect(event.currentTarget).not.to.be.undefined;
-      expect(event.srcElement).not.to.be.undefined;
-      expect(event.timeStamp).not.to.be.undefined;
+      assert.isDefined(event.target);
+      assert.isDefined(event.currentTarget);
+      assert.isDefined(event.srcElement);
+      assert.isDefined(event.timeStamp);
 
       expect(event.timeStamp).to.be.above(0);
       expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
@@ -105,12 +105,12 @@ describe('VideoElement | EventHandler', function() {
     var expectedOnplayCaught = 2;
 
     video.onplay = function() {
-      if(++onPlayCaught == expectedOnplayCaught) {
+      if(++onPlayCaught === expectedOnplayCaught) {
         done();
       }
       video.pause();
       video.play();
-    }
+    };
 
     video = attachMediaStream(video, stream);
   });
@@ -123,10 +123,10 @@ describe('VideoElement | EventHandler', function() {
     var now = new Date().getTime();
 
     video.onplay = function(event) {
-      expect(event.target).not.to.be.undefined;
-      expect(event.currentTarget).not.to.be.undefined;
-      expect(event.srcElement).not.to.be.undefined;
-      expect(event.timeStamp).not.to.be.undefined;
+      assert.isDefined(event.target);
+      assert.isDefined(event.currentTarget);
+      assert.isDefined(event.srcElement);
+      assert.isDefined(event.timeStamp);
 
       expect(event.timeStamp).to.be.above(0);
       expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);
@@ -161,10 +161,10 @@ it('VideoElement.onloadedmetadata :: emit', function (done) {
     var now = new Date().getTime();
 
     video.onloadedmetadata = function(event) {
-      expect(event.target).not.to.be.undefined;
-      expect(event.currentTarget).not.to.be.undefined;
-      expect(event.srcElement).not.to.be.undefined;
-      expect(event.timeStamp).not.to.be.undefined;
+      assert.isDefined(event.target);
+      assert.isDefined(event.currentTarget);
+      assert.isDefined(event.srcElement);
+      assert.isDefined(event.timeStamp);
 
       expect(event.timeStamp).to.be.above(0);
       expect(event.timeStamp).to.be.within(now - timeStampMaxError, now + timeStampMaxError);

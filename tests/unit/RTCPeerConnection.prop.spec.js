@@ -241,20 +241,14 @@ describe('RTCPeerConnection | Properties', function() {
     assert.equal(typeof peer1.getStreamById, FUNCTION_TYPE);
     assert.equal(typeof peer2.getStreamById, FUNCTION_TYPE);
 
-    var result1 = peer1.getStreamById(stream.id);
-    var result2 = peer2.getStreamById(stream.id);
-
-    expect(result1).to.be.null;
-    expect(result2).to.be.null;
+    assert.isNull(peer1.getStreamById(stream.id));
+    assert.isNull(peer2.getStreamById(stream.id));
 
     peer1.addStream(stream);
     peer2.addStream(stream);
 
-    var result1 = peer1.getStreamById(stream.id);
-    var result2 = peer2.getStreamById(stream.id);
-
-    expect(result1).to.equal(stream);
-    expect(result2).to.equal(stream);
+    expect(peer1.getStreamById(stream.id)).to.equal(stream);
+    expect(peer2.getStreamById(stream.id)).to.equal(stream);
 
     done();
   });

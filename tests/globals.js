@@ -94,10 +94,8 @@ var printJSON = function (obj, spaces) {
 
         if (typeof val === 'object') {
           outputStr += printJSON(val, spaces + 2);
-
         } else if (typeof val === 'string') {
           outputStr += '"' + val + '"';
-
         } else {
           outputStr += val;
         }
@@ -133,12 +131,13 @@ var printJSON = function (obj, spaces) {
 };
 
 var isArrayEqual = function(array1, array2) {
-  if (array1.length != array2.length) 
-    return false
+  if (array1.length !== array2.length) {
+    return false;
+  }
   
   return array1.every(function(element, index) {
     return element === array2[index]; 
-  })
+  });
 };
 
 // Connect the RTCPeerConnection object
@@ -178,6 +177,17 @@ var connect = function (peer1, peer2, offerConstraints) {
     }
   };
 
+  // create answer
+  var peer2AnswerCb = function (a) {
+    answer = a;
+    peer2.setLocalDescription(answer, function() {}, function (error) {
+      throw error;
+    });
+    peer1.setRemoteDescription(answer, function() {}, function (error) {
+      throw error;
+    });
+  };
+
   // create offer
   var peer1OfferCb = function (o) {
     offer = o;
@@ -192,19 +202,12 @@ var connect = function (peer1, peer2, offerConstraints) {
     });  
   };
 
-  // create answer
-  var peer2AnswerCb = function (a) {
-    answer = a;
-    peer2.setLocalDescription(answer, function() {}, function (error) {
-      throw error;
-    });
-    peer1.setRemoteDescription(answer, function() {}, function (error) {
-      throw error;
-    });
-  };
-
   // start
   peer1.createOffer(peer1OfferCb, function (error) {
     throw error;
   }, offerConstraints);
 };
+
+// Plugin functions have different types depending on the interface (NPAPI VS ActiveX)
+FUNCTION_TYPE = webrtcDetectedBrowser === 'IE' ? 'object' : 'function';
+
