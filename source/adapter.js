@@ -760,11 +760,6 @@ if ( navigator.mozGetUserMedia ||
   AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
 
-  // always define navigator.mediaDevices if it's not defined
-  if (!navigator.mediaDevices) {
-    navigator.mediaDevices = {};
-  }
-
   /* jshint -W035 */
   AdapterJS.WebRTCPlugin.WaitForPluginReady = function() {
     while (AdapterJS.WebRTCPlugin.pluginState !== AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY) {
@@ -1004,7 +999,8 @@ if ( navigator.mozGetUserMedia ||
     window.navigator.getUserMedia = getUserMedia;
 
     // Defined mediaDevices when promises are available
-    if (typeof Promise !== 'undefined') {
+    if ( !navigator.mediaDevices &&
+      typeof Promise !== 'undefined') {
       requestUserMedia = function(constraints) {
         return new Promise(function(resolve, reject) {
           getUserMedia(constraints, resolve, reject);
