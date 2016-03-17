@@ -196,7 +196,10 @@
 
     AdapterJS.getUserMedia = getUserMedia = 
        window.getUserMedia = navigator.getUserMedia;
-    navigator.mediaDevices.getUserMedia = requestUserMedia;
+    if ( navigator.mediaDevices &&
+      typeof Promise !== 'undefined') {
+      navigator.mediaDevices.getUserMedia = requestUserMedia;
+    }
   }
 
   // For chrome, use an iframe to load the screensharing extension
