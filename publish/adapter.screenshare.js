@@ -1,4 +1,4 @@
-/*! adapterjs - v0.13.1 - 2016-03-14 */
+/*! adapterjs - v0.13.2 - 2016-03-18 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -17,7 +17,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.13.1';
+AdapterJS.VERSION = '0.13.2';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -3166,7 +3166,10 @@ if ( navigator.mozGetUserMedia ||
 
     AdapterJS.getUserMedia = getUserMedia = 
        window.getUserMedia = navigator.getUserMedia;
-    navigator.mediaDevices.getUserMedia = requestUserMedia;
+    if ( navigator.mediaDevices &&
+      typeof Promise !== 'undefined') {
+      navigator.mediaDevices.getUserMedia = requestUserMedia;
+    }
   }
 
   // For chrome, use an iframe to load the screensharing extension
