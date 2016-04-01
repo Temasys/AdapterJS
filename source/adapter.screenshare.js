@@ -114,9 +114,9 @@
           }
         };
 
-        if (window.cefGetScreenMedia) {
-            //window.cefGetScreenMedia is experimental - may be removed without notice
-            window.cefGetScreenMedia(chromeCallback);
+        if (window.cef && window.cef.getScreenMedia) {
+            // Chromium Embedded Framework does not include these methods as standard
+            window.cef.getScreenMedia(chromeCallback);
         } else { // Use Chrome extension
           var onIFrameCallback = function (event) {
             if (!event.data) {
