@@ -2435,6 +2435,7 @@ if ( navigator.mozGetUserMedia ||
   attachMediaStream_base = attachMediaStream;
   attachMediaStream = function (element, stream) {
     if ((webrtcDetectedBrowser === 'chrome' ||
+         webrtcDetectedBrowser === 'blink'  ||
          webrtcDetectedBrowser === 'opera') && 
         !stream) {
       // Chrome does not support "src = null"

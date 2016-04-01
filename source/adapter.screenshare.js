@@ -79,7 +79,8 @@
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
-        if (window.webrtcDetectedBrowser !== 'chrome') {
+        if (window.webrtcDetectedBrowser !== 'chrome' &&
+            window.webrtcDetectedBrowser !== 'blink') {
           // This is Opera, which does not support screensharing
           failureCb(new Error('Current browser does not support screensharing'));
           return;
@@ -209,7 +210,8 @@
   // For chrome, use an iframe to load the screensharing extension
   // in the correct domain.
   // Modify here for custom screensharing extension in chrome
-  if (window.webrtcDetectedBrowser === 'chrome') {
+  if (window.webrtcDetectedBrowser === 'chrome' ||
+      window.webrtcDetectedBrowser === 'blink') {
     var iframe = document.createElement('iframe');
 
     iframe.onload = function() {
