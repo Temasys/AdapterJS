@@ -1,4 +1,4 @@
-/*! adapterjs - v0.13.2 - 2016-03-18 */
+/*! adapterjs - v0.13.3 - 2016-04-13 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -17,7 +17,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.13.2';
+AdapterJS.VERSION = '0.13.3';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -2709,24 +2709,30 @@ if ( navigator.mozGetUserMedia ||
 
       // Call relevant PeerConnection constructor according to plugin version
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
+
+      // RTCPeerConnection prototype from the old spec
+      var iceServers = null;
+      if (servers && Array.isArray(servers.iceServers)) {
+        iceServers = servers.iceServers;
+        for (var i = 0; i < iceServers.length; i++) {
+          // Legacy plugin versions compatibility
+          if (iceServers[i].urls && !iceServers[i].url) {
+            iceServers[i].url = iceServers[i].urls;
+          }
+          iceServers[i].hasCredentials = AdapterJS.
+            isDefined(iceServers[i].username) &&
+            AdapterJS.isDefined(iceServers[i].credential);
+        }
+      }
+
       if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION &&
           AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
         // RTCPeerConnection prototype from the new spec
+        if (iceServers) {
+          servers.iceServers = iceServers;
+        }
         return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
       } else {
-        // RTCPeerConnection prototype from the old spec
-        var iceServers = null;
-        if (servers && Array.isArray(servers.iceServers)) {
-          iceServers = servers.iceServers;
-          for (var i = 0; i < iceServers.length; i++) {
-            if (iceServers[i].urls && !iceServers[i].url) {
-              iceServers[i].url = iceServers[i].urls;
-            }
-            iceServers[i].hasCredentials = AdapterJS.
-              isDefined(iceServers[i].username) &&
-              AdapterJS.isDefined(iceServers[i].credential);
-          }
-        }
         var mandatory = (constraints && constraints.mandatory) ?
           constraints.mandatory : null;
         var optional = (constraints && constraints.optional) ?
