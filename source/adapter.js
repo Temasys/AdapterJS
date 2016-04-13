@@ -959,6 +959,7 @@ if ( navigator.mozGetUserMedia ||
       if (servers && Array.isArray(servers.iceServers)) {
         iceServers = servers.iceServers;
         for (var i = 0; i < iceServers.length; i++) {
+          // Legacy plugin versions compatibility
           if (iceServers[i].urls && !iceServers[i].url) {
             iceServers[i].url = iceServers[i].urls;
           }
@@ -971,10 +972,8 @@ if ( navigator.mozGetUserMedia ||
       if (AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION &&
           AdapterJS.WebRTCPlugin.plugin.PEER_CONNECTION_VERSION > 1) {
         // RTCPeerConnection prototype from the new spec
-        if (iceServers) {
-          servers.iceServers = iceServers;
-        }
-        return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
+        var s = { iceServers: iceServers };
+        return AdapterJS.WebRTCPlugin.plugin.PeerConnection(s);
       } else {
         var mandatory = (constraints && constraints.mandatory) ?
           constraints.mandatory : null;
