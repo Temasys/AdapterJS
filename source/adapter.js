@@ -959,6 +959,7 @@ if ( navigator.mozGetUserMedia ||
       if (servers && Array.isArray(servers.iceServers)) {
         iceServers = servers.iceServers;
         for (var i = 0; i < iceServers.length; i++) {
+          // Legacy plugin versions compatibility
           if (iceServers[i].urls && !iceServers[i].url) {
             iceServers[i].url = iceServers[i].urls;
           }
