@@ -1048,16 +1048,11 @@ if ( navigator.mozGetUserMedia ||
     };
 
     getUserMedia = function (constraints, successCallback, failureCallback) {
-      var cc = {
-        audio: false,
-        video: false
-      };
-      if (constraints.audio) {
-        cc.audio = constraintsToPlugin(constraints.audio);
-      }
-      if (constraints.video) {
-        cc.video = constraintsToPlugin(constraints.video);
-      }
+      var cc = {};
+      cc.audio = constraints.audio ?
+        constraintsToPlugin(constraints.audio) : false;
+      cc.video = constraints.video ?
+        constraintsToPlugin(constraints.video) : false;
 
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.
