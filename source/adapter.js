@@ -987,7 +987,7 @@ if ( navigator.mozGetUserMedia ||
       }
     };
 
-    MediaStreamTrack = function(){};
+    MediaStreamTrack = {};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.GetSources(callback);
