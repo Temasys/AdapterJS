@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 
       source: 'source',
 
-      googleAdapterPath: 'third_party/adapter/adapter.js',
+      googleAdapterPath: 'third_party/adapter/out/adapter.js',
 
       production: 'publish',
 
@@ -124,6 +124,18 @@ module.exports = function(grunt) {
               if (filePath.indexOf(grunt.config.get('googleAdapterPath')) !== -1) {
                 // Indent file and indent Google's exports
                 return includeContents
+                  .replace(/chromeShim\.shimOnTrack\(\);\n/gm, function(content) {
+                    var r = content + 
+                    '      navigator.attachMediaStream   = chromeShim.attachMediaStream;\n' + 
+                    '      navigator.reattachMediaStream = chromeShim.reattachMediaStream;\n';
+                    return r;
+                  })
+                  .replace(/firefoxShim\.shimOnTrack\(\);\n/gm, function(content) {
+                    var r = content + 
+                    '      navigator.attachMediaStream   = firefoxShim.attachMediaStream;\n' + 
+                    '      navigator.reattachMediaStream = firefoxShim.reattachMediaStream;\n';
+                    return r;
+                  })
                   // Comment export
                   .replace(/if \(typeof module \!\=\= 'undefined'\) \{(.|\n)*\}\n/gm, function(content) {
                   return '/* Orginal exports removed in favor of AdapterJS custom export.\n' + content + '*/\n';

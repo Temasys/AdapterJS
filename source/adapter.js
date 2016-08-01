@@ -543,7 +543,7 @@ if ( navigator.mozGetUserMedia ||
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
 /* jshint ignore:start */
-@Goo@include('third_party/adapter/adapter.js', {})
+@Goo@include('third_party/adapter/out/adapter.js', {})
 /* jshint ignore:end */
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -676,7 +676,7 @@ if ( navigator.mozGetUserMedia ||
 
   // Need to override attachMediaStream and reattachMediaStream
   // to support the plugin's logic
-  attachMediaStream_base = attachMediaStream;
+  attachMediaStream_base = navigator.attachMediaStream;
   attachMediaStream = function (element, stream) {
     if ((webrtcDetectedBrowser === 'chrome' ||
          webrtcDetectedBrowser === 'opera') && 
@@ -688,7 +688,7 @@ if ( navigator.mozGetUserMedia ||
     }
     return element;
   };
-  reattachMediaStream_base = reattachMediaStream;
+  reattachMediaStream_base = navigator.reattachMediaStream;
   reattachMediaStream = function (to, from) {
     reattachMediaStream_base(to, from);
     return to;

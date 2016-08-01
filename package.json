@@ -19,7 +19,8 @@
     }
   ],
   "scripts": {
-    "test": "./test.sh;"
+    "test": "./test.sh;",
+    "postinstall": "sh npm_postinstall.sh"
   },
   "dependencies": {},
   "devDependencies": {
