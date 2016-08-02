@@ -19,8 +19,10 @@
     }
   ],
   "scripts": {
-    "test": "./test.sh;",
-    "postinstall": "sh npm_postinstall.sh"
+    "postinstall": "npm --prefix third_party/adapter install third_party/adapter",
+    "version": "grunt publish",
+    "prepublish": "grunt publish",
+    "test": "./test.sh;"
   },
   "dependencies": {},
   "devDependencies": {
