@@ -126,14 +126,20 @@ module.exports = function(grunt) {
                 return includeContents
                   .replace(/chromeShim\.shimOnTrack\(\);\n/gm, function(content) {
                     var r = content + 
-                    '      navigator.attachMediaStream   = chromeShim.attachMediaStream;\n' + 
-                    '      navigator.reattachMediaStream = chromeShim.reattachMediaStream;\n';
+                    '      AdapterJS.attachMediaStream_base   = chromeShim.attachMediaStream;\n' + 
+                    '      AdapterJS.reattachMediaStream_base = chromeShim.reattachMediaStream;\n';
                     return r;
                   })
                   .replace(/firefoxShim\.shimOnTrack\(\);\n/gm, function(content) {
                     var r = content + 
-                    '      navigator.attachMediaStream   = firefoxShim.attachMediaStream;\n' + 
-                    '      navigator.reattachMediaStream = firefoxShim.reattachMediaStream;\n';
+                    '      AdapterJS.attachMediaStream_base = firefoxShim.attachMediaStream;\n' + 
+                    '      AdapterJS.reattachMediaStream_base = firefoxShim.reattachMediaStream;\n';
+                    return r;
+                  })
+                  .replace(/edgeShim\.shimPeerConnection\(\);\n/gm, function(content) {
+                    var r = content + 
+                    '      AdapterJS.attachMediaStream_base = edgeShim.attachMediaStream;\n' + 
+                    '      AdapterJS.reattachMediaStream_base = edgeShim.reattachMediaStream;\n';
                     return r;
                   })
                   // Comment export

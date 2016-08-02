@@ -659,24 +659,8 @@ if ( navigator.mozGetUserMedia ||
     };
   }
 
-  // adapter.js by Google currently doesn't suppport
-  // attachMediaStream and reattachMediaStream for Egde
-  if (navigator.mediaDevices && navigator.userAgent.match(
-      /Edge\/(\d+).(\d+)$/)) {
-    getUserMedia = window.getUserMedia = navigator.getUserMedia.bind(navigator);
-    attachMediaStream = function(element, stream) {
-      element.srcObject = stream;
-      return element;
-    };
-    reattachMediaStream = function(to, from) {
-      to.srcObject = from.srcObject;
-      return to;
-    };
-  }
-
   // Need to override attachMediaStream and reattachMediaStream
   // to support the plugin's logic
-  attachMediaStream_base = navigator.attachMediaStream;
   attachMediaStream = function (element, stream) {
     if ((webrtcDetectedBrowser === 'chrome' ||
          webrtcDetectedBrowser === 'opera') && 
@@ -684,13 +668,12 @@ if ( navigator.mozGetUserMedia ||
       // Chrome does not support "src = null"
       element.src = '';
     } else {
-      attachMediaStream_base(element, stream);
+      AdapterJS.attachMediaStream_base(element, stream);
     }
     return element;
   };
-  reattachMediaStream_base = navigator.reattachMediaStream;
   reattachMediaStream = function (to, from) {
-    reattachMediaStream_base(to, from);
+    AdapterJS.reattachMediaStream_base(to, from);
     return to;
   };
 
