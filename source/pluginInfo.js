@@ -12,9 +12,11 @@ AdapterJS.WebRTCPlugin.pluginInfo = AdapterJS.WebRTCPlugin.pluginInfo || {
     win: 'http://bit.ly/1kkS4FN'
   }
 };
-if(!!navigator.platform.match(/^Mac/i)) {
-  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.mac;
-}
-else if(!!navigator.platform.match(/^Win/i)) {
-  AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.win;
+if(typeof AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== "undefined" && AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== null) {
+  if(!!navigator.platform.match(/^Mac/i)) {
+    AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.mac;
+  }
+  else if(!!navigator.platform.match(/^Win/i)) {
+    AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.win;
+  }
 }
