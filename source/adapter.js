@@ -680,7 +680,9 @@ if ( navigator.mozGetUserMedia ||
   // Propagate attachMediaStream and gUM in window and AdapterJS
   window.attachMediaStream      = attachMediaStream;
   window.reattachMediaStream    = reattachMediaStream;
-  window.getUserMedia           = getUserMedia;
+  window.getUserMedia           = function(constraints, onSuccess, onFailure) {
+    navigator.getUserMedia(constraints, onSuccess, onFailure);
+  };
   AdapterJS.attachMediaStream   = attachMediaStream;
   AdapterJS.reattachMediaStream = reattachMediaStream;
   AdapterJS.getUserMedia        = getUserMedia;
