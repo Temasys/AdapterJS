@@ -577,6 +577,15 @@ if ( navigator.mozGetUserMedia ||
       }, 0);
     };
 
+    // Attach a media stream to an element.
+    attachMediaStream = function(element, stream) {
+      element.srcObject = stream;
+    };
+
+    reattachMediaStream = function(to, from) {
+      to.srcObject = from.srcObject;
+    };
+
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
       // Note: Google's import of AJS will auto-reverse to 'url': '...' for FF < 38
@@ -620,6 +629,26 @@ if ( navigator.mozGetUserMedia ||
       return iceServers;
     };
   } else if ( navigator.webkitGetUserMedia ) {
+    // Attach a media stream to an element.
+    attachMediaStream = function(element, stream) {
+      if (browserDetails.version >= 43) {
+        element.srcObject = stream;
+      } else if (typeof element.src !== 'undefined') {
+        element.src = URL.createObjectURL(stream);
+      } else {
+        console.error('Error attaching stream to element.');
+        // logging('Error attaching stream to element.');
+      }
+    };
+
+    reattachMediaStream = function(to, from) {
+      if (browserDetails.version >= 43) {
+        to.srcObject = from.srcObject;
+      } else {
+        to.src = from.src;
+      }
+    };
+
     createIceServer = function (url, username, password) {
       console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
 
@@ -657,25 +686,16 @@ if ( navigator.mozGetUserMedia ||
       }
       return iceServers;
     };
-  }
+  } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+    // Attach a media stream to an element.
+    attachMediaStream = function(element, stream) {
+      element.srcObject = stream;
+    };
 
-  // Need to override attachMediaStream and reattachMediaStream
-  // to support the plugin's logic
-  attachMediaStream = function (element, stream) {
-    if ((webrtcDetectedBrowser === 'chrome' ||
-         webrtcDetectedBrowser === 'opera') && 
-        !stream) {
-      // Chrome does not support "src = null"
-      element.src = '';
-    } else {
-      AdapterJS.attachMediaStream_base(element, stream);
-    }
-    return element;
-  };
-  reattachMediaStream = function (to, from) {
-    AdapterJS.reattachMediaStream_base(to, from);
-    return to;
-  };
+    reattachMediaStream = function(to, from) {
+      to.srcObject = from.srcObject;
+    };
+  }
 
   // Propagate attachMediaStream and gUM in window and AdapterJS
   window.attachMediaStream      = attachMediaStream;
