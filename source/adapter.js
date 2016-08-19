@@ -580,10 +580,12 @@ if ( navigator.mozGetUserMedia ||
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
       element.srcObject = stream;
+      return element;
     };
 
     reattachMediaStream = function(to, from) {
       to.srcObject = from.srcObject;
+      return to;
     };
 
     createIceServer = function (url, username, password) {
@@ -631,7 +633,7 @@ if ( navigator.mozGetUserMedia ||
   } else if ( navigator.webkitGetUserMedia ) {
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
-      if (browserDetails.version >= 43) {
+      if (webrtcDetectedVersion >= 43) {
         element.srcObject = stream;
       } else if (typeof element.src !== 'undefined') {
         element.src = URL.createObjectURL(stream);
@@ -639,14 +641,16 @@ if ( navigator.mozGetUserMedia ||
         console.error('Error attaching stream to element.');
         // logging('Error attaching stream to element.');
       }
+      return element;
     };
 
     reattachMediaStream = function(to, from) {
-      if (browserDetails.version >= 43) {
+      if (webrtcDetectedVersion >= 43) {
         to.srcObject = from.srcObject;
       } else {
         to.src = from.src;
       }
+      return to;
     };
 
     createIceServer = function (url, username, password) {
@@ -690,10 +694,12 @@ if ( navigator.mozGetUserMedia ||
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
       element.srcObject = stream;
+      return element;
     };
 
     reattachMediaStream = function(to, from) {
       to.srcObject = from.srcObject;
+      return to;
     };
   }
 
