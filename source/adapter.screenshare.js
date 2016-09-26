@@ -2,6 +2,8 @@
 
   'use strict';
 
+  var baseGetUserMedia = null;
+
   AdapterJS.TEXT.EXTENSION = {
     REQUIRE_INSTALLATION_FF: 'To enable screensharing you need to install the Skylink WebRTC tools Firefox Add-on.',
     REQUIRE_INSTALLATION_CHROME: 'To enable screensharing you need to install the Skylink WebRTC tools Chrome Extension.',
@@ -26,7 +28,7 @@
   if (window.navigator.mozGetUserMedia) {
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      var baseGetUserMedia = window.navigator.getUserMedia;
+      baseGetUserMedia = window.navigator.getUserMedia;
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
@@ -74,7 +76,7 @@
   } else if (window.navigator.webkitGetUserMedia) {
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      var baseGetUserMedia = window.navigator.getUserMedia;
+      baseGetUserMedia = window.navigator.getUserMedia;
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           // This is Opera, which does not support screensharing
@@ -161,7 +163,7 @@
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
   } else {
-    var baseGetUserMedia = window.navigator.getUserMedia;
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
