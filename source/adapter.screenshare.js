@@ -26,9 +26,10 @@
   };
 
   if (window.navigator.mozGetUserMedia) {
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      baseGetUserMedia = window.navigator.getUserMedia;
+
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         // intercepting screensharing requests
 
@@ -74,9 +75,9 @@
     };
 
   } else if (window.navigator.webkitGetUserMedia) {
+    baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      baseGetUserMedia = window.navigator.getUserMedia;
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
           // This is Opera, which does not support screensharing
