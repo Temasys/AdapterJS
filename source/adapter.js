@@ -230,8 +230,8 @@ AdapterJS.isDefined = null;
 //   - 'plugin': Using the plugin implementation.
 AdapterJS.parseWebrtcDetectedBrowser = function () {
   var hasMatch = null;
-  if ((!!window.opr && !!opr.addons) || 
-    !!window.opera || 
+  if ((!!window.opr && !!opr.addons) ||
+    !!window.opera ||
     navigator.userAgent.indexOf(' OPR/') >= 0) {
     // Opera 8.0+
     webrtcDetectedBrowser = 'opera';
@@ -259,7 +259,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     if (!webrtcDetectedVersion) {
       hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
-      webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);      
+      webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     }
   } else if (!!window.StyleMedia) {
     // Edge 20+
@@ -269,13 +269,20 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     // Chrome 1+
     // Bowser and Version set in Google's adapter
     webrtcDetectedType    = 'webkit';
-  } else if ((webrtcDetectedBrowser === 'chrome'|| webrtcDetectedBrowser === 'opera') && 
+  } else if ((webrtcDetectedBrowser === 'chrome'|| webrtcDetectedBrowser === 'opera') &&
     !!window.CSS) {
     // Blink engine detection
     webrtcDetectedBrowser = 'blink';
     // TODO: detected WebRTC version
   }
-
+  if ((navigator.userAgent.match(/android/ig) || []).length === 0 &&
+  (navigator.userAgent.match(/chrome/ig) || []).length === 0 && 
+  navigator.userAgent.indexOf('Safari/') > 0) {
+    webrtcDetectedBrowser = 'safari';
+    webrtcDetectedVersion = parseInt((navigator.userAgent.match(/Version\/(.*)\ /) || ['', '0'])[1], 10);
+    webrtcMinimumVersion = 7;
+    webrtcDetectedType = 'plugin';
+  }
   window.webrtcDetectedBrowser = webrtcDetectedBrowser;
   window.webrtcDetectedVersion = webrtcDetectedVersion;
   window.webrtcMinimumVersion  = webrtcMinimumVersion;
@@ -347,6 +354,7 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         AdapterJS.WebRTCPlugin.isPluginInstalled(
           AdapterJS.WebRTCPlugin.pluginInfo.prefix,
           AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+          AdapterJS.WebRTCPlugin.pluginInfo.type,
           function() { // plugin now installed
             clearInterval(pluginInstallInterval);
             AdapterJS.WebRTCPlugin.defineWebRTCInterface();
@@ -534,10 +542,12 @@ webrtcDetectedVersion = null;
 webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
-if ( navigator.mozGetUserMedia || 
-  navigator.webkitGetUserMedia || 
-  (navigator.mediaDevices && 
-    navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) ) { 
+if ( (navigator.mozGetUserMedia || 
+      navigator.webkitGetUserMedia || 
+      (navigator.mediaDevices && 
+       navigator.userAgent.match(/Edge\/(\d+).(\d+)$/))) 
+    && !((navigator.userAgent.match(/android/ig) || []).length === 0 &&
+          (navigator.userAgent.match(/chrome/ig) || []).length === 0 && navigator.userAgent.indexOf('Safari/') > 0)) { 
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -702,6 +712,38 @@ if ( navigator.mozGetUserMedia ||
       return to;
     };
   }
+
+  // Need to override attachMediaStream and reattachMediaStream
+  // to support the plugin's logic
+  attachMediaStream_base = attachMediaStream;
+
+  if (webrtcDetectedBrowser === 'opera') {
+    attachMediaStream_base = function (element, stream) {
+      if (webrtcDetectedVersion > 38) {
+        element.srcObject = stream;
+      } else if (typeof element.src !== 'undefined') {
+        element.src = URL.createObjectURL(stream);
+      }
+      // Else it doesn't work
+    };
+  }
+
+  attachMediaStream = function (element, stream) {
+    if ((webrtcDetectedBrowser === 'chrome' ||
+         webrtcDetectedBrowser === 'opera') &&
+        !stream) {
+      // Chrome does not support "src = null"
+      element.src = '';
+    } else {
+      attachMediaStream_base(element, stream);
+    }
+    return element;
+  };
+  reattachMediaStream_base = reattachMediaStream;
+  reattachMediaStream = function (to, from) {
+    reattachMediaStream_base(to, from);
+    return to;
+  };
 
   // Propagate attachMediaStream and gUM in window and AdapterJS
   window.attachMediaStream      = attachMediaStream;
@@ -870,11 +912,11 @@ if ( navigator.mozGetUserMedia ||
   };
 
   AdapterJS.WebRTCPlugin.isPluginInstalled =
-    function (comName, plugName, installedCb, notInstalledCb) {
+    function (comName, plugName, plugType, installedCb, notInstalledCb) {
     if (!isIE) {
-      var pluginArray = navigator.plugins;
+      var pluginArray = navigator.mimeTypes;
       for (var i = 0; i < pluginArray.length; i++) {
-        if (pluginArray[i].name.indexOf(plugName) >= 0) {
+        if (pluginArray[i].type.indexOf(plugType) >= 0) {
           installedCb();
           return;
         }
@@ -949,11 +991,11 @@ if ( navigator.mozGetUserMedia ||
       if (typeof constraints !== 'undefined' && constraints !== null) {
         var invalidConstraits = false;
         invalidConstraits |= typeof constraints !== 'object';
-        invalidConstraits |= constraints.hasOwnProperty('mandatory') && 
-                              constraints.mandatory !== undefined && 
-                              constraints.mandatory !== null && 
+        invalidConstraits |= constraints.hasOwnProperty('mandatory') &&
+                              constraints.mandatory !== undefined &&
+                              constraints.mandatory !== null &&
                               constraints.mandatory.constructor !== Object;
-        invalidConstraits |= constraints.hasOwnProperty('optional') && 
+        invalidConstraits |= constraints.hasOwnProperty('optional') &&
                               constraints.optional !== undefined &&
                               constraints.optional !== null &&
                               !Array.isArray(constraints.optional);
@@ -998,7 +1040,7 @@ if ( navigator.mozGetUserMedia ||
       }
     };
 
-    MediaStreamTrack = {};
+    MediaStreamTrack = function(){};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.GetSources(callback);
@@ -1213,7 +1255,7 @@ if ( navigator.mozGetUserMedia ||
           propName = properties[prop];
 
           if (typeof propName.slice === 'function' &&
-              propName.slice(0,2) === 'on' && 
+              propName.slice(0,2) === 'on' &&
               typeof srcElem[propName] === 'function') {
               AdapterJS.addEvent(destElem, propName.slice(2), srcElem[propName]);
           }
@@ -1275,10 +1317,12 @@ if ( navigator.mozGetUserMedia ||
     }
   };
 
+
   // Try to detect the plugin and act accordingly
   AdapterJS.WebRTCPlugin.isPluginInstalled(
     AdapterJS.WebRTCPlugin.pluginInfo.prefix,
     AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+    AdapterJS.WebRTCPlugin.pluginInfo.type,
     AdapterJS.WebRTCPlugin.defineWebRTCInterface,
     AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCb);
 

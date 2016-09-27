@@ -211,7 +211,7 @@ window.navigator.getUserMedia({
 
 ## Setup this project
 
-- Copy this repository with submodules (`git clone --recursive ...`), or run `git submodule init` and `git submodule udpate`
+- Copy this repository with submodules (`git clone --recursive ...`), or run `git submodule init` and `git submodule update`
 - Install or update to at lest version 0.10.26 of node and version 1.4.6 of npm
 - Install `grunt-cli` (See: http://gruntjs.com/getting-started)
 - Run `npm install` to install dev dependencies.

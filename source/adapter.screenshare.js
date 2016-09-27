@@ -74,7 +74,7 @@
       });
     };
 
-  } else if (window.navigator.webkitGetUserMedia) {
+  } else if (window.navigator.webkitGetUserMedia && window.webrtcDetectedBrowser !== 'safari') {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
