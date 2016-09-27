@@ -248,6 +248,16 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedVersion = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
     webrtcMinimumVersion  = 0;
     webrtcDetectedType    = 'webkit';
+
+  // Detect Firefox on iOS (does not support WebRTC yet)
+  } else if (navigator.userAgent.indexOf('OPiOS') > 0) {
+    hasMatch = navigator.userAgent.match(/OPiOS\/([0-9]+)\./);
+
+    // Browser which do not support webrtc yet
+    webrtcDetectedBrowser = 'opera';
+    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion  = 0;
+    webrtcDetectedType    = '';
   
   // Detect Chrome on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('CriOS') > 0) {
@@ -260,11 +270,11 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
 
   // Detect Firefox on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('FxiOS') > 0) {
-    hasMatch = navigator.userAgent.match(/FxiOS\/([0-9]+)\./);
+    hasMatch = navigator.userAgent.match(/FxiOS\/([0-9]+)\./) || [];
 
     // Browser which do not support webrtc yet
     webrtcDetectedBrowser = 'firefox';
-    webrtcDetectedVersion = parseInt((hasMatch || ['', '0'])[1], 10);
+    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion  = 0;
     webrtcDetectedType    = '';
 
