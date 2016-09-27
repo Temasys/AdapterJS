@@ -235,61 +235,70 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
   if ((!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
     hasMatch = navigator.userAgent.match(/OPR\/(\d+)/i) || [];
 
-    webrtcDetectedBrowser = 'opera';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion  = 26;
-    webrtcDetectedType    = 'webkit';
+    webrtcDetectedBrowser   = 'opera';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 26;
+    webrtcDetectedType      = 'webkit';
+    webrtcDetectedDCSupport = 'sctp'; // Opera 20+ uses Chrome 33
 
   // Detect Bowser on iOS
   } else if (navigator.userAgent.match(/Bowser\/[0-9.]*/g)) {
     hasMatch = navigator.userAgent.match(/Bowser\/[0-9.]*/g) || [];
 
-    webrtcDetectedBrowser = 'bowser';
-    webrtcDetectedVersion = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
-    webrtcMinimumVersion  = 0;
-    webrtcDetectedType    = 'webkit';
+    var chromiumVersion = parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [])[1] || '0', 10);
+
+    webrtcDetectedBrowser   = 'bowser';
+    webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
+    webrtcMinimumVersion    = 0;
+    webrtcDetectedType      = 'webkit';
+    webrtcDetectedDCSupport = chromiumVersion > 30 ? 'sctp' : 'rtp';
+
 
   // Detect Opera on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('OPiOS') > 0) {
     hasMatch = navigator.userAgent.match(/OPiOS\/([0-9]+)\./);
 
     // Browser which do not support webrtc yet
-    webrtcDetectedBrowser = 'opera';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion  = 0;
-    webrtcDetectedType    = '';
-  
+    webrtcDetectedBrowser   = 'opera';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 0;
+    webrtcDetectedType      = '';
+    webrtcDetectedDCSupport = null;
+
   // Detect Chrome on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('CriOS') > 0) {
     hasMatch = navigator.userAgent.match(/CriOS\/([0-9]+)\./) || [];
 
-    webrtcDetectedBrowser = 'chrome';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion  = 0;
-    webrtcDetectedType    = '';
+    webrtcDetectedBrowser   = 'chrome';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 0;
+    webrtcDetectedType      = '';
+    webrtcDetectedDCSupport = null;
 
   // Detect Firefox on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('FxiOS') > 0) {
     hasMatch = navigator.userAgent.match(/FxiOS\/([0-9]+)\./) || [];
 
     // Browser which do not support webrtc yet
-    webrtcDetectedBrowser = 'firefox';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion  = 0;
-    webrtcDetectedType    = '';
+    webrtcDetectedBrowser   = 'firefox';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 0;
+    webrtcDetectedType      = '';
+    webrtcDetectedDCSupport = null;
 
   // Detect IE (6-11)
   } else if (/*@cc_on!@*/false || !!document.documentMode) {
     hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
 
-    webrtcDetectedBrowser = 'IE';
-    webrtcDetectedVersion = parseInt(hasMatch[1], 10);
-    webrtcMinimumVersion  = 9;
-    webrtcDetectedType    = 'plugin';
-    
+    webrtcDetectedBrowser   = 'IE';
+    webrtcDetectedVersion   = parseInt(hasMatch[1], 10);
+    webrtcMinimumVersion    = 9;
+    webrtcDetectedType      = 'plugin';
+    webrtcDetectedDCSupport = 'sctp';
+
     if (!webrtcDetectedVersion) {
       hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
-  
+
       webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     }
 
@@ -300,49 +309,58 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     // Previous webrtc/adapter uses minimum version as 10547 but checking in the Edge release history,
     // It's close to 13.10547 and ObjectRTC API is fully supported in that version
 
-    webrtcDetectedBrowser = 'edge';
-    webrtcDetectedVersion = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
-    webrtcMinimumVersion  = 13.10547;
-    webrtcDetectedType    = 'ms';
+    webrtcDetectedBrowser   = 'edge';
+    webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
+    webrtcMinimumVersion    = 13.10547;
+    webrtcDetectedType      = 'ms';
+    webrtcDetectedDCSupport = null;
 
   // Detect Firefox (1.0+)
   // Placed before Safari check to ensure Firefox on Android is detected
   } else if (typeof InstallTrigger !== 'undefined' || navigator.userAgent.indexOf('irefox') > 0) {
     hasMatch = navigator.userAgent.match(/Firefox\/([0-9]+)\./) || [];
 
-    webrtcDetectedBrowser = 'firefox';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion  = 31;
-    webrtcDetectedType    = 'moz';
+    webrtcDetectedBrowser   = 'firefox';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 31;
+    webrtcDetectedType      = 'moz';
+    webrtcDetectedDCSupport = 'sctp';
 
   // Detect SamsungBrowser
   // It runs on Chromium so just detect it as Chrome instead.
   /*} else if (navigator.userAgent.indexOf('SamsungBrowser') > 0) {
     hasMatch = navigator.userAgent.match(/SamsungBrowser\/(.*)\ /);
 
-    webrtcDetectedBrowser = 'SamsungBrowser';
-    webrtcDetectedVersion = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
-    webrtcMinimumVersion = 0;
-    webrtcDetectedType = 'webkit';*/
+    var chromiumVersion = parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [])[1] || '0', 10);
+
+    webrtcDetectedBrowser   = 'SamsungBrowser';
+    webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
+    webrtcMinimumVersion    = 0;
+    webrtcDetectedType      = 'webkit';
+    webrtcDetectedDCSupport = chromiumVersion > 30 ? 'sctp' : null;*/
 
   // Detect Chrome (1+ and mobile)
   // Placed before Safari check to ensure Chrome on Android is detected
   } else if ((!!window.chrome && !!window.chrome.webstore) || navigator.userAgent.indexOf('Chrom') > 0) {
     hasMatch = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [];
 
-    webrtcDetectedBrowser = 'chrome';
-    webrtcDetectedVersion = parseInt(hasMatch[2] || '0', 10);
-    webrtcMinimumVersion  = 38;
-    webrtcDetectedType    = 'webkit';
+    webrtcDetectedBrowser   = 'chrome';
+    webrtcDetectedVersion   = parseInt(hasMatch[2] || '0', 10);
+    webrtcMinimumVersion    = 38;
+    webrtcDetectedType      = 'webkit';
+    webrtcDetectedDCSupport = webrtcDetectedVersion > 30 ? 'sctp' : 'rtp'; // Chrome 31+ supports SCTP without flags
 
   // Detect Safari (9 and below)
   } else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
     hasMatch = navigator.userAgent.match(/version\/(\d+)/i) || [];
-    
-    webrtcDetectedBrowser = 'safari';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion  = 7;
-    webrtcDetectedType    = 'plugin';
+
+    var isMobile = navigator.userAgent.match(/(iPhone|iPad)/gi) || [];
+
+    webrtcDetectedBrowser   = 'safari';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 7;
+    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : '';
+    webrtcDetectedDCSupport = isMobile.length === 0 ? 'sctp' : null;
 
   // Detect Safari (10+)
   } else if (navigator.userAgent.indexOf('Safari/') > 0) {
@@ -350,16 +368,18 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
 
     // We ignore AppleWebkit WebRTC implementation for now (it's getUserMedia) and use plugin instead
     // Version can be detected with: AppleWebKit\/([0-9]+)\.
-    webrtcDetectedBrowser = 'safari';
-    webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion = 7;
-    webrtcDetectedType = 'plugin';
+    webrtcDetectedBrowser   = 'safari';
+    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    webrtcMinimumVersion    = 7;
+    webrtcDetectedType      = 'plugin';
+    webrtcDetectedDCSupport = 'sctp';
   }
 
-  window.webrtcDetectedBrowser = webrtcDetectedBrowser;
-  window.webrtcDetectedVersion = webrtcDetectedVersion;
-  window.webrtcMinimumVersion  = webrtcMinimumVersion;
-  window.webrtcDetectedType    = webrtcDetectedType; // Scope it to window for better consistency
+  window.webrtcDetectedBrowser   = webrtcDetectedBrowser;
+  window.webrtcDetectedVersion   = webrtcDetectedVersion;
+  window.webrtcMinimumVersion    = webrtcMinimumVersion;
+  window.webrtcDetectedType      = webrtcDetectedType; // Scope it to window for better consistency
+  window.webrtcDetectedDCSupport = webrtcDetectedDCSupport; // Scope it to window for better consistency
 };
 
 AdapterJS.addEvent = function(elem, evnt, func) {
@@ -616,12 +636,12 @@ webrtcDetectedVersion = null;
 webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
-if ( (navigator.mozGetUserMedia || 
-      navigator.webkitGetUserMedia || 
-      (navigator.mediaDevices && 
-       navigator.userAgent.match(/Edge\/(\d+).(\d+)$/))) 
+if ( (navigator.mozGetUserMedia ||
+      navigator.webkitGetUserMedia ||
+      (navigator.mediaDevices &&
+       navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)))
     && !((navigator.userAgent.match(/android/ig) || []).length === 0 &&
-          (navigator.userAgent.match(/chrome/ig) || []).length === 0 && navigator.userAgent.indexOf('Safari/') > 0)) { 
+          (navigator.userAgent.match(/chrome/ig) || []).length === 0 && navigator.userAgent.indexOf('Safari/') > 0)) {
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
