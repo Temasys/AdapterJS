@@ -262,7 +262,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser   = 'opera';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = '';
+    webrtcDetectedType      = null;
     webrtcDetectedDCSupport = null;
 
   // Detect Chrome on iOS (does not support WebRTC yet)
@@ -272,7 +272,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser   = 'chrome';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = '';
+    webrtcDetectedType      = null;
     webrtcDetectedDCSupport = null;
 
   // Detect Firefox on iOS (does not support WebRTC yet)
@@ -283,7 +283,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser   = 'firefox';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = '';
+    webrtcDetectedType      = null;
     webrtcDetectedDCSupport = null;
 
   // Detect IE (6-11)
