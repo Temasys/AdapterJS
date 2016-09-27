@@ -249,7 +249,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcMinimumVersion  = 0;
     webrtcDetectedType    = 'webkit';
 
-  // Detect Firefox on iOS (does not support WebRTC yet)
+  // Detect Opera on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('OPiOS') > 0) {
     hasMatch = navigator.userAgent.match(/OPiOS\/([0-9]+)\./);
 
