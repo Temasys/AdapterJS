@@ -68,11 +68,12 @@
     };
 
     AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    /* Comment out to prevent recursive errors
     navigator.mediaDevices.getUserMedia = function(constraints) {
       return new Promise(function(resolve, reject) {
         window.getUserMedia(constraints, resolve, reject);
       });
-    };
+    };*/
 
   } else if (window.navigator.webkitGetUserMedia && window.webrtcDetectedBrowser !== 'safari') {
     baseGetUserMedia = window.navigator.getUserMedia;
