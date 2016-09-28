@@ -326,19 +326,6 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedType      = 'moz';
     webrtcDetectedDCSupport = 'SCTP';
 
-  // Detect SamsungBrowser
-  // It runs on Chromium so just detect it as Chrome instead.
-  /*} else if (navigator.userAgent.indexOf('SamsungBrowser') > 0) {
-    hasMatch = navigator.userAgent.match(/SamsungBrowser\/(.*)\ /);
-
-    var chromiumVersion = parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [])[1] || '0', 10);
-
-    webrtcDetectedBrowser   = 'SamsungBrowser';
-    webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
-    webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = 'webkit';
-    webrtcDetectedDCSupport = chromiumVersion > 30 ? 'SCTP' : null;*/
-
   // Detect Chrome (1+ and mobile)
   // Placed before Safari check to ensure Chrome on Android is detected
   } else if ((!!window.chrome && !!window.chrome.webstore) || navigator.userAgent.indexOf('Chrom') > 0) {
