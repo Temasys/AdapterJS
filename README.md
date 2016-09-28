@@ -172,10 +172,11 @@ displays the browser webrtc implementation type.
 
 expected values:
 
-- null: Not implemented with webrtc.
-- `webkit`: Webkit implementation of webrtc.
-- `moz`: Mozilla implementation of webrtc.
-- `plugin`: Temasys plugin implementation of webrtc.
+- `null`: Not implemented with webrtc.
+- `"webkit"`: Webkit implementation of webrtc.
+- `"moz"`: Mozilla implementation of webrtc.
+- `"plugin"`: Temasys plugin implementation of webrtc.
+- `"ms"`: Edge implementation of webrtc (polyfilled from ORTC).
 
 ##### `webrtcDetectedDCSupport`
 
@@ -183,12 +184,14 @@ displays the browser webrtc datachannel support type.
 
 expected values:
 
-- null: No datachannel support.
-- `SCTP`: SCTP enabled datachannel.
-- `RTP`: RTP enabled datachannel.
+- `null`: No datachannel support.
+- `"SCTP"`: SCTP enabled datachannel.
+- `"RTP"`: RTP enabled datachannel.
 
 
 #### Using screensharing functionality
+
+> **Note** that the Firefox add-on not installed detection will not work with `window.navigator.mediaDevices` on Firefox browsers to prevent errors.
 
 AdapterJS 0.12.0+ offers cross-browser screensharing in Chrome 34+, Firefox 33+ and with a licensed copy of our [Temasys WebRTC Plugin](http://skylink.io/plugin) in IE9+ and Safari 7.1+. (For plugin licensing interest please contact sales (a) temasys.com.sg)
 
