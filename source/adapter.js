@@ -337,29 +337,19 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedType      = 'webkit';
     webrtcDetectedDCSupport = webrtcDetectedVersion > 30 ? 'SCTP' : 'RTP'; // Chrome 31+ supports SCTP without flags
 
-  // Detect Safari (9 and below)
-  } else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0) {
-    hasMatch = navigator.userAgent.match(/version\/(\d+)/i) || [];
+  // Detect Safari
+  } else if (Object.prototype.toString.call(window.HTMLElement).indexOf('Constructor') > 0 || navigator.userAgent.indexOf('Safari/') > 0) {
+    hasMatch = navigator.userAgent.match(/Version\/(.*)\ /i) || [];
 
     var isMobile = navigator.userAgent.match(/(iPhone|iPad)/gi) || [];
-
-    webrtcDetectedBrowser   = 'safari';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 7;
-    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : '';
-    webrtcDetectedDCSupport = isMobile.length === 0 ? 'SCTP' : null;
-
-  // Detect Safari (10+)
-  } else if (navigator.userAgent.indexOf('Safari/') > 0) {
-    hasMatch = navigator.userAgent.match(/Version\/(.*)\ /) || [];
 
     // We ignore AppleWebkit WebRTC implementation for now (it's getUserMedia) and use plugin instead
     // Version can be detected with: AppleWebKit\/([0-9]+)\.
     webrtcDetectedBrowser   = 'safari';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 7;
-    webrtcDetectedType      = 'plugin';
-    webrtcDetectedDCSupport = 'SCTP';
+    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : '';
+    webrtcDetectedDCSupport = isMobile.length === 0 ? 'SCTP' : null;
   }
 
   window.webrtcDetectedBrowser   = webrtcDetectedBrowser;
