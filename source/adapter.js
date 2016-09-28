@@ -245,7 +245,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
   } else if (navigator.userAgent.match(/Bowser\/[0-9.]*/g)) {
     hasMatch = navigator.userAgent.match(/Bowser\/[0-9.]*/g) || [];
 
-    var chromiumVersion = parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [])[1] || '0', 10);
+    var chromiumVersion = parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [])[2] || '0', 10);
 
     webrtcDetectedBrowser   = 'bowser';
     webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
@@ -346,7 +346,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser   = 'safari';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 7;
-    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : null;
+    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : nullg;
     webrtcDetectedDCSupport = isMobile.length === 0 ? 'SCTP' : null;
 
   }
