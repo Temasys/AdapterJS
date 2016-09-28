@@ -346,7 +346,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser   = 'safari';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 7;
-    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : '';
+    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : null;
     webrtcDetectedDCSupport = isMobile.length === 0 ? 'SCTP' : null;
 
   }
