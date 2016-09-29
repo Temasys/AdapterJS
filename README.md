@@ -1,13 +1,13 @@
-#![AdapterJS](https://cdn.temasys.io/branding/product/adapterjs/temasys-adapterjs.svg)
+<img src="https://cdn.temasys.io/branding/product/adapterjs/temasys-adapterjs.svg" alt="Temasys AdapterJS" width="450" />
 
 > Creating a common API for WebRTC in the browser
 
 Find the most recent version hosted on our CDN.
 
-- Minified version: `//cdn.temasys.com.sg/adapterjs/0.13.x/adapter.min.js`
-- Debug version `//cdn.temasys.com.sg/adapterjs/0.13.x/adapter.debug.js`
-- Minified version (with screensharing changes): `//cdn.temasys.com.sg/adapterjs/0.13.x/adapter.screenshare.min.js`
-- Debug version (with screensharing changes)`//cdn.temasys.com.sg/adapterjs/0.13.x/adapter.screenshare.js`
+- Minified version: `//cdn.temasys.io/adapterjs/0.13.x/adapter.min.js`
+- Debug version `//cdn.temasys.io/adapterjs/0.13.x/adapter.debug.js`
+- Minified version (with screensharing changes): `//cdn.temasys.io/adapterjs/0.13.x/adapter.screenshare.min.js`
+- Debug version (with screensharing changes)`//cdn.temasys.io/adapterjs/0.13.x/adapter.screenshare.js`
 
 Part of the [Skylink WebRTC](http://skylink.io/web) toolkit.
 
@@ -25,8 +25,8 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | Opera             | `26`         | MacOS / Win / Ubuntu / Android |  -                        | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
 | Bowser            | `0`          | iOS                      |  -                        |
-| Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.com.sg/plugin/#commercial-licensing)) |
-| IE (Plugin)       | `9`          | Win                      | Yes ([custom build Plugin](https://temasys.com.sg/plugin/#commercial-licensing)) |
+| Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
+| IE (Plugin)       | `9`          | Win                      | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
 ^Note that currently Edge doesn't support `RTCDataChannel` API.
 
 ### How it looks like if WebRTC is not supported by browser
@@ -235,7 +235,7 @@ This displays the browser WebRTC `Datachannel` support type. Defined as `null` w
 
 > **Note** that the Firefox add-on not installed detection will not work with `window.navigator.mediaDevices` on Firefox browsers to prevent errors.
 
-AdapterJS `0.12.0`+ offers cross-browser screensharing in Chrome `34`+, Firefox `33`+ and with a licensed copy of our [Temasys WebRTC Plugin](http://skylink.io/plugin) in IE `9`+ and Safari `7.1`+. (For plugin licensing interest please contact sales (a) temasys.com.sg)
+AdapterJS `0.12.0`+ offers cross-browser screensharing in Chrome `34`+, Firefox `33`+ and with a licensed copy of our [Temasys WebRTC Plugin](http://temasys.io/plugin) in IE `9`+ and Safari `7.1`+. (For plugin licensing interest please contact sales (a) temasys.com.sg)
 
 To use the screensharing functionality, reference `publish/adapter.screenshare.js` and add the `mediaSource: 'window'` setting to the video media constraints. This requires HTTPS!
 
