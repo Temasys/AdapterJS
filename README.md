@@ -104,11 +104,7 @@ This creates a valid iceServers array for the specific browser and version.
 #### `checkIceConnectionState(peerId, iceConnectionState, callback)`
 This handles all the `iceConnectionState` return value differences cross-browsers when `RTCPeerConnection.oniceconnectionstate` is fired.
 
-- Expected outcome should be: `checking` > `connected` > `completed`.
-- What was received in Chrome/Opera as offerer:  `checking` > `completed` > `completed`.
-- What was received in Chrome/Opera as answerer: `checking` > `connected`.
-- What was received in Firefox as offerer: `checking` > `connected`.
-- What was received in Firefox as answerer: `checking` > `connected`.
+Expected outcome should be: `checking > connected > completed`. What was received in Chrome/Opera as offerer:  `checking > completed > completed`. What was received in Chrome/Opera as answerer: `checking > connected`. What was received in Firefox as offerer: `checking > connected`. What was received in Firefox as answerer: `checking > connected`.
 
 - Expected parameters:
 
@@ -132,7 +128,7 @@ peerConnection.oniceconnectionstatechange = function () {
 This handles all `MediaStream` and `DataChannel` differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
 
-- For some older (20+) versions of Firefox and Chrome `MediaStream` interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a `DataChannel` connection as an offerer, and results in no DataChannel connection.
+For some older (20+) versions of Firefox and Chrome `MediaStream` interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a `DataChannel` connection as an offerer, and results in no DataChannel connection.
 - To achieve both `MediaStream` and `DataChannel` connection interopability, Chrome or other browsers has to be the one creating the offer.
 
 - Expected parameters:
