@@ -109,7 +109,9 @@ This creates a valid iceServers array for the specific browser and version.
             - `username`: The username.
             - `credential`: The credential password.
 
-#### `checkIceConnectionState(peerId, iceConnectionState, callback)`
+#### `checkIceConnectionState(peerId, iceConnectionState, callback)` 
+> Note that this function has been deprecated.
+
 This handles all the `iceConnectionState` return value differences cross-browsers when `RTCPeerConnection.oniceconnectionstate` is fired.
 
 Expected outcome should be: `checking > connected > completed`. What was received in Chrome/Opera as offerer:  `checking > completed > completed`. What was received in Chrome/Opera as answerer: `checking > connected`. What was received in Firefox as offerer: `checking > connected`. What was received in Firefox as answerer: `checking > connected`.
@@ -133,6 +135,8 @@ peerConnection.oniceconnectionstatechange = function () {
 ```
 
 #### `checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion, callback, constraints)`
+> Note that this function has been deprecated.
+
 This handles all `MediaStream` and `DataChannel` differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
 
