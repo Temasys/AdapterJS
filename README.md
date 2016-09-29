@@ -26,7 +26,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 #### Polyfills
 
-`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`
+`RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`, `navigator.mediaDevices.getUserMedia`, `navigator.mediaDevices.enumerateDevices`
 
 
 ## Using AdapterJS
