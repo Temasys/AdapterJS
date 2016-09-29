@@ -16,7 +16,15 @@ Part of the [Skylink WebRTC](http://skylink.io/web) toolkit.
 
 AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps around the native APIs in Chrome, Opera and Firefox and provides support for WebRTC in Internet Explorer and Safari on Mac and Windows through the available [Temasys Browser Plugins](http://skylink.io/plugin/).
 
-- [AdapterJS browser compatibility table](https://temasys.atlassian.net/wiki/display/TPD/AdapterJS+-+Browser+support+and+compatibility)
+| Browsers          | Min. Version | OS Platform              | Screensharing             | 
+| ----------------- | ------------ | ------------------------ | ------------------------- | 
+| Chrome \ Chromium | `38`         | MacOS/Win/Ubuntu/Android | Yes (w [Extension](https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc))         |
+| Firefox           | `31`         | MacOS/Win/Ubuntu/Android | Yes (w [Extension](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
+| Opera             | `26`         | MacOS/Win/Ubuntu/Android |  -                        | 
+| Edge              | `13.10547`   | Win                      |  -                        |
+| Bowser            | `0`          | iOS                      |  -                        |
+| Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.com.sg/plugin/#commercial-licensing)) |
+| IE (Plugin)       | `9`          | Win                      | Yes ([custom build Plugin](https://temasys.com.sg/plugin/#commercial-licensing)) |
 
 ![Plugin Install Bar in IE and Safari](http://temasys.github.io/resources/img/adapterheader.png)
 > In versions of IE and Safari that don't support WebRTC natively, AdapterJS will suggest to the user to install the [Temasys WebRTC plugin](http://skylink.io/plugin/) for Mac or Windows when you try to access getUserMedia or RTCPeerConnection.
@@ -45,7 +53,7 @@ AdapterJS.webRTCReady(function(isUsingPlugin) {
 
 Note that `AdapterJS.onwebrtcready` is now deprecated.
 
-Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+Temasys+WebRTC+Plugin+into+your+website).
+Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://confluence.temasys.com.sg/display/TWPP/How+to+integrate+the+Temasys+WebRTC+Plugin+into+your+website).
 
 ----
 
