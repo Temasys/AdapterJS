@@ -1,4 +1,4 @@
-#![AdapterJS](http://temasys.github.io/resources/img/adapterjs.svg)
+#![AdapterJS](https://cdn.temasys.io/branding/product/adapterjs/temasys-adapterjs.svg)
 
 > Creating a common API for WebRTC in the browser
 
