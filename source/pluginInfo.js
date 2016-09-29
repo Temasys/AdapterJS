@@ -8,8 +8,8 @@ AdapterJS.WebRTCPlugin.pluginInfo = AdapterJS.WebRTCPlugin.pluginInfo || {
   downloadLink : null, //set below
   companyName: 'Temasys',
   downloadLinks : {
-    mac: 'http://bit.ly/1n77hco',
-    win: 'http://bit.ly/1kkS4FN'
+    mac: 'http://bit.ly/webrtcpluginpkg',
+    win: 'http://bit.ly/webrtcpluginmsi'
   }
 };
 if(typeof AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== "undefined" && AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== null) {
