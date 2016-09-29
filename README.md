@@ -73,8 +73,8 @@ This is taken over for compatibility with the original `adapter.js` from Google.
 
 - **Parameters:**
 
-    - **`element` (DOM Element)**: The `<video>` or `<audio>` DOM element.
-    - **`stream` (DOM Element)**: The `MediaStream` object.
+    - **`element`**: (DOM Element) The `<video>` or `<audio>` DOM element.
+    - **`stream`**: (DOM Element) The `MediaStream` object.
     
 - **Returns: None**
 
@@ -86,8 +86,8 @@ This is taken over for compatibility with adapter.js from Google. Feeds a `Media
 
 - **Parameters:**
 
-    - **`elementFrom` (DOM Element):** The `<video>` or `<audio>` DOM element that has been attached with an existing `MediaStream` from `attachMediaStream()` API.
-    - **`elementTo` (DOM Element):** The `<video>` or `<audio>` DOM element to copy the `MediaStream` from the `elementFrom` DOM element parameter.
+    - **`elementFrom`**: (DOM Element) The `<video>` or `<audio>` DOM element that has been attached with an existing `MediaStream` from `attachMediaStream()` API.
+    - **`elementTo`**: (DOM Element) The `<video>` or `<audio>` DOM element to copy the `MediaStream` from the `elementFrom` DOM element parameter.
 
 - **Returns: None**
 
@@ -99,14 +99,14 @@ This creates a valid `RTCIceServer` object from one `url`, `username` and `passw
 
 - **Parameters:**
 
-    - **`url` (String)**: The ICE server url.
-    - **`username` (String)**: The ICE server username only for TURN.
-    - **`password` (String)**: The ICE server credential password only for TURN.
+    - **`url`**: (String) The ICE server url.
+    - **`username`**: (String) The ICE server username only for TURN.
+    - **`password`**: (String) The ICE server credential password only for TURN.
 
-- **Returns: JSON:**
-    - **`url` (String):** The ICE server url.
-    - **`username` (String):** The ICE server username only for TURN.
-    - **`credential` (String):** The ICE server credential password only for TURN.
+- **Returns: JSON**
+    - **`url`**: (String) The ICE server url.
+    - **`username`**: (String) The ICE server username only for TURN.
+    - **`credential`**: (String) The ICE server credential password only for TURN.
 
 ##### `createIceServers(urls, username, password)` : JSON
 ```javascript
@@ -117,16 +117,16 @@ This creates a valid an Array of `RTCIceServer` objects for browsers that suppor
 
 - **Parameters:**
 
-    - **`urls` (Array):** The array of ICE server urls.
-        - **`#index` (String):** The ICE server url.
-    - **`username` (String):** The ICE server username only for TURN.
-    - **`password` (String):** The ICE server credential password only for TURN.
+    - **`urls`**: (Array) The array of ICE server urls.
+        - **`#index`**: (String) The ICE server url.
+    - **`username`**: (String) The ICE server username only for TURN.
+    - **`password`**: (String) The ICE server credential password only for TURN.
 
 - **Returns: Array**
-    - **`#index` (JSON):** The ICE server object.
-        - **`url` (String):** The ICE server url.
-        - **`username` (String):** The TURN ICE server username.
-        - **`credential` (String):** The TURN ICE server credential password.
+    - **`#index`**: (JSON) The ICE server object.
+        - **`url`**: (String) The ICE server url.
+        - **`username`**: (String) The TURN ICE server username.
+        - **`credential`**: (String) The TURN ICE server credential password.
 
 ##### `checkIceConnectionState(peerId, iceConnectionState, callback)` : None
 > **Note** that this function has been deprecated since expected triggering of ICE connection states should not be handled.
@@ -144,11 +144,11 @@ Expected outcome should be: `checking > connected > completed`. What was receive
 
 - **Parameters:**
 
-    - **`peerId` (String):** The unique identifier for the peer to store all fired states tied specifically to this peer.
-    - **`iceConnectionState` (String):** The `RTCPeerConnection.iceConnectionState` received.
-    - **`callback` (Function):** The callback fired once the parsing is completed.
+    - **`peerId`**: (String) The unique identifier for the peer to store all fired states tied specifically to this peer.
+    - **`iceConnectionState`**: (String) The `RTCPeerConnection.iceConnectionState` received.
+    - **`callback`**: (Function) The callback fired once the parsing is completed.
         - **Returned `callback` parameters:**
-            - **`updatedIceConnectionState` (String)**: The updated `RTCPeerConnection.iceConnectionState` that Peer should trigger.
+            - **`updatedIceConnectionState`**: (String) The updated `RTCPeerConnection.iceConnectionState` that Peer should trigger.
 
 - **Returns: None**
 
@@ -178,13 +178,13 @@ For some older (`20`+) versions of Firefox and Chrome `MediaStream` interopabili
 
 - **Parameters:**
 
-    - **`peerAgentBrowser` (String):** The browser agent or name. *E.g. Chrome*.
-    - **`peerAgentVersion` (Number):** The browser agent version. *E.g. `35`*.
-    - **`callback` (Function):** The callback fired after the check has been made.
+    - **`peerAgentBrowser`**: (String) The browser agent or name. *E.g. Chrome*.
+    - **`peerAgentVersion`**: (Number) The browser agent version. *E.g. `35`*.
+    - **`callback`**: (Function) The callback fired after the check has been made.
         - **Returned `callback` parameters:**
-            - **`beOfferrer` (Boolean):** Returns a `true` or a `false`. If `true`, user should do the offer. If `false`, inform the other peer to do the offer.
-            - **`unifiedConstraints` (JSON):** The updated `RTCOfferOptions` offer constraints for interoperability. 
-    - **`constraints` (JSON):** The `RTCOfferOptions` offer constraints.
+            - **`beOfferrer`**: (Boolean) Returns a `true` or a `false`. If `true`, user should do the offer. If `false`, inform the other peer to do the offer.
+            - **`unifiedConstraints`**: (JSON) The updated `RTCOfferOptions` offer constraints for interoperability. 
+    - **`constraints`:** (JSON) The `RTCOfferOptions` offer constraints.
 
 - **Returns: None**
 
