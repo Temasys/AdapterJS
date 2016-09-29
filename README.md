@@ -24,14 +24,14 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 
 ## Functionality
 
-#### Polyfills
+### Polyfills
 
 `RTCPeerConnection`, `RTCIceCandidate`, `RTCSessionDescription`, `MediaStreamTrack`, `navigator.getUserMedia`, `navigator.mediaDevices.getUserMedia`, `navigator.mediaDevices.enumerateDevices`
 
 
 ## Using AdapterJS
 
-#### Working with AdapterJS
+### Working with AdapterJS
 
 We **strongly** recommend only executing any WebRTC related code in the callback of the `AdapterJS.webRTCReady` function. It is triggered whenever the browser or our Temasys WebRTC plugin is ready to be used.
 
@@ -47,17 +47,18 @@ Note that `AdapterJS.onwebrtcready` is now deprecated.
 
 Find more information about how to optimize your application for the Temasys WebRTC Plugin in the [Temasys WebRTC Plugin Documentation](https://temasys.atlassian.net/wiki/display/TWPP/How+to+integrate+the+Temasys+WebRTC+Plugin+into+your+website).
 
+----
 
-#### Helper functions
+### Helper functions
 
-##### `attachMediaStream(element, stream)`
+#### `attachMediaStream(element, stream)`
 This is taken over for compatibility with the original `adapter.js` from Google. Feeds a `MediaStream` object into video and audio tags.
 Calling `attachMediaStream(element, null)` will detach any existing stream from the element. The stream will still be running and available to be attached to any rendering element.
 
-##### `reattachMediaStream(elementFrom, elementTo)`
+#### `reattachMediaStream(elementFrom, elementTo)`
 This is taken over for compatibility with adapter.js from Google. Feeds a `MediaStream` from one video or audio tag into another.
 
-##### `createIceServer(url, username, password)`
+#### `createIceServer(url, username, password)`
 This creates a valid iceServer from one url, username and password
 
 **Expected parameters:**
@@ -72,7 +73,7 @@ This creates a valid iceServer from one url, username and password
   - `username`: The username.
   - `credential`: The credetial password.
 
-##### `createIceServers(urls, username, password)`
+#### `createIceServers(urls, username, password)`
 This creates a valid iceServers array for the specific browser and version.
 
 **Expected parameters:**
@@ -87,7 +88,7 @@ This creates a valid iceServers array for the specific browser and version.
      - `username`: The username.
      - `credential`: The credential password.
 
-##### `checkIceConnectionState(peerId, iceConnectionState, callback)`
+#### `checkIceConnectionState(peerId, iceConnectionState, callback)`
 This handles all the `iceConnectionState` return value differences cross-browsers when `RTCPeerConnection.oniceconnectionstate` is fired.
 
 - Expected outcome should be:  `checking` > `connected` > `completed`.
@@ -112,7 +113,7 @@ peerConnection.oniceconnectionstatechange = function () {
 };
 ```
 
-##### `checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion, callback, constraints)`
+#### `checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion, callback, constraints)`
 This handles all `MediaStream` and `DataChannel` differences for interopability cross-browsers.
 method has to be called before creating the offer to check if peer should create the offer.
 
@@ -145,9 +146,11 @@ checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion
 }, inputConstraints);
 ```
 
-#### Helper variables
+----
 
-##### `webrtcDetectedType`
+### Helper variables
+
+#### `webrtcDetectedType`
 This displays the browser webrtc implementation type.
 
 **Expected values:**
@@ -157,7 +160,7 @@ This displays the browser webrtc implementation type.
 - `"plugin"`: Temasys plugin implementation of webrtc.
 - `"ms"`: Edge implementation of webrtc (polyfilled from ORTC).
 
-##### `webrtcDetectedDCSupport`
+#### `webrtcDetectedDCSupport`
 This displays the browser webrtc datachannel support type.
 
 **Expected values:**
@@ -165,7 +168,9 @@ This displays the browser webrtc datachannel support type.
 - `"SCTP"`: SCTP enabled datachannel.
 - `"RTP"`: RTP enabled datachannel.
 
-#### Using screensharing functionality
+----
+
+### Using screensharing functionality
 
 > **Note** that the Firefox add-on not installed detection will not work with `window.navigator.mediaDevices` on Firefox browsers to prevent errors.
 
@@ -173,7 +178,7 @@ AdapterJS `0.12.0`+ offers cross-browser screensharing in Chrome `34`+, Firefox 
 
 To use the screensharing functionality, reference `publish/adapter.screenshare.js` and add the `mediaSource: 'window'` setting to the video media constraints. Requires HTTPS!
 
-Example:
+**Example:**
 
 ```javascript
 window.navigator.getUserMedia({
@@ -200,7 +205,7 @@ window.navigator.getUserMedia({
 - Run `grunt publish` to create production debug and minified copies of the `source/` files with the `webrtc/adapter` dependency compiled in the `publish/` folder.
 
 ## Folders
-##### `publish/`
+#### `publish/`
 Contains the debug version of the library and a minified copy of it.
 
 **Expected Files:**
@@ -209,7 +214,7 @@ Contains the debug version of the library and a minified copy of it.
 - `adapter.screenshare.js`: Contains the compiled `adapter.debug.js` with Screensharing polyfill changes.
 - `adapter.screenshare.min.js`: Contains the minified and production ready version of `adapter.screenshare.js`. 
 
-##### `source/`
+#### `source/`
 Contains the AdapterJS library development files.
 
 **Expected Files:**
@@ -217,12 +222,15 @@ Contains the AdapterJS library development files.
 - `adapter.screenshare.js`: Contains the polyfills for Screensharing changes.
 - `pluginInfo.js`: Contains the Temasys Plugin information. Modify this for your custom Temasys Plugin.
 
-##### Tests
+#### `tests/`
 Run `grunt test` to generate the published versions of adapter.js (same as `grunt publish`) and run the automated test suite on it.
 You can configure the browser to test in `Gruntfile.js` (see the karma target).
 You can also run `grunt karma` to run the test and bypass the publish step.
 
 (Mac only) If you are testing the Temasys WebRTC Plugin, you can run `osascript tests/mac.watcher.scpt` to automatically validate the permission popup.
+
+#### `third_party/`
+The `webrtc/adapter` dependency linked repo at commit version.
 
 ## License
 APACHE 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
