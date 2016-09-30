@@ -130,6 +130,7 @@ This creates a valid an Array of `RTCIceServer` objects for browsers that suppor
 
 ##### `checkIceConnectionState(peerId, iceConnectionState, callback)` : None
 > **Note** that this function has been deprecated since expected triggering of ICE connection states should not be handled.
+
 ```javascript
 peerConnection.oniceconnectionstatechange = function () {
   checkICEConnectionState(peerId, peerConnection.iceConnectionState, function (updatedIceConnectionState) {
