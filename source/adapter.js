@@ -576,21 +576,16 @@ createIceServers = null;
 //------------------------------------------------------------
 
 //The RTCPeerConnection object.
-if (!window.RTCPeerConnection) {
-  RTCPeerConnection = null;
-}
+RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
+  RTCPeerConnection : null;
 
 // Creates RTCSessionDescription object for Plugin Browsers
-if (!window.RTCSessionDescription) {
-  RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
-    RTCSessionDescription : null;
-}
+RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
+  RTCSessionDescription : null;
 
 // Creates RTCIceCandidate object for Plugin Browsers
-if (!window.RTCIceCandidate) {
-  RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
-    RTCIceCandidate : null;
-}
+RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
+  RTCIceCandidate : null;
 
 // Get UserMedia (only difference is the prefix).
 // Code from Adam Barth.
