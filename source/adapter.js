@@ -576,15 +576,21 @@ createIceServers = null;
 //------------------------------------------------------------
 
 //The RTCPeerConnection object.
-RTCPeerConnection = null;
+if (!window.RTCPeerConnection) {
+  RTCPeerConnection = null;
+}
 
 // Creates RTCSessionDescription object for Plugin Browsers
-RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
-  RTCSessionDescription : null;
+if (!window.RTCSessionDescription) {
+  RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
+    RTCSessionDescription : null;
+}
 
 // Creates RTCIceCandidate object for Plugin Browsers
-RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
-  RTCIceCandidate : null;
+if (!window.RTCIceCandidate) {
+  RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
+    RTCIceCandidate : null;
+}
 
 // Get UserMedia (only difference is the prefix).
 // Code from Adam Barth.
@@ -618,6 +624,19 @@ if ( (navigator.mozGetUserMedia ||
        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)))
     && !((navigator.userAgent.match(/android/ig) || []).length === 0 &&
           (navigator.userAgent.match(/chrome/ig) || []).length === 0 && navigator.userAgent.indexOf('Safari/') > 0)) {
+
+  // Handle mozRTCPeerconnection deprecation..
+  if (typeof InstallTrigger !== 'undefined' || navigator.userAgent.indexOf('irefox') > 0) {
+    if (window.RTCPeerConnection) {
+      window.mozRTCPeerConnection = window.RTCPeerConnection;
+    }
+    if (window.RTCSessionDescription) {
+      window.mozRTCSessionDescription = window.RTCSessionDescription;
+    }
+    if (window.RTCICECandidate) {
+      window.mozRTCICECandidate = window.RTCICECandidate;
+    }
+  }
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
