@@ -625,19 +625,6 @@ if ( (navigator.mozGetUserMedia ||
     && !((navigator.userAgent.match(/android/ig) || []).length === 0 &&
           (navigator.userAgent.match(/chrome/ig) || []).length === 0 && navigator.userAgent.indexOf('Safari/') > 0)) {
 
-  // Handle mozRTCPeerconnection deprecation..
-  if (typeof InstallTrigger !== 'undefined' || navigator.userAgent.indexOf('irefox') > 0) {
-    if (window.RTCPeerConnection) {
-      window.mozRTCPeerConnection = window.RTCPeerConnection;
-    }
-    if (window.RTCSessionDescription) {
-      window.mozRTCSessionDescription = window.RTCSessionDescription;
-    }
-    if (window.RTCICECandidate) {
-      window.mozRTCICECandidate = window.RTCICECandidate;
-    }
-  }
-
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
