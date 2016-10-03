@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 
       source: 'source',
 
-      googleAdapterPath: 'third_party/adapter/adapter.js',
+      googleAdapterPath: 'third_party/adapter/out/adapter.js',
 
       production: 'publish',
 

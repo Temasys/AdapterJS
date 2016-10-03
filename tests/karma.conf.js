@@ -9,19 +9,18 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['mocha', 'requirejs', 'chai'],
+    frameworks: ['mocha', 'chai'],
 
     // list of files / patterns to load in the browser
     files: [
       // config files
       {pattern: 'karma.conf.js',                  included: true},
-      {pattern: 'test-main.js',                   included: true},
       {pattern: '../publish/adapter.debug.js',    included: true},
       {pattern: 'globals.js',                     included: true},
 
       // tests
-      {pattern: 'unit/*.spec.js',                 included: false},
-      {pattern: 'unit/*.no-spec.js',              included: false},
+      {pattern: 'unit/*.spec.js',                 included: true, served: true},
+      {pattern: 'unit/*.no-spec.js',              included: true, served: true},
     ],
 
 
@@ -93,7 +92,7 @@ module.exports = function(config) {
               'karma-safari-launcher', 
               'karma-firefox-launcher',
               'karma-ie-launcher',
-              'karma-opera-launcher',
-              'karma-requirejs']
+              'karma-opera-launcher' 
+              ]
   });
 };
