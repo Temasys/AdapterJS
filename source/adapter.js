@@ -1319,10 +1319,10 @@ if ( (navigator.mozGetUserMedia ||
     AdapterJS.getUserMedia        = getUserMedia;
 
     AdapterJS.forwardEventHandlers = function (destElem, srcElem, prototype) {
-      properties = Object.getOwnPropertyNames( prototype );
+      var properties = Object.getOwnPropertyNames( prototype );
       for(var prop in properties) {
         if (prop) {
-          propName = properties[prop];
+          var propName = properties[prop];
 
           if (typeof propName.slice === 'function' &&
               propName.slice(0,2) === 'on' &&
