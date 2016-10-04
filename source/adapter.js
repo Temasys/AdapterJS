@@ -576,7 +576,8 @@ createIceServers = null;
 //------------------------------------------------------------
 
 //The RTCPeerConnection object.
-RTCPeerConnection = null;
+RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
+  RTCPeerConnection : null;
 
 // Creates RTCSessionDescription object for Plugin Browsers
 RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
