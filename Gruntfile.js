@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         },
       },
 
-      version: '<%= pkg.version %>_<%= githash.submodule.short %>',
+      version: '<%= pkg.version %>-<%= githash.submodule.short %>',
 
       clean: {
         production: ['<%= production %>/'],
