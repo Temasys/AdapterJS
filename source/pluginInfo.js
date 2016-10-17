@@ -4,12 +4,12 @@ AdapterJS.WebRTCPlugin.pluginInfo = AdapterJS.WebRTCPlugin.pluginInfo || {
   pluginId : 'plugin0',
   type : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0',
-  portalLink : 'http://skylink.io/plugin/',
+  portalLink : 'https://skylink.io/plugin/',
   downloadLink : null, //set below
   companyName: 'Temasys',
   downloadLinks : {
-    mac: 'http://bit.ly/webrtcpluginpkg',
-    win: 'http://bit.ly/webrtcpluginmsi'
+    mac: 'https://bit.ly/webrtcpluginpkg',
+    win: 'https://bit.ly/webrtcpluginmsi'
   }
 };
 if(typeof AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== "undefined" && AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== null) {
