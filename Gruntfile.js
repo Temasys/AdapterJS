@@ -10,6 +10,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-githash');
 
     grunt.initConfig({
 
@@ -18,15 +19,25 @@ module.exports = function(grunt) {
       base: grunt.config('base') || grunt.option('base') || process.cwd(),
 
       source: 'source',
-
-      googleAdapterPath: 'third_party/adapter/out/adapter.js',
-
       production: 'publish',
-
       bamboo: 'bamboo',
+
+      // webrtc-adapter submodule
+      webrtcAdapterSubmodule: 'third_party/adapter/',
+      googleAdapterPath: '<%= webrtcAdapterSubmodule %>/out/adapter.js',
 
       pluginInfoRoot: grunt.option('pluginInfoRoot') || '<%= source %>',
       pluginInfoFile: grunt.option('pluginInfoFile') || 'pluginInfo.js',
+
+      githash: {
+        submodule: {
+          options: {
+            dir: '<%= webrtcAdapterSubmodule %>'
+          }
+        },
+      },
+
+      version: '<%= pkg.version %>-<%= githash.submodule.short %>',
 
       clean: {
         production: ['<%= production %>/'],
@@ -63,7 +74,7 @@ module.exports = function(grunt) {
             compress: {
                 drop_console: true
             },
-            banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+            banner: '/*! <%= pkg.name %> - v<%= version %> - ' +
                 '<%= grunt.template.today("yyyy-mm-dd") %> */\n'
         },
         production: {
@@ -82,7 +93,7 @@ module.exports = function(grunt) {
   			options: {
   				separator: '\n',
   				stripBanners: false,
-  				banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+  				banner: '/*! <%= pkg.name %> - v<%= version %> - ' +
   					'<%= grunt.template.today("yyyy-mm-dd") %> */\n\n'
   			},
   			production: {
@@ -99,7 +110,7 @@ module.exports = function(grunt) {
         production: {
           options: {
             variables: {
-              'version': '<%= pkg.version %>'
+              'version': '<%= version %>',
             },
             prefix: '@@'
           },
@@ -207,7 +218,7 @@ module.exports = function(grunt) {
         doc: {
           name: '<%= pkg.name %>',
           description: '<%= pkg.description %>',
-          version: '<%= pkg.version %>',
+          version: '<%= version %>',
           url: '<%= pkg.homepage %>',
           options: {
             paths: 'source/',
@@ -276,7 +287,7 @@ module.exports = function(grunt) {
             tag = tag.toString();
             grunt.config('meta.tag', tag);
 
-            grunt.log.write('Version: ' + grunt.config('pkg.version') +
+            grunt.log.write('Version: ' + grunt.config('<%= version %>') +
                 '\nRevision: ' + grunt.config('meta.rev') +
                 '\nDate: ' + grunt.config('meta.date') +
                 '\nGit Tag: ' + grunt.config('meta.tag') + '\n');
@@ -326,6 +337,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('publish', [
+        'githash',
         'CheckSubmodules',
         'CheckPluginInfo',
         // 'webrtc-adapter',
