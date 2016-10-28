@@ -1254,7 +1254,7 @@ if ( (navigator.mozGetUserMedia ||
           '<param name="pluginId" value="' + elementId + '" /> ' +
           '<param name="pageId" value="' + AdapterJS.WebRTCPlugin.pageId + '" /> ' +
           '<param name="windowless" value="true" /> ' +
-          '<param name="streamId" value="' + streamId + '" /> ' +
+          '<param name="streamId" value="' + streamId + '" /> ' + // legacy support (plugin < 0.8.883)
           '<param name="tag" value="' + tag + '" /> ' +
           '</object>';
         while (temp.firstChild) {
@@ -1285,9 +1285,14 @@ if ( (navigator.mozGetUserMedia ||
             break;
           }
         }
-        element.setStreamId(streamId);
       }
       var newElement = document.getElementById(elementId);
+      if (typeof newElement.srcObject != 'undefined') {
+        newElement.srcObject = stream;
+      } else {
+        // Legacy support (plugin < 0.8.883)
+        newElement.setStreamId(streamId);
+      }
       AdapterJS.forwardEventHandlers(newElement, element, Object.getPrototypeOf(element));
 
       return newElement;
@@ -1295,15 +1300,21 @@ if ( (navigator.mozGetUserMedia ||
 
     reattachMediaStream = function (to, from) {
       var stream = null;
-      var children = from.children;
-      for (var i = 0; i !== children.length; ++i) {
-        if (children[i].name === 'streamId') {
-          AdapterJS.WebRTCPlugin.WaitForPluginReady();
-          stream = AdapterJS.WebRTCPlugin.plugin
-            .getStreamWithId(AdapterJS.WebRTCPlugin.pageId, children[i].value);
-          break;
+      if (typeof from.srcObject != 'undefined') {
+        stream = from.srcObject;
+      } else {
+        // Legacy support (plugin < 0.8.883)
+        var children = from.children;
+        for (var i = 0; i !== children.length; ++i) {
+          if (children[i].name === 'streamId') {
+            AdapterJS.WebRTCPlugin.WaitForPluginReady();
+            stream = AdapterJS.WebRTCPlugin.plugin
+              .getStreamWithId(AdapterJS.WebRTCPlugin.pageId, children[i].value);
+            break;
+          }
         }
       }
+
       if (stream !== null) {
         return attachMediaStream(to, stream);
       } else {
