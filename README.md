@@ -21,7 +21,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | Browsers          | Min. Version | OS Platform              | Screensharing             | 
 | ----------------- | ------------ | ------------------------ | ------------------------- | 
 | Chrome \ Chromium | `38`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc))         |
-| Firefox           | `31`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
+| Firefox           | `33`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
 | Opera             | `26`         | MacOS / Win / Ubuntu / Android |  -                        | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
 | Bowser            | `0`          | iOS                      |  -                        |

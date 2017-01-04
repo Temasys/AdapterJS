@@ -322,7 +322,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
 
     webrtcDetectedBrowser   = 'firefox';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 31;
+    webrtcMinimumVersion    = 33;
     webrtcDetectedType      = 'moz';
     webrtcDetectedDCSupport = 'SCTP';
 
