@@ -24,10 +24,11 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | Firefox           | `33`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
 | Opera             | `26`         | MacOS / Win / Ubuntu / Android |  -                        | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
-| Bowser            | `0.6.1`      | iOS 9+ and below         |  -                        |
+| Bowser            | `0.6.1`      | iOS 9+ and below^^       |  -                        |
 | Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
 | IE (Plugin)       | `9`          | Win                      | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
 ^Note that currently Edge doesn't support `RTCDataChannel` API.
+^^There seems to be issues for Bowser version `0.6.1` working with iOS 10+ version.
 
 ### How it looks like if WebRTC is not supported by browser
 ![Plugin Install Bar in IE and Safari](http://temasys.github.io/resources/img/adapterheader.png)
