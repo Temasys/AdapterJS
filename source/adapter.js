@@ -1,5 +1,6 @@
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
+AdapterJS.isPluginNotificationBar = false;
 
 // Browserify compatibility
 if(typeof exports !== 'undefined') {
@@ -417,22 +418,24 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         e.cancelBubble = true;
       } catch(error) { }
 
-      var pluginInstallInterval = setInterval(function(){
-        if(! isIE) {
-          navigator.plugins.refresh(false);
-        }
-        AdapterJS.WebRTCPlugin.isPluginInstalled(
-          AdapterJS.WebRTCPlugin.pluginInfo.prefix,
-          AdapterJS.WebRTCPlugin.pluginInfo.plugName,
-          AdapterJS.WebRTCPlugin.pluginInfo.type,
-          function() { // plugin now installed
-            clearInterval(pluginInstallInterval);
-            AdapterJS.WebRTCPlugin.defineWebRTCInterface();
-          },
-          function() {
-            // still no plugin detected, nothing to do
-          });
-      } , 500);
+      if (AdapterJS.isPluginNotificationBar) {
+        var pluginInstallInterval = setInterval(function(){
+          if(! isIE) {
+            navigator.plugins.refresh(false);
+          }
+          AdapterJS.WebRTCPlugin.isPluginInstalled(
+            AdapterJS.WebRTCPlugin.pluginInfo.prefix,
+            AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+            AdapterJS.WebRTCPlugin.pluginInfo.type,
+            function() { // plugin now installed
+              clearInterval(pluginInstallInterval);
+              AdapterJS.WebRTCPlugin.defineWebRTCInterface();
+            },
+            function() {
+              // still no plugin detected, nothing to do
+            });
+        } , 500);
+      }
     });
 
     // On click on Cancel
@@ -884,6 +887,7 @@ if ( (navigator.mozGetUserMedia ||
   }
   AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
+  AdapterJS.isPluginNotificationBar = true;
 
   /* jshint -W035 */
   AdapterJS.WebRTCPlugin.WaitForPluginReady = function() {
