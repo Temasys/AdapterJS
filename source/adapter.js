@@ -1,6 +1,5 @@
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
-AdapterJS.isPluginNotificationBar = false;
 
 // Browserify compatibility
 if(typeof exports !== 'undefined') {
@@ -369,7 +368,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNewTab, displayRefreshBar) {
+AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, isPluginBar, openNewTab, displayRefreshBar) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -418,7 +417,7 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, openNe
         e.cancelBubble = true;
       } catch(error) { }
 
-      if (AdapterJS.isPluginNotificationBar) {
+      if (isPluginBar) {
         var pluginInstallInterval = setInterval(function(){
           if(! isIE) {
             navigator.plugins.refresh(false);
@@ -887,7 +886,6 @@ if ( (navigator.mozGetUserMedia ||
   }
   AdapterJS.parseWebrtcDetectedBrowser();
   isIE = webrtcDetectedBrowser === 'IE';
-  AdapterJS.isPluginNotificationBar = true;
 
   /* jshint -W035 */
   AdapterJS.WebRTCPlugin.WaitForPluginReady = function() {
@@ -1386,7 +1384,7 @@ if ( (navigator.mozGetUserMedia ||
        popupString = AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION;
       }
 
-      AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, downloadLink);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, downloadLink, true);
     } else { // no download link, just print a generic explanation
       AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
     }

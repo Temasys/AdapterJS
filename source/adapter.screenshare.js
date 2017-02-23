@@ -54,7 +54,7 @@
               if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError', 'NotAllowedError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                   AdapterJS.TEXT.EXTENSION.BUTTON_FF,
-                  'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', true, true);
+                  'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', false, true, true);
               } else {
                 failureCb(error);
               }
@@ -108,7 +108,7 @@
             if (error === 'permission-denied') {
               failureCb(new Error('Permission denied for screen retrieval'));
             } else {
-              // NOTE(J-O): I don't think we ever pass in here. 
+              // NOTE(J-O): I don't think we ever pass in here.
               // A failure to capture the screen does not lead here.
               failureCb(new Error('Failed retrieving selected screen'));
             }
@@ -132,7 +132,7 @@
             if (event.data.chromeExtensionStatus === 'not-installed') {
               AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
                 AdapterJS.TEXT.EXTENSION.BUTTON_CHROME,
-                event.data.data, true, true);
+                event.data.data, false, true, true);
             } else {
               chromeCallback(event.data.chromeExtensionStatus, null);
             }
@@ -195,7 +195,7 @@
       }
     };
 
-    AdapterJS.getUserMedia = getUserMedia = 
+    AdapterJS.getUserMedia = getUserMedia =
        window.getUserMedia = navigator.getUserMedia;
     if ( navigator.mediaDevices &&
       typeof Promise !== 'undefined') {
