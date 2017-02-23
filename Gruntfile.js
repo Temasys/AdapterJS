@@ -11,6 +11,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-githash');
+    grunt.loadNpmTasks('grunt-string-replace');
 
     grunt.initConfig({
 
@@ -240,6 +241,24 @@ module.exports = function(grunt) {
             'IE'
           ]
         }
+      },
+
+      // Replace the replace( module to prevent other require modules from referencing browserified file
+      'string-replace': {
+        dist: {
+          files: {
+            'publish/': 'publish/*.js'
+          },
+          options: {
+            replacements: [{
+              pattern: /\(require,/ig,
+              replacement: '(requirecopy,'
+            }, {
+              pattern: /require\(/ig,
+              replacement: 'requirecopy('
+            }]
+          }
+        }
       }
     });
 
@@ -346,6 +365,7 @@ module.exports = function(grunt) {
         'concat',
         'replace',
         'includereplace',
+        'string-replace',
         'uglify',
         'yuidoc'
     ]);
