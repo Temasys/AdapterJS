@@ -368,7 +368,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
   }
 };
 
-AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, isPluginBar, openNewTab, displayRefreshBar) {
+AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback) {
   // only inject once the page is ready
   if (document.readyState !== 'complete') {
     return;
@@ -398,46 +398,21 @@ AdapterJS.renderNotificationBar = function (text, buttonText, buttonLink, isPlug
   c.document.open();
   c.document.write('<span style="display: inline-block; font-family: Helvetica, Arial,' +
     'sans-serif; font-size: .9rem; padding: 4px; vertical-align: ' +
-    'middle; cursor: default;">' + text + '</span>');
-  if(buttonText && buttonLink) {
+    'middle; cursor: default;">' + message + '</span>');
+  if(buttonText && typeof buttonCallback === 'function') {
     c.document.write('<button id="okay">' + buttonText + '</button><button id="cancel">Cancel</button>');
     c.document.close();
 
     // On click on okay
-    AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function(e) {
-      if (!!displayRefreshBar) {
-        AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
-          AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
-          AdapterJS.TEXT.REFRESH.BUTTON, 'javascript:location.reload()'); // jshint ignore:line
-      }
-      window.open(buttonLink, !!openNewTab ? '_blank' : '_top');
-
+    AdapterJS.addEvent(c.document.getElementById('okay'), 'click', function (e) {
       e.preventDefault();
       try {
         e.cancelBubble = true;
       } catch(error) { }
-
-      if (isPluginBar) {
-        var pluginInstallInterval = setInterval(function(){
-          if(! isIE) {
-            navigator.plugins.refresh(false);
-          }
-          AdapterJS.WebRTCPlugin.isPluginInstalled(
-            AdapterJS.WebRTCPlugin.pluginInfo.prefix,
-            AdapterJS.WebRTCPlugin.pluginInfo.plugName,
-            AdapterJS.WebRTCPlugin.pluginInfo.type,
-            function() { // plugin now installed
-              clearInterval(pluginInstallInterval);
-              AdapterJS.WebRTCPlugin.defineWebRTCInterface();
-            },
-            function() {
-              // still no plugin detected, nothing to do
-            });
-        } , 500);
-      }
+      buttonCallback(e);
     });
 
-    // On click on Cancel
+    // On click on Cancel - all bars has same logic so keeping it that way for now
     AdapterJS.addEvent(c.document.getElementById('cancel'), 'click', function(e) {
       w.document.body.removeChild(i);
     });
@@ -1384,7 +1359,26 @@ if ( (navigator.mozGetUserMedia ||
        popupString = AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION;
       }
 
-      AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, downloadLink, true);
+      AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, function () {
+        window.open(downloadLink, '_top');
+
+        var pluginInstallInterval = setInterval(function(){
+          if(! isIE) {
+            navigator.plugins.refresh(false);
+          }
+          AdapterJS.WebRTCPlugin.isPluginInstalled(
+            AdapterJS.WebRTCPlugin.pluginInfo.prefix,
+            AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+            AdapterJS.WebRTCPlugin.pluginInfo.type,
+            function() { // plugin now installed
+              clearInterval(pluginInstallInterval);
+              AdapterJS.WebRTCPlugin.defineWebRTCInterface();
+            },
+            function() {
+              // still no plugin detected, nothing to do
+            });
+        } , 500);
+      });
     } else { // no download link, just print a generic explanation
       AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
     }

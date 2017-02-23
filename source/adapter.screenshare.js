@@ -53,8 +53,19 @@
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
               if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError', 'NotAllowedError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
-                  AdapterJS.TEXT.EXTENSION.BUTTON_FF,
-                  'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', false, true, true);
+                  AdapterJS.TEXT.EXTENSION.BUTTON_FF, function (e) {
+                  window.open('https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', '_blank');
+                  if (e.target && e.target.parentElement && e.target.nextElementSibling &&
+                    e.target.nextElementSibling.click) {
+                    e.target.nextElementSibling.click();
+                  }
+                  // Trigger refresh bar
+                  AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
+                    AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
+                    AdapterJS.TEXT.REFRESH.BUTTON, function () {
+                    window.open('javascript:location.reload()', '_top');
+                  }); // jshint ignore:line
+                });
               } else {
                 failureCb(error);
               }
@@ -131,8 +142,19 @@
           if (event.data.chromeExtensionStatus) {
             if (event.data.chromeExtensionStatus === 'not-installed') {
               AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
-                AdapterJS.TEXT.EXTENSION.BUTTON_CHROME,
-                event.data.data, false, true, true);
+                AdapterJS.TEXT.EXTENSION.BUTTON_CHROME, function (e) {
+                window.open(event.data.data, '_blank');
+                if (e.target && e.target.parentElement && e.target.nextElementSibling &&
+                  e.target.nextElementSibling.click) {
+                  e.target.nextElementSibling.click();
+                }
+                // Trigger refresh bar
+                AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
+                  AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
+                  AdapterJS.TEXT.REFRESH.BUTTON, function () {
+                  window.open('javascript:location.reload()', '_top');
+                }); // jshint ignore:line
+              });
             } else {
               chromeCallback(event.data.chromeExtensionStatus, null);
             }
