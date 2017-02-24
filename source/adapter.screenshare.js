@@ -1,16 +1,13 @@
-(function () {
+AdapterJS.TEXT.EXTENSION = {
+  REQUIRE_INSTALLATION_FF: 'To enable screensharing you need to install the Skylink WebRTC tools Firefox Add-on.',
+  REQUIRE_INSTALLATION_CHROME: 'To enable screensharing you need to install the Skylink WebRTC tools Chrome Extension.',
+  REQUIRE_REFRESH: 'Please refresh this page after the Skylink WebRTC tools extension has been installed.',
+  BUTTON_FF: 'Install Now',
+  BUTTON_CHROME: 'Go to Chrome Web Store'
+};
 
-  'use strict';
-
+AdapterJS.defineMediaSourcePolyfill = function () {
   var baseGetUserMedia = null;
-
-  AdapterJS.TEXT.EXTENSION = {
-    REQUIRE_INSTALLATION_FF: 'To enable screensharing you need to install the Skylink WebRTC tools Firefox Add-on.',
-    REQUIRE_INSTALLATION_CHROME: 'To enable screensharing you need to install the Skylink WebRTC tools Chrome Extension.',
-    REQUIRE_REFRESH: 'Please refresh this page after the Skylink WebRTC tools extension has been installed.',
-    BUTTON_FF: 'Install Now',
-    BUTTON_CHROME: 'Go to Chrome Web Store'
-  };
 
   var clone = function(obj) {
     if (null === obj || 'object' !== typeof obj) {
@@ -255,4 +252,8 @@
   } else if (window.webrtcDetectedBrowser === 'opera') {
     console.warn('Opera does not support screensharing feature in getUserMedia');
   }
-})();
+};
+
+if (typeof window.require !== 'function') {
+  AdapterJS.defineMediaSourcePolyfill();
+}

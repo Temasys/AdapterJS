@@ -1,11 +1,6 @@
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
 
-// Browserify compatibility
-if(typeof exports !== 'undefined') {
-  module.exports = AdapterJS;
-}
-
 AdapterJS.options = AdapterJS.options || {};
 
 // uncomment to get virtual webcams
@@ -38,14 +33,28 @@ AdapterJS._onwebrtcreadies = [];
 // Sets a callback function to be called when the WebRTC interface is ready.
 // The first argument is the function to callback.\
 // Throws an error if the first argument is not a function
-AdapterJS.webRTCReady = function (callback) {
-  if (typeof callback !== 'function') {
+AdapterJS.webRTCReady = function (baseCallback) {
+  if (typeof baseCallback !== 'function') {
     throw new Error('Callback provided is not a function');
   }
 
-  if (true === AdapterJS.onwebrtcreadyDone) {
+  var callback = function () {
+    // Make users having requirejs to use the webRTCReady function to define first
+    // When you set a setTimeout(definePolyfill, 0), it overrides the WebRTC function
+    // This is be more than 0s
+    if (typeof window.require === 'function' &&
+      typeof AdapterJS.defineMediaSourcePolyfill === 'function') {
+      AdapterJS.defineMediaSourcePolyfill();
+    }
+
     // All WebRTC interfaces are ready, just call the callback
-    callback(null !== AdapterJS.WebRTCPlugin.plugin);
+    baseCallback(null !== AdapterJS.WebRTCPlugin.plugin);
+  };
+
+
+
+  if (true === AdapterJS.onwebrtcreadyDone) {
+    callback();
   } else {
     // will be triggered automatically when your browser/plugin is ready.
     AdapterJS._onwebrtcreadies.push(callback);
@@ -1395,4 +1404,11 @@ if ( (navigator.mozGetUserMedia ||
 
   // END OF WEBRTC PLUGIN SHIM
   ///////////////////////////////////////////////////////////////////
+}
+
+// Placed it here so that the module.exports from the browserified
+//   adapterjs will not override our AdapterJS exports
+// Browserify compatibility
+if(typeof exports !== 'undefined') {
+  module.exports = AdapterJS;
 }
