@@ -156,7 +156,7 @@ Expected outcome should be: `checking > connected > completed`. What was receive
 
 
 ##### `checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion, callback, constraints)` : None
-> **Note** that this function has been deprecated as this is based off older versions of browsers interopability in which is lower than our minimum supported browser versions.
+> **Note** that this function has been deprecated as this is based off older versions of browsers interoperability in which is lower than our minimum supported browser versions.
 
 ```javascript
 // Right now we are not yet doing the offer. We are just checking if we should be the offerer instead of the other peer
@@ -174,9 +174,9 @@ checkMediaDataChannelSettings(peerAgentBrowser, peerAgentVersion
 }, inputConstraints);
 ```
 
-This handles all `MediaStream` and `DataChannel` differences for interopability cross-browsers. The method has to be called before creating the offer to check if peer should create the offer.
+This handles all `MediaStream` and `DataChannel` differences for interoperability cross-browsers. The method has to be called before creating the offer to check if peer should create the offer.
 
-For some older (`20`+) versions of Firefox and Chrome `MediaStream` interopability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a `DataChannel` connection as an offerer, and results in no DataChannel connection. To achieve both `MediaStream` and `DataChannel` connection interopability, Chrome or other browsers has to be the one creating the offer.
+For some older (`20`+) versions of Firefox and Chrome `MediaStream` interoperability, `MozDontOfferDataChannel` has to be used, and hence Firefox cannot establish a `DataChannel` connection as an offerer, and results in no DataChannel connection. To achieve both `MediaStream` and `DataChannel` connection interoperability, Chrome or other browsers has to be the one creating the offer.
 
 - **Parameters:**
 
