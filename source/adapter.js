@@ -562,7 +562,7 @@ createIceServers = null;
 //------------------------------------------------------------
 
 //Creates MediaStream object.
-MediaStream = null;
+MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
 
 //The RTCPeerConnection object.
 RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
