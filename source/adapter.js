@@ -1042,10 +1042,7 @@ if ( (navigator.mozGetUserMedia ||
 
     MediaStream = function (mediaStreamOrTracks) {
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
-      if (typeof mediaStreamOrTracks !== 'undefined' && mediaStreamOrTracks !== null) {
-        return AdapterJS.WebRTCPlugin.plugin.MediaStream(mediaStreamOrTracks);
-      } 
-      return AdapterJS.WebRTCPlugin.plugin.MediaStream();
+      return AdapterJS.WebRTCPlugin.plugin.MediaStream(mediaStreamOrTracks);
     }
 
     RTCPeerConnection = function (servers, constraints) {
