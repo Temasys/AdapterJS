@@ -194,18 +194,17 @@ AdapterJS.defineMediaSourcePolyfill = function () {
         // wait for plugin to be ready
         AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
           // check if screensharing feature is available
-          if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
-            !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
-            // set the constraints
+          if ( !AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature
+            || !AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable ) {
+            failureCb(new Error('Your version of the WebRTC plugin does not support screensharing'));
+            return;
+          } else if (typeof AdapterJS.WebRTCPlugin.plugin.screensharingKeys === 'undefined') {
+            // Legacy system, set the sourceId to AdapterJS.WebRTCPlugin.plugin.screensharingKey
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
             updatedConstraints.video.optional.push({
               sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
             });
-
             delete updatedConstraints.video.mediaSource;
-          } else {
-            failureCb(new Error('Your version of the WebRTC plugin does not support screensharing'));
-            return;
           }
           baseGetUserMedia(updatedConstraints, successCb, failureCb);
         });
