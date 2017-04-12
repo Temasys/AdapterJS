@@ -561,6 +561,9 @@ createIceServer = null;
 createIceServers = null;
 //------------------------------------------------------------
 
+//Creates MediaStream object.
+MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
+
 //The RTCPeerConnection object.
 RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
   RTCPeerConnection : null;
@@ -833,6 +836,7 @@ if ( (navigator.mozGetUserMedia ||
   //
   // Shims the follwing:
   // -- getUserMedia
+  // -- MediaStream
   // -- MediaStreamTrack
   // -- MediaStreamTrack.getSources
   // -- RTCPeerConnection
@@ -1035,6 +1039,11 @@ if ( (navigator.mozGetUserMedia ||
       return AdapterJS.WebRTCPlugin.plugin.
         ConstructSessionDescription(info.type, info.sdp);
     };
+
+    MediaStream = function (mediaStreamOrTracks) {
+      AdapterJS.WebRTCPlugin.WaitForPluginReady();
+      return AdapterJS.WebRTCPlugin.plugin.MediaStream(mediaStreamOrTracks);
+    }
 
     RTCPeerConnection = function (servers, constraints) {
       // Validate server argumenr
