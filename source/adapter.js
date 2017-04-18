@@ -1287,7 +1287,7 @@ if ( (navigator.mozGetUserMedia ||
         }
       }
       var newElement = document.getElementById(elementId);
-      if (typeof newElement.srcObject != 'undefined') {
+      if (typeof newElement.srcObject !== 'undefined') {
         newElement.srcObject = stream;
       } else {
         // Legacy support (plugin < 0.8.883)
@@ -1300,7 +1300,7 @@ if ( (navigator.mozGetUserMedia ||
 
     reattachMediaStream = function (to, from) {
       var stream = null;
-      if (typeof from.srcObject != 'undefined') {
+      if (typeof from.srcObject !== 'undefined') {
         stream = from.srcObject;
       } else {
         // Legacy support (plugin < 0.8.883)
