@@ -612,9 +612,9 @@ if ( (navigator.mozGetUserMedia ||
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
-  // Prevent Edge overrides
+  // Store the original native RTCPC in msRTCPeerConnection object
   if (navigator.userAgent.match(/Edge\/(\d+).(\d+)$/) && window.RTCPeerConnection) {
-    window.cachedRTCPeerConnection = window.RTCPeerConnection;
+    window.msRTCPeerConnection = window.RTCPeerConnection;
   }
 
 /* jshint ignore:start */
@@ -776,10 +776,6 @@ if ( (navigator.mozGetUserMedia ||
       to.srcObject = from.srcObject;
       return to;
     };
-
-    if (window.cachedRTCPeerConnection) {
-      window.RTCPeerConnection = window.cachedRTCPeerConnection;
-    }
   }
 
   // Need to override attachMediaStream and reattachMediaStream
