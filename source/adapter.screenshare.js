@@ -55,8 +55,9 @@ AdapterJS.defineMediaSourcePolyfill = function () {
 
         var updatedConstraints = clone(constraints);
 
-        //constraints.video.mediaSource = constraints.video.mediaSource;
-        updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource;
+        updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource =
+          Array.isArray(updatedConstraints.video.mediaSource) ?
+          updatedConstraints.video.mediaSource[0] : updatedConstraints.video.mediaSource;
 
         // so generally, it requires for document.readyState to be completed before the getUserMedia could be invoked.
         // strange but this works anyway
@@ -113,10 +114,13 @@ AdapterJS.defineMediaSourcePolyfill = function () {
           return;
         }
 
+        var updatedConstraints = clone(constraints);
+        updatedConstraints.video.mediaSource = typeof updatedConstraints.video.mediaSource === 'string' ?
+          [updatedConstraints.video.mediaSource] : updatedConstraints.video.mediaSource;
+
         function fetchStream (response) {
           // Success retrieve stream
           if (response.success) {
-            var updatedConstraints = clone(constraints);
             updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
             updatedConstraints.video.mandatory.chromeMediaSource = 'desktop';
             updatedConstraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
@@ -150,7 +154,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
 
         // Use iframe method
         if (AdapterJS.extensionInfo.chrome.iframeLink) {
-          iframe.getSourceId([], fetchStream);
+          iframe.getSourceId(updatedConstraints.video.mediaSource, fetchStream);
         // Use new method
         } else {
           var icon = document.createElement('img');
@@ -170,9 +174,11 @@ AdapterJS.defineMediaSourcePolyfill = function () {
                 return;
               }
 
+              console.info(updatedConstraints);
+
               chrome.runtime.sendMessage(AdapterJS.extensionInfo.chrome.extensionId, {
                 type: 'get-source',
-                sources: constraints.video.mediaSource
+                sources: updatedConstraints.video.mediaSource
               }, function (sourceRes) {
                 // Permission denied
                 if (!(sourceRes && typeof sourceRes === 'object')) {
@@ -363,10 +369,22 @@ AdapterJS.defineMediaSourcePolyfill = function () {
           // check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
             !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
+            var sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing';
+
+            if (AdapterJS.WebRTCPlugin.plugin.screensharingKeys) {
+              if (updatedConstraints.video.mediaSource === 'screen') {
+                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen;
+              } else if (updatedConstraints.video.mediaSource === 'window') {
+                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window;
+              } else {
+                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
+              }
+            }
+
             // set the constraints
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
             updatedConstraints.video.optional.push({
-              sourceId: AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing'
+              sourceId: sourceId
             });
 
             delete updatedConstraints.video.mediaSource;
