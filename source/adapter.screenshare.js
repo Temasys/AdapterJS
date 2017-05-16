@@ -1,9 +1,22 @@
+// Define extension popup bar text
 AdapterJS.TEXT.EXTENSION = {
   REQUIRE_INSTALLATION_FF: 'To enable screensharing you need to install the Skylink WebRTC tools Firefox Add-on.',
   REQUIRE_INSTALLATION_CHROME: 'To enable screensharing you need to install the Skylink WebRTC tools Chrome Extension.',
   REQUIRE_REFRESH: 'Please refresh this page after the Skylink WebRTC tools extension has been installed.',
   BUTTON_FF: 'Install Now',
   BUTTON_CHROME: 'Go to Chrome Web Store'
+};
+
+// Define extension settings
+AdapterJS.extensionInfo = {
+  chrome: {
+    extensionId: 'ljckddiekopnnjoeaiofddfhgnbdoafc',
+    extensionLink: 'https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc',
+    iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html',
+  },
+  firefox: {
+    extensionLink: 'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/'
+  }
 };
 
 AdapterJS.defineMediaSourcePolyfill = function () {
@@ -51,7 +64,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
               if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError', 'NotAllowedError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                   AdapterJS.TEXT.EXTENSION.BUTTON_FF, function (e) {
-                  window.open('https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/', '_blank');
+                  window.open(AdapterJS.extensionInfo.firefox.extensionLink, '_blank');
                   if (e.target && e.target.parentElement && e.target.nextElementSibling &&
                     e.target.nextElementSibling.click) {
                     e.target.nextElementSibling.click();
@@ -140,7 +153,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             if (event.data.chromeExtensionStatus === 'not-installed') {
               AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
                 AdapterJS.TEXT.EXTENSION.BUTTON_CHROME, function (e) {
-                window.open(event.data.data, '_blank');
+                window.open(AdapterJS.extensionInfo.chrome.extensionLink || event.data.data, '_blank');
                 if (e.target && e.target.parentElement && e.target.nextElementSibling &&
                   e.target.nextElementSibling.click) {
                   e.target.nextElementSibling.click();
@@ -164,7 +177,8 @@ AdapterJS.defineMediaSourcePolyfill = function () {
         window.addEventListener('message', onIFrameCallback);
 
         postFrameMessage({
-          captureSourceId: true
+          captureSourceId: true,
+          extensionId: AdapterJS.extensionInfo.chrome.extensionId
         });
 
       } else {
@@ -232,7 +246,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       iframe.isLoaded = true;
     };
 
-    iframe.src = 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html';
+    iframe.src = AdapterJS.extensionInfo.chrome.iframeLink;
     iframe.style.display = 'none';
 
     (document.body || document.documentElement).appendChild(iframe);
