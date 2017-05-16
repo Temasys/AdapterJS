@@ -14,6 +14,7 @@ AdapterJS.extensionInfo = {
     extensionLink: 'https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc',
     iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html',
   },
+  // Required only for Firefox 51 and below
   firefox: {
     extensionLink: 'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/'
   }
@@ -61,7 +62,8 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             clearInterval(checkIfReady);
 
             baseGetUserMedia(updatedConstraints, successCb, function (error) {
-              if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError', 'NotAllowedError'].indexOf(error.name) > -1 && window.parent.location.protocol === 'https:') {
+              if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError', 'NotAllowedError'].indexOf(error.name) > -1 &&
+                window.parent.location.protocol === 'https:' && window.webrtcDetectedVersion < 52) {
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                   AdapterJS.TEXT.EXTENSION.BUTTON_FF, function (e) {
                   window.open(AdapterJS.extensionInfo.firefox.extensionLink, '_blank');
