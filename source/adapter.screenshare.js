@@ -12,7 +12,10 @@ AdapterJS.extensionInfo = {
   chrome: {
     extensionId: 'ljckddiekopnnjoeaiofddfhgnbdoafc',
     extensionLink: 'https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc',
+    // Define this to use iframe method
     iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html',
+    // Invoke this again if AdapterJS.extensionInfo is defined later with a different iframeLink
+    iframeReloadFn: null
   },
   // Required only for Firefox 51 and below
   firefox: {
@@ -100,62 +103,35 @@ AdapterJS.defineMediaSourcePolyfill = function () {
 
   } else if (window.navigator.webkitGetUserMedia && window.webrtcDetectedBrowser !== 'safari') {
     baseGetUserMedia = window.navigator.getUserMedia;
+    var iframe = document.createElement('iframe');
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
       if (constraints && constraints.video && !!constraints.video.mediaSource) {
         if (window.webrtcDetectedBrowser !== 'chrome') {
-          // This is Opera, which does not support screensharing
+          // This is Opera/, which does not support screensharing
           failureCb(new Error('Current browser does not support screensharing'));
           return;
         }
 
-        // would be fine since no methods
-        var updatedConstraints = clone(constraints);
-
-        var chromeCallback = function(error, sourceId) {
-          if(!error) {
+        function fetchStream (response) {
+          // Success retrieve stream
+          if (response.success) {
+            var updatedConstraints = clone(constraints);
             updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
             updatedConstraints.video.mandatory.chromeMediaSource = 'desktop';
             updatedConstraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
             updatedConstraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
-
-            if (sourceId) {
-              updatedConstraints.video.mandatory.chromeMediaSourceId = sourceId;
-            }
-
+            updatedConstraints.video.mandatory.chromeMediaSourceId = response.sourceId;
+            console.info(updatedConstraints);
             delete updatedConstraints.video.mediaSource;
-
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
-
-          } else { // GUM failed
-            if (error === 'permission-denied') {
-              failureCb(new Error('Permission denied for screen retrieval'));
-            } else {
-              // NOTE(J-O): I don't think we ever pass in here.
-              // A failure to capture the screen does not lead here.
-              failureCb(new Error('Failed retrieving selected screen'));
-            }
-          }
-        };
-
-        var onIFrameCallback = function (event) {
-          if (!event.data) {
-            return;
-          }
-
-          if (event.data.chromeMediaSourceId) {
-            if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
-                chromeCallback('permission-denied');
-            } else {
-              chromeCallback(null, event.data.chromeMediaSourceId);
-            }
-          }
-
-          if (event.data.chromeExtensionStatus) {
-            if (event.data.chromeExtensionStatus === 'not-installed') {
+          // Error, return error
+          } else {
+            // Extension not installed, trigger to install
+            if (response.extensionLink) {
               AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
                 AdapterJS.TEXT.EXTENSION.BUTTON_CHROME, function (e) {
-                window.open(AdapterJS.extensionInfo.chrome.extensionLink || event.data.data, '_blank');
+                window.open(response.extensionLink, '_blank');
                 if (e.target && e.target.parentElement && e.target.nextElementSibling &&
                   e.target.nextElementSibling.click) {
                   e.target.nextElementSibling.click();
@@ -167,22 +143,67 @@ AdapterJS.defineMediaSourcePolyfill = function () {
                   window.open('javascript:location.reload()', '_top');
                 }); // jshint ignore:line
               });
-            } else {
-              chromeCallback(event.data.chromeExtensionStatus, null);
             }
+            failureCb(response.error);
           }
+        }
 
-          // this event listener is no more needed
-          window.removeEventListener('message', onIFrameCallback);
-        };
+        // Use iframe method
+        if (AdapterJS.extensionInfo.chrome.iframeLink) {
+          iframe.getSourceId([], fetchStream);
+        // Use new method
+        } else {
+          var icon = document.createElement('img');
+          icon.src = 'chrome-extension://' + AdapterJS.extensionInfo.chrome.extensionId + '/icon.png';
 
-        window.addEventListener('message', onIFrameCallback);
+          icon.onload = function() {
+            // Check if extension is enabled, it should return data
+            chrome.runtime.sendMessage(AdapterJS.extensionInfo.chrome.extensionId, {
+              type: 'get-version'
+            }, function (versionRes) {
+              // Extension not enabled
+              if (!(versionRes && typeof versionRes === 'object' && versionRes.type === 'send-version')) {
+                fetchStream({
+                  success: false,
+                  error: new Error('Extension is disabled')
+                });
+                return;
+              }
 
-        postFrameMessage({
-          captureSourceId: true,
-          extensionId: AdapterJS.extensionInfo.chrome.extensionId
-        });
+              chrome.runtime.sendMessage(AdapterJS.extensionInfo.chrome.extensionId, {
+                type: 'get-source',
+                sources: constraints.video.mediaSource
+              }, function (sourceRes) {
+                // Permission denied
+                if (!(sourceRes && typeof sourceRes === 'object')) {
+                  fetchStream({
+                    success: false,
+                    error: new Error('Retrieval failed')
+                  });
+                // Could be cancelled
+                } else if (sourceRes.type === 'send-source-error') {
+                  fetchStream({
+                    success: false,
+                    error: new Error('Permission denied for screen retrieval')
+                  });
+                } else {
+                  fetchStream({
+                    success: true,
+                    sourceId: sourceRes.sourceId
+                  });
+                }
+              });
+            });
+          };
 
+          icon.onerror = function () {
+            fetchStream({
+              success: false,
+              error: new Error('Extension not installed'),
+              extensionLink: AdapterJS.extensionInfo.chrome.extensionLink
+            });
+          };
+        }
       } else {
         baseGetUserMedia(constraints, successCb, failureCb);
       }
@@ -195,33 +216,132 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       });
     };
 
-    // For chrome, use an iframe to load the screensharing extension
-    // in the correct domain.
-    // Modify here for custom screensharing extension in chrome
-    if (window.webrtcDetectedBrowser === 'chrome') {
-      var iframe = document.createElement('iframe');
+    // Load for iframe method
+    AdapterJS.extensionInfo.chrome.iframeReloadFn = function () {
+      if (!AdapterJS.extensionInfo.chrome.iframeLink) {
+        return;
+      }
+
+      var states = {
+        loaded: false,
+        error: false
+      };
+
+      // Remove previous iframe if it exists
+      if (iframe) {
+        // Prevent errors thrown when iframe does not exists yet
+        try {
+          (document.body || document.documentElement).removeChild(iframe);
+        } catch (e) {}
+      }
 
       iframe.onload = function() {
-        iframe.isLoaded = true;
+        states.loaded = true;
+      };
+
+      iframe.onerror = function () {
+        states.error = true;
       };
 
       iframe.src = AdapterJS.extensionInfo.chrome.iframeLink;
       iframe.style.display = 'none';
 
-      (document.body || document.documentElement).appendChild(iframe);
-
-      var postFrameMessage = function (object) { // jshint ignore:line
-        object = object || {};
-
-        if (!iframe.isLoaded) {
-          setTimeout(function () {
-            iframe.contentWindow.postMessage(object, '*');
-          }, 100);
+      iframe.getSourceId = function (sources, cb) {
+        // If iframe failed to load, ignore
+        if (states.error) {
+          cb({
+            success: false,
+            error: new Error('iframe is not loaded')
+          });
           return;
         }
 
-        iframe.contentWindow.postMessage(object, '*');
+        // Listen to iframe messages
+        function getSourceId () {
+          window.addEventListener('message', function iframeListener (evt) {
+            // Unload since it should be replied once if success or failure
+            window.removeEventListener('message', iframeListener);
+            // If no data is returned, it is incorrect
+            if (!evt.data) {
+              cb({
+                success: false,
+                error: new Error('Failed retrieving response')
+              });
+            // Extension not installed
+            } else if (evt.data.chromeExtensionStatus === 'not-installed') {
+              cb({
+                success: false,
+                error: new Error('Extension is not installed'),
+                // Should return the above configured chrome.extensionLink but fallback for users using custom detectRTC.html
+                extensionLink: evt.data.data || AdapterJS.extensionInfo.chrome.extensionLink
+              });
+            // Extension not enabled
+            } else if (evt.data.chromeExtensionStatus === 'installed-disabled') {
+              cb({
+                success: false,
+                error: new Error('Extension is disabled')
+              });
+            // Permission denied for retrieval
+            } else if (evt.data.chromeMediaSourceId === 'PermissionDeniedError') {
+              cb({
+                success: false,
+                error: new Error('Permission denied for screen retrieval')
+              });
+            // Source ID retrieved
+            } else if (evt.data.chromeMediaSourceId && typeof evt.data.chromeMediaSourceId === 'string') {
+              cb({
+                success: true,
+                sourceId: evt.data.chromeMediaSourceId
+              });
+            // Unknown error which is invalid state whereby iframe is not returning correctly and source cannot be retrieved correctly
+            } else {
+              cb({
+                success: false,
+                error: new Error('Failed retrieving selected screen')
+              });
+            }
+          });
+
+          // Check if extension has loaded, and then fetch for the sourceId
+          iframe.contentWindow.postMessage({
+            captureSourceId: true,
+            sources: sources,
+            extensionId: AdapterJS.extensionInfo.chrome.extensionId,
+            extensionLink: AdapterJS.extensionInfo.chrome.extensionLink
+          }, '*');
+        }
+
+        // Set interval to wait for iframe to load till 5 seconds before counting as dead
+        if (!states.loaded) {
+          var endBlocks = 0;
+          var intervalChecker = setInterval(function () {
+            if (!states.loaded) {
+              // Loading of iframe has been dead.
+              if (endBlocks === 50) {
+                clearInterval(intervalChecker);
+                cb({
+                  success: false,
+                  error: new Error('iframe failed to load')
+                });
+              } else {
+                endBlocks++;
+              }
+            } else {
+              clearInterval(intervalChecker);
+              getSourceId();
+            }
+          }, 100);
+        } else {
+          getSourceId();
+        }
       };
+
+      // Re-append to reload
+      (document.body || document.documentElement).appendChild(iframe);
+    };
+
+    if (window.webrtcDetectedBrowser === 'chrome') {
+      AdapterJS.extensionInfo.chrome.iframeReloadFn();
     } else if (window.webrtcDetectedBrowser === 'opera') {
       console.warn('Opera does not support screensharing feature in getUserMedia');
     }
