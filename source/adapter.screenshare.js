@@ -22,6 +22,10 @@ AdapterJS.extensionInfo = {
   // Required only for Firefox 51 and below
   firefox: {
     extensionLink: 'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/'
+  },
+  opera: {
+    extensionId: 'jbjibcfdghfanokgdpaohadjdaegfhij',
+    extensionLink: 'https://addons.opera.com/extensions/details/temasys-webrtc-tools'
   }
 };
 
@@ -153,12 +157,6 @@ AdapterJS.defineMediaSourcePolyfill = function () {
 
       // Prevent accessing property from Boolean errors
       if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
-        // This is Opera, which does not support screensharing
-        if (window.webrtcDetectedBrowser !== 'chrome') {
-          failureCb(new Error('Current browser does not support screensharing'));
-          return;
-        }
-
         var updatedConstraints = clone(constraints);
         // See: https://developer.chrome.com/extensions/desktopCapture#type-DesktopCaptureSourceType
         var mediaSourcesList = ['window', 'screen', 'tab', 'audio'];
@@ -245,16 +243,19 @@ AdapterJS.defineMediaSourcePolyfill = function () {
         };
 
         // Communicate with detectRTC (iframe) method to retrieve source ID
-        if (AdapterJS.extensionInfo.chrome.iframeLink) {
+        // Opera browser should not use iframe method
+        if (AdapterJS.extensionInfo.chrome.iframeLink && window.webrtcDetectedBrowser !== 'opera') {
           iframe.getSourceId(updatedConstraints.video.mediaSource, fetchStream);
         // Communicate with extension directly (needs updated extension code)
         } else {
+          var extensionId = AdapterJS.extensionInfo[window.webrtcDetectedBrowser === 'opera' ? 'opera' : 'chrome'].extensionId;
+          var extensionLink = AdapterJS.extensionInfo[window.webrtcDetectedBrowser === 'opera' ? 'opera' : 'chrome'].extensionLink;
           var icon = document.createElement('img');
-          icon.src = 'chrome-extension://' + AdapterJS.extensionInfo.chrome.extensionId + '/icon.png';
+          icon.src = 'chrome-extension://' + extensionId + '/icon.png';
 
           icon.onload = function() {
             // Check if extension is enabled, it should return data
-            chrome.runtime.sendMessage(AdapterJS.extensionInfo.chrome.extensionId, {
+            chrome.runtime.sendMessage(extensionId, {
               type: 'get-version'
             }, function (versionRes) {
               // Extension not enabled
@@ -266,7 +267,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
                 return;
               }
               // Retrieve source ID
-              chrome.runtime.sendMessage(AdapterJS.extensionInfo.chrome.extensionId, {
+              chrome.runtime.sendMessage(extensionId, {
                 type: 'get-source',
                 sources: updatedConstraints.video.mediaSource
               }, function (sourceRes) {
@@ -297,7 +298,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             fetchStream({
               success: false,
               error: new Error('Extension not installed'),
-              extensionLink: AdapterJS.extensionInfo.chrome.extensionLink
+              extensionLink: extensionLink
             });
           };
         }
@@ -448,8 +449,6 @@ AdapterJS.defineMediaSourcePolyfill = function () {
     // Start loading the iframe
     if (window.webrtcDetectedBrowser === 'chrome') {
       AdapterJS.extensionInfo.chrome.reloadIFrame();
-    } else if (window.webrtcDetectedBrowser === 'opera') {
-      console.warn('Opera does not support screensharing feature in getUserMedia');
     }
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
