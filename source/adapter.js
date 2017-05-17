@@ -1185,7 +1185,11 @@ if ( (navigator.mozGetUserMedia ||
       typeof Promise !== 'undefined') {
       requestUserMedia = function(constraints) {
         return new Promise(function(resolve, reject) {
-          getUserMedia(constraints, resolve, reject);
+          try {
+            getUserMedia(constraints, resolve, reject);
+          } catch (error) {
+            reject(error);
+          }
         });
       };
       navigator.mediaDevices = {getUserMedia: requestUserMedia,

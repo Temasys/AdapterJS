@@ -15,7 +15,7 @@ AdapterJS.extensionInfo = {
     // Define this to use iframe method
     iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html',
     // Invoke this again if AdapterJS.extensionInfo is defined later with a different iframeLink
-    iframeReloadFn: null
+    reloadIFrame: null
   },
   // Required only for Firefox 51 and below
   firefox: {
@@ -43,60 +43,85 @@ AdapterJS.defineMediaSourcePolyfill = function () {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
+      // Append checks for overrides as these are mandatory
+      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
+      if (!(constraints && typeof constraints === 'object')) {
+        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
+      } else if (typeof successCb !== 'function') {
+        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
+      } else if (typeof failureCb !== 'function') {
+        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
+      }
 
-      if (constraints && constraints.video && !!constraints.video.mediaSource) {
-        // intercepting screensharing requests
+      // Prevent accessing property from Boolean errors
+      if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
+        var updatedConstraints = clone(constraints);
+
+        // Obtain first item in array if array is provided
+        if (Array.isArray(updatedConstraints.video.mediaSource)) {
+          for (var i = 0; i < updatedConstraints.video.mediaSource.length; i++) {
+            if (['screen', 'window'].indexOf(updatedConstraints.video.mediaSource[i]) > -1) {
+              updatedConstraints.video.mediaSource = updatedConstraints.video.mediaSource[i];
+              break;
+            }
+          }
+          updatedConstraints.video.mediaSource = typeof updatedConstraints.video.mediaSource === 'string' ?
+            updatedConstraints.video.mediaSource : null;
+        }
 
         // Invalid mediaSource for firefox, only "screen" and "window" are supported
-        if (constraints.video.mediaSource !== 'screen' && constraints.video.mediaSource !== 'window') {
+        if (['screen', 'window'].indexOf(updatedConstraints.video.mediaSource) === -1) {
           failureCb(new Error('GetUserMedia: Only "screen" and "window" are supported as mediaSource constraints'));
           return;
         }
 
-        var updatedConstraints = clone(constraints);
-
-        updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource =
-          Array.isArray(updatedConstraints.video.mediaSource) ?
-          updatedConstraints.video.mediaSource[0] : updatedConstraints.video.mediaSource;
-
-        // so generally, it requires for document.readyState to be completed before the getUserMedia could be invoked.
-        // strange but this works anyway
+        // Apparently requires document.readyState to be completed before the getUserMedia() could be invoked
+        // NOTE: Doesn't make sense but let's keep it that way for now
         var checkIfReady = setInterval(function () {
-          if (document.readyState === 'complete') {
-            clearInterval(checkIfReady);
-
-            baseGetUserMedia(updatedConstraints, successCb, function (error) {
-              if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError', 'NotAllowedError'].indexOf(error.name) > -1 &&
-                window.parent.location.protocol === 'https:' && window.webrtcDetectedVersion < 52) {
-                AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
-                  AdapterJS.TEXT.EXTENSION.BUTTON_FF, function (e) {
-                  window.open(AdapterJS.extensionInfo.firefox.extensionLink, '_blank');
-                  if (e.target && e.target.parentElement && e.target.nextElementSibling &&
-                    e.target.nextElementSibling.click) {
-                    e.target.nextElementSibling.click();
-                  }
-                  // Trigger refresh bar
-                  AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
-                    AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
-                    AdapterJS.TEXT.REFRESH.BUTTON, function () {
-                    window.open('javascript:location.reload()', '_top');
-                  }); // jshint ignore:line
-                });
-              } else {
-                failureCb(error);
-              }
-            });
+          if (document.readyState !== 'complete') {
+            return;
           }
-        }, 1);
 
-      } else { // regular GetUserMediaRequest
+          clearInterval(checkIfReady);
+          updatedConstraints.video.mozMediaSource = updatedConstraints.video.mediaSource;
+
+          baseGetUserMedia(updatedConstraints, successCb, function (error) {
+            // Reference: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+            // Firefox 51 and below throws the following errors when screensharing is disabled, in which we can
+            //   trigger installation for legacy extension (which no longer can be used) to enable screensharing
+            if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError'].indexOf(error.name) > -1 &&
+            // Note that "https:" should be required for screensharing 
+              window.webrtcDetectedVersion < 52 && window.parent.location.protocol === 'https:') {
+              // Render the notification bar to install legacy Firefox (for 51 and below) extension
+              AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
+                AdapterJS.TEXT.EXTENSION.BUTTON_FF, function (e) {
+                // Render the refresh bar once the user clicks to install extension from addons store
+                window.open(AdapterJS.extensionInfo.firefox.extensionLink, '_blank');
+                if (e.target && e.target.parentElement && e.target.nextElementSibling &&
+                  e.target.nextElementSibling.click) {
+                  e.target.nextElementSibling.click();
+                }
+                AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
+                  AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
+                  AdapterJS.TEXT.REFRESH.BUTTON, function () {
+                  window.open('javascript:location.reload()', '_top');
+                });
+              });
+            } else {
+              failureCb(error);
+            }
+          });
+        }, 1);
+      // Regular getUserMedia() call
+      } else {
         baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
 
     AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
-    /* Comment out to prevent recursive errors
-    navigator.mediaDevices.getUserMedia = function(constraints) {
+    // Comment out to prevent recursive errors as webrtc/adapter polyfills navigator.getUserMedia and calls
+    //   navigator.mediaDevices.getUserMedia internally
+    /*navigator.mediaDevices.getUserMedia = function(constraints) {
       return new Promise(function(resolve, reject) {
         window.getUserMedia(constraints, resolve, reject);
       });
@@ -107,55 +132,79 @@ AdapterJS.defineMediaSourcePolyfill = function () {
     var iframe = document.createElement('iframe');
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      if (constraints && constraints.video && !!constraints.video.mediaSource) {
+      // Append checks for overrides as these are mandatory
+      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
+      if (!(constraints && typeof constraints === 'object')) {
+        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
+      } else if (typeof successCb !== 'function') {
+        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
+      } else if (typeof failureCb !== 'function') {
+        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
+      }
+
+      // Prevent accessing property from Boolean errors
+      if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
+        // This is Opera, which does not support screensharing
         if (window.webrtcDetectedBrowser !== 'chrome') {
-          // This is Opera/, which does not support screensharing
           failureCb(new Error('Current browser does not support screensharing'));
           return;
         }
 
-        var updatedConstraints = clone(constraints);
-        updatedConstraints.video.mediaSource = typeof updatedConstraints.video.mediaSource === 'string' ?
-          [updatedConstraints.video.mediaSource] : updatedConstraints.video.mediaSource;
+        // Check against non "screen" or "window"
+        if (!(['window', 'screen', 'tab'].indexOf(constraints.video.mediaSource) > -1 ||
+        // Check against Array not containing either - ["tab", "window", "screen"]
+          (Array.isArray(constraints.video.mediaSource) && (constraints.video.mediaSource.indexOf('window') > -1 ||
+          constraints.video.mediaSource.indexOf('screen') > -1 || constraints.video.mediaSource.indexOf('tab') > -1)))) {
+          // Check against returning "audio" or ["audio"] without "tab"
+          if (Array.isArray(constraints.video.mediaSource) ? constraints.video.mediaSource.indexOf('audio') > -1 :
+            constraints.video.mediaSource === 'audio') {
+            failureCb(new Error('GetUserMedia: "audio" mediaSource must be provided with ["audio", "tab"]'));
+          } else {
+            failureCb(new Error('GetUserMedia: Only "screen", "window", "tab" are supported as mediaSource constraints'));
+          }
+          return;
+        }
 
-        function fetchStream (response) {
-          // Success retrieve stream
+        if (Array.isArray(constraints.video.mediaSource) && constraints.video.mediaSource.indexOf('tab') > -1 &&
+          constraints.video.mediaSource.indexOf('audio') > -1 && !update)
+
+        var updatedConstraints = clone(constraints);
+        var fetchStream = function (response) {
           if (response.success) {
             updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
             updatedConstraints.video.mandatory.chromeMediaSource = 'desktop';
             updatedConstraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
             updatedConstraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
             updatedConstraints.video.mandatory.chromeMediaSourceId = response.sourceId;
-            console.info(updatedConstraints);
             delete updatedConstraints.video.mediaSource;
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
-          // Error, return error
           } else {
             // Extension not installed, trigger to install
             if (response.extensionLink) {
+              // Render the notification bar to install extension
               AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME,
                 AdapterJS.TEXT.EXTENSION.BUTTON_CHROME, function (e) {
+                // Render the refresh bar once the user clicks to install extension from addons store
                 window.open(response.extensionLink, '_blank');
                 if (e.target && e.target.parentElement && e.target.nextElementSibling &&
                   e.target.nextElementSibling.click) {
                   e.target.nextElementSibling.click();
                 }
-                // Trigger refresh bar
                 AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION ?
                   AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH : AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH,
                   AdapterJS.TEXT.REFRESH.BUTTON, function () {
                   window.open('javascript:location.reload()', '_top');
-                }); // jshint ignore:line
+                });
               });
             }
             failureCb(response.error);
           }
-        }
+        };
 
-        // Use iframe method
+        // Communicate with detectRTC (iframe) method to retrieve source ID
         if (AdapterJS.extensionInfo.chrome.iframeLink) {
           iframe.getSourceId(updatedConstraints.video.mediaSource, fetchStream);
-        // Use new method
+        // Communicate with extension directly (needs updated extension code)
         } else {
           var icon = document.createElement('img');
           icon.src = 'chrome-extension://' + AdapterJS.extensionInfo.chrome.extensionId + '/icon.png';
@@ -173,9 +222,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
                 });
                 return;
               }
-
-              console.info(updatedConstraints);
-
+              // Retrieve source ID
               chrome.runtime.sendMessage(AdapterJS.extensionInfo.chrome.extensionId, {
                 type: 'get-source',
                 sources: updatedConstraints.video.mediaSource
@@ -202,6 +249,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             });
           };
 
+          // Extension icon didn't load so extension was not installed
           icon.onerror = function () {
             fetchStream({
               success: false,
@@ -218,16 +266,17 @@ AdapterJS.defineMediaSourcePolyfill = function () {
     AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
     navigator.mediaDevices.getUserMedia = function(constraints) {
       return new Promise(function(resolve, reject) {
-        window.getUserMedia(constraints, resolve, reject);
+        try {
+          window.getUserMedia(constraints, resolve, reject);
+        } catch (error) {
+          reject(error);
+        }
       });
     };
 
-    // Load for iframe method
-    AdapterJS.extensionInfo.chrome.iframeReloadFn = function () {
-      if (!AdapterJS.extensionInfo.chrome.iframeLink) {
-        return;
-      }
-
+    // Save the loading of iframe into a function so users can invoke this later when
+    //   the iframe settings is defined after AdapterJS is loaded.
+    AdapterJS.extensionInfo.chrome.reloadIFrame = function () {
       var states = {
         loaded: false,
         error: false
@@ -241,6 +290,11 @@ AdapterJS.defineMediaSourcePolyfill = function () {
         } catch (e) {}
       }
 
+      // Do not need to load iframe as it is not requested
+      if (!AdapterJS.extensionInfo.chrome.iframeLink) {
+        return;
+      }
+
       iframe.onload = function() {
         states.loaded = true;
       };
@@ -252,6 +306,62 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       iframe.src = AdapterJS.extensionInfo.chrome.iframeLink;
       iframe.style.display = 'none';
 
+      // Listen to iframe messages
+      var getSourceIdFromIFrame = function (cb) {
+        window.addEventListener('message', function iframeListener (evt) {
+          // Unload since it should be replied once if success or failure
+          window.removeEventListener('message', iframeListener);
+          // If no data is returned, it is incorrect
+          if (!evt.data) {
+            cb({
+              success: false,
+              error: new Error('Failed retrieving response')
+            });
+          // Extension not installed
+          } else if (evt.data.chromeExtensionStatus === 'not-installed') {
+            cb({
+              success: false,
+              error: new Error('Extension is not installed'),
+              // Should return the above configured chrome.extensionLink but fallback for users using custom detectRTC.html
+              extensionLink: evt.data.data || AdapterJS.extensionInfo.chrome.extensionLink
+            });
+          // Extension not enabled
+          } else if (evt.data.chromeExtensionStatus === 'installed-disabled') {
+            cb({
+              success: false,
+              error: new Error('Extension is disabled')
+            });
+          // Permission denied for retrieval
+          } else if (evt.data.chromeMediaSourceId === 'PermissionDeniedError') {
+            cb({
+              success: false,
+              error: new Error('Permission denied for screen retrieval')
+            });
+          // Source ID retrieved
+          } else if (evt.data.chromeMediaSourceId && typeof evt.data.chromeMediaSourceId === 'string') {
+            cb({
+              success: true,
+              sourceId: evt.data.chromeMediaSourceId
+            });
+          // Unknown error which is invalid state whereby iframe is not returning correctly and source cannot be retrieved correctly
+          } else {
+            cb({
+              success: false,
+              error: new Error('Failed retrieving selected screen')
+            });
+          }
+        });
+
+        // Check if extension has loaded, and then fetch for the sourceId
+        iframe.contentWindow.postMessage({
+          captureSourceId: true,
+          sources: sources,
+          extensionId: AdapterJS.extensionInfo.chrome.extensionId,
+          extensionLink: AdapterJS.extensionInfo.chrome.extensionLink
+        }, '*');
+      };
+
+      // The function to communicate with iframe
       iframe.getSourceId = function (sources, cb) {
         // If iframe failed to load, ignore
         if (states.error) {
@@ -260,61 +370,6 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             error: new Error('iframe is not loaded')
           });
           return;
-        }
-
-        // Listen to iframe messages
-        function getSourceId () {
-          window.addEventListener('message', function iframeListener (evt) {
-            // Unload since it should be replied once if success or failure
-            window.removeEventListener('message', iframeListener);
-            // If no data is returned, it is incorrect
-            if (!evt.data) {
-              cb({
-                success: false,
-                error: new Error('Failed retrieving response')
-              });
-            // Extension not installed
-            } else if (evt.data.chromeExtensionStatus === 'not-installed') {
-              cb({
-                success: false,
-                error: new Error('Extension is not installed'),
-                // Should return the above configured chrome.extensionLink but fallback for users using custom detectRTC.html
-                extensionLink: evt.data.data || AdapterJS.extensionInfo.chrome.extensionLink
-              });
-            // Extension not enabled
-            } else if (evt.data.chromeExtensionStatus === 'installed-disabled') {
-              cb({
-                success: false,
-                error: new Error('Extension is disabled')
-              });
-            // Permission denied for retrieval
-            } else if (evt.data.chromeMediaSourceId === 'PermissionDeniedError') {
-              cb({
-                success: false,
-                error: new Error('Permission denied for screen retrieval')
-              });
-            // Source ID retrieved
-            } else if (evt.data.chromeMediaSourceId && typeof evt.data.chromeMediaSourceId === 'string') {
-              cb({
-                success: true,
-                sourceId: evt.data.chromeMediaSourceId
-              });
-            // Unknown error which is invalid state whereby iframe is not returning correctly and source cannot be retrieved correctly
-            } else {
-              cb({
-                success: false,
-                error: new Error('Failed retrieving selected screen')
-              });
-            }
-          });
-
-          // Check if extension has loaded, and then fetch for the sourceId
-          iframe.contentWindow.postMessage({
-            captureSourceId: true,
-            sources: sources,
-            extensionId: AdapterJS.extensionInfo.chrome.extensionId,
-            extensionLink: AdapterJS.extensionInfo.chrome.extensionLink
-          }, '*');
         }
 
         // Set interval to wait for iframe to load till 5 seconds before counting as dead
@@ -334,11 +389,11 @@ AdapterJS.defineMediaSourcePolyfill = function () {
               }
             } else {
               clearInterval(intervalChecker);
-              getSourceId();
+              getSourceIdFromIFrame(cb);
             }
           }, 100);
         } else {
-          getSourceId();
+          getSourceIdFromIFrame(cb);
         }
       };
 
@@ -346,63 +401,79 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       (document.body || document.documentElement).appendChild(iframe);
     };
 
+    // Start loading the iframe
     if (window.webrtcDetectedBrowser === 'chrome') {
-      AdapterJS.extensionInfo.chrome.iframeReloadFn();
+      AdapterJS.extensionInfo.chrome.reloadIFrame();
     } else if (window.webrtcDetectedBrowser === 'opera') {
       console.warn('Opera does not support screensharing feature in getUserMedia');
     }
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
-    // nothing here because edge does not support screensharing
+    // Nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
   } else {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      if (constraints && constraints.video && !!constraints.video.mediaSource) {
-        // would be fine since no methods
+      // Append checks for overrides as these are mandatory
+      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
+      if (!(constraints && typeof constraints === 'object')) {
+        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
+      } else if (typeof successCb !== 'function') {
+        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
+      } else if (typeof failureCb !== 'function') {
+        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
+      }
+
+      if (constraints.video && typeof constraints.video === 'string' && constraints.video.hasOwnProperty('mediaSource')) {
         var updatedConstraints = clone(constraints);
 
-        // wait for plugin to be ready
+        // Wait for plugin to be ready
         AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
-          // check if screensharing feature is available
-          if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature &&
-            !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
+          // Check if screensharing feature is available
+          if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature && !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
+            // Do strict checks for the source ID - "screen", "window" or ["screen", "window"]
             var sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing';
 
             if (AdapterJS.WebRTCPlugin.plugin.screensharingKeys) {
-              if (updatedConstraints.video.mediaSource === 'screen') {
+              // Param: ["screen", "window"]
+              if (Array.isArray(updatedConstraints.video.mediaSource) && 
+                updatedConstraints.video.mediaSource.indexOf('screen') > -1 &&
+                updatedConstraints.video.mediaSource.indexOf('window') > -1) {
+                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
+              // Param: ["screen"] or "screen"
+              } else if ((Array.isArray(updatedConstraints.video.mediaSource) && 
+                updatedConstraints.video.mediaSource.indexOf('screen') > -1) || updatedConstraints.video.mediaSource === 'screen') {
                 sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen;
-              } else if (updatedConstraints.video.mediaSource === 'window') {
+              // Param: ["window"] or "window"
+              } else if ((Array.isArray(updatedConstraints.video.mediaSource) && 
+                updatedConstraints.video.mediaSource.indexOf('window') > -1) || updatedConstraints.video.mediaSource === 'window') {
                 sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window;
               } else {
-                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
+                failureCb(new Error('GetUserMedia: Only "screen", "window", ["screen", "window"] are supported as mediaSource constraints'));
+                return;
               }
             }
 
-            // set the constraints
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
-            updatedConstraints.video.optional.push({
-              sourceId: sourceId
-            });
-
+            updatedConstraints.video.optional.push({ sourceId: sourceId });
             delete updatedConstraints.video.mediaSource;
+
+            baseGetUserMedia(updatedConstraints, successCb, failureCb);
+
           } else {
             failureCb(new Error('Your version of the WebRTC plugin does not support screensharing'));
             return;
           }
-          baseGetUserMedia(updatedConstraints, successCb, failureCb);
         });
       } else {
         baseGetUserMedia(constraints, successCb, failureCb);
       }
     };
 
-    AdapterJS.getUserMedia = getUserMedia =
-       window.getUserMedia = navigator.getUserMedia;
-    if ( navigator.mediaDevices &&
-      typeof Promise !== 'undefined') {
+    AdapterJS.getUserMedia = getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    if (navigator.mediaDevices && typeof Promise !== 'undefined') {
       navigator.mediaDevices.getUserMedia = requestUserMedia;
     }
   }
