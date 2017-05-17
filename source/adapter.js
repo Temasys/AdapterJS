@@ -43,8 +43,8 @@ AdapterJS.webRTCReady = function (baseCallback) {
     // When you set a setTimeout(definePolyfill, 0), it overrides the WebRTC function
     // This is be more than 0s
     if (typeof window.require === 'function' &&
-      typeof AdapterJS.defineMediaSourcePolyfill === 'function') {
-      AdapterJS.defineMediaSourcePolyfill();
+      typeof AdapterJS._defineMediaSourcePolyfill === 'function') {
+      AdapterJS._defineMediaSourcePolyfill();
     }
 
     // All WebRTC interfaces are ready, just call the callback

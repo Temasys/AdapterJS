@@ -28,15 +28,13 @@ AdapterJS.extensionInfo =  AdapterJS.extensionInfo || {
 };
 
 AdapterJS._mediaSourcePolyfillIsDefined = false;
-
-AdapterJS.defineMediaSourcePolyfill = function () {
-  // Insanity checks to prevent re-defining the polyfills again in any case.
+AdapterJS._defineMediaSourcePolyfill = function () {
+  // Sanity checks to prevent re-defining the polyfills again in any case.
   if (AdapterJS._mediaSourcePolyfillIsDefined) {
     return;
   }
 
   AdapterJS._mediaSourcePolyfillIsDefined = true;
-
   var baseGetUserMedia = null;
 
   var clone = function(obj) {
@@ -543,5 +541,5 @@ AdapterJS.defineMediaSourcePolyfill = function () {
 };
 
 if (typeof window.require !== 'function') {
-  AdapterJS.defineMediaSourcePolyfill();
+  AdapterJS._defineMediaSourcePolyfill();
 }
