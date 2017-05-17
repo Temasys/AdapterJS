@@ -178,7 +178,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
               }
               j++;
             }
-            index++;
+            i++;
           }
           updatedConstraints.video.mediaSource = outputMediaSource;
         } else {
