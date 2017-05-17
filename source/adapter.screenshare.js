@@ -54,7 +54,8 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       }
 
       // Prevent accessing property from Boolean errors
-      if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
+      if (constraints.video && typeof constraints.video === 'object' &&
+        constraints.video.hasOwnProperty('mediaSource')) {
         var updatedConstraints = clone(constraints);
 
         // Obtain first item in array if array is provided
@@ -150,14 +151,19 @@ AdapterJS.defineMediaSourcePolyfill = function () {
           return;
         }
 
+        var updatedConstraints = clone(constraints);
+
         // Check against non "screen" or "window"
-        if (!(['window', 'screen', 'tab'].indexOf(constraints.video.mediaSource) > -1 ||
+        if (!(['window', 'screen', 'tab'].indexOf(updatedConstraints.video.mediaSource) > -1 ||
         // Check against Array not containing either - ["tab", "window", "screen"]
-          (Array.isArray(constraints.video.mediaSource) && (constraints.video.mediaSource.indexOf('window') > -1 ||
-          constraints.video.mediaSource.indexOf('screen') > -1 || constraints.video.mediaSource.indexOf('tab') > -1)))) {
+          (Array.isArray(updatedConstraints.video.mediaSource) &&
+          (updatedConstraints.video.mediaSource.indexOf('window') > -1 ||
+          updatedConstraints.video.mediaSource.indexOf('screen') > -1 ||
+          updatedConstraints.video.mediaSource.indexOf('tab') > -1)))) {
           // Check against returning "audio" or ["audio"] without "tab"
-          if (Array.isArray(constraints.video.mediaSource) ? constraints.video.mediaSource.indexOf('audio') > -1 :
-            constraints.video.mediaSource === 'audio') {
+          if (Array.isArray(updatedConstraints.video.mediaSource) ?
+            updatedConstraints.video.mediaSource.indexOf('audio') > -1 :
+            updatedConstraints.video.mediaSource === 'audio') {
             failureCb(new Error('GetUserMedia: "audio" mediaSource must be provided with ["audio", "tab"]'));
           } else {
             failureCb(new Error('GetUserMedia: Only "screen", "window", "tab" are supported as mediaSource constraints'));
@@ -165,10 +171,13 @@ AdapterJS.defineMediaSourcePolyfill = function () {
           return;
         }
 
-        if (Array.isArray(constraints.video.mediaSource) && constraints.video.mediaSource.indexOf('tab') > -1 &&
-          constraints.video.mediaSource.indexOf('audio') > -1 && !update)
+        // Warn users that no tab audio will be used because constraints.audio must be enabled
+        if (Array.isArray(updatedConstraints.video.mediaSource) &&
+          updatedConstraints.video.mediaSource.indexOf('tab') > -1 &&
+          updatedConstraints.video.mediaSource.indexOf('audio') > -1 && !updatedConstraints.audio) {
+          console.warn('Audio must be requested if "tab" and "audio" mediaSource constraints is requested');
+        }
 
-        var updatedConstraints = clone(constraints);
         var fetchStream = function (response) {
           if (response.success) {
             updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
