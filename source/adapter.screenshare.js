@@ -161,6 +161,24 @@ AdapterJS.defineMediaSourcePolyfill = function () {
         // See: https://developer.chrome.com/extensions/desktopCapture#type-DesktopCaptureSourceType
         var mediaSourcesList = ['window', 'screen', 'tab', 'audio'];
 
+        // Check if it is Android phone for experimental 59 screensharing
+        // See: https://bugs.chromium.org/p/chromium/issues/detail?id=487935
+        if (navigator.userAgent.toLowerCase().indexOf('android') > -1) {
+          if (Array.isArray(updatedConstraints.video.mediaSource) ?
+            updatedConstraints.video.mediaSource.indexOf('screen') > -1 :
+            updatedConstraints.video.mediaSource === 'screen') {
+            updatedConstraints.video.mandatory = updatedConstraints.video.mandatory || {};
+            updatedConstraints.video.mandatory.chromeMediaSource = 'screen';
+            updatedConstraints.video.mandatory.maxHeight = window.screen.height;
+            updatedConstraints.video.mandatory.maxWidth = window.screen.width;
+            delete updatedConstraints.video.mediaSource;
+            baseGetUserMedia(updatedConstraints, successCb, failureCb);
+          } else {
+            failureCb(new Error('GetUserMedia: Only "screen" are supported as mediaSource constraints for Android'));
+          }
+          return;
+        }
+
         // Check against non valid sources
         if (typeof updatedConstraints.video.mediaSource === 'string' &&
           mediaSourcesList.indexOf(updatedConstraints.video.mediaSource) > -1 &&
