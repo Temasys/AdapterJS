@@ -185,6 +185,16 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             updatedConstraints.video.mandatory.maxWidth = window.screen.width > 1920 ? window.screen.width : 1920;
             updatedConstraints.video.mandatory.maxHeight = window.screen.height > 1080 ? window.screen.height : 1080;
             updatedConstraints.video.mandatory.chromeMediaSourceId = response.sourceId;
+
+            if (Array.isArray(updatedConstraints.video.mediaSource) &&
+              updatedConstraints.video.mediaSource.indexOf('tab') > -1 &&
+              updatedConstraints.video.mediaSource.indexOf('audio') > -1 && updatedConstraints.audio) {
+              updatedConstraints.audio = typeof updatedConstraints.audio === 'object' ? updatedConstraints.audio : {};
+              updatedConstraints.audio.mandatory = updatedConstraints.audio.mandatory || {};
+              updatedConstraints.audio.mandatory.chromeMediaSource = 'desktop';
+              updatedConstraints.audio.mandatory.chromeMediaSourceId = response.sourceId;
+            }
+
             delete updatedConstraints.video.mediaSource;
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
           } else {
