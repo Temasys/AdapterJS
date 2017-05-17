@@ -8,16 +8,14 @@ AdapterJS.TEXT.EXTENSION = {
 };
 
 // Define extension settings
-AdapterJS.extensionInfo = {
+AdapterJS.extensionInfo =  AdapterJS.extensionInfo || {
   chrome: {
     extensionId: 'ljckddiekopnnjoeaiofddfhgnbdoafc',
     extensionLink: 'https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc',
     // Flag for extension versions that does not honor the "mediaSource" flag
     legacy: true,
     // Deprecated! Define this to use iframe method
-    iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html',
-    // Invoke this again if AdapterJS.extensionInfo is defined later with a different iframeLink
-    reloadIFrame: null
+    iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html'
   },
   // Required only for Firefox 51 and below
   firefox: {
@@ -336,9 +334,8 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       });
     };
 
-    // Save the loading of iframe into a function so users can invoke this later when
-    //   the iframe settings is defined after AdapterJS is loaded.
-    AdapterJS.extensionInfo.chrome.reloadIFrame = function () {
+    // Start loading the iframe
+    if (window.webrtcDetectedBrowser === 'chrome') {
       var states = {
         loaded: false,
         error: false
@@ -462,11 +459,6 @@ AdapterJS.defineMediaSourcePolyfill = function () {
 
       // Re-append to reload
       (document.body || document.documentElement).appendChild(iframe);
-    };
-
-    // Start loading the iframe
-    if (window.webrtcDetectedBrowser === 'chrome') {
-      AdapterJS.extensionInfo.chrome.reloadIFrame();
     }
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
