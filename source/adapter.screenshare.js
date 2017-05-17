@@ -27,7 +27,16 @@ AdapterJS.extensionInfo =  AdapterJS.extensionInfo || {
   }
 };
 
+AdapterJS._mediaSourcePolyfillIsDefined = false;
+
 AdapterJS.defineMediaSourcePolyfill = function () {
+  // Insanity checks to prevent re-defining the polyfills again in any case.
+  if (AdapterJS._mediaSourcePolyfillIsDefined) {
+    return;
+  }
+
+  AdapterJS._mediaSourcePolyfillIsDefined = true;
+
   var baseGetUserMedia = null;
 
   var clone = function(obj) {
