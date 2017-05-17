@@ -418,6 +418,38 @@ AdapterJS.defineMediaSourcePolyfill = function () {
     }
 
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+    baseGetUserMedia = window.navigator.getUserMedia;
+
+    navigator.getUserMedia = function (constraints, successCb, failureCb) {
+      // Append checks for overrides as these are mandatory
+      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
+      if (!(constraints && typeof constraints === 'object')) {
+        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
+      } else if (typeof successCb !== 'function') {
+        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
+      } else if (typeof failureCb !== 'function') {
+        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
+      }
+
+      if (constraints.video && typeof constraints.video === 'string' && constraints.video.hasOwnProperty('mediaSource')) {
+        failureCb(new Error('Current browser does not support screensharing'));
+        return;
+      }
+
+      baseGetUserMedia(constraints, successCb, failureCb);
+    };
+
+    AdapterJS.getUserMedia = window.getUserMedia = navigator.getUserMedia;
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+      return new Promise(function(resolve, reject) {
+        try {
+          window.getUserMedia(constraints, resolve, reject);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    };
+
     // Nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
