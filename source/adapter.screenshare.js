@@ -57,21 +57,27 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       if (constraints.video && typeof constraints.video === 'object' &&
         constraints.video.hasOwnProperty('mediaSource')) {
         var updatedConstraints = clone(constraints);
+        // See: http://fluffy.github.io/w3c-screen-share/#screen-based-video-constraints
+        // See also: https://bugzilla.mozilla.org/show_bug.cgi?id=1037405
+        var mediaSourcesList = ['screen', 'window', 'application', 'browser', 'camera'];
+        var useExtensionErrors = ['NotAllowedError', 'PermissionDeniedError', 'SecurityError'];
 
         // Obtain first item in array if array is provided
         if (Array.isArray(updatedConstraints.video.mediaSource)) {
-          for (var i = 0; i < updatedConstraints.video.mediaSource.length; i++) {
-            if (['screen', 'window'].indexOf(updatedConstraints.video.mediaSource[i]) > -1) {
+          var i = 0;
+          while (i < updatedConstraints.video.mediaSource.length) {
+            if (mediaSourcesList.indexOf(updatedConstraints.video.mediaSource[i]) > -1) {
               updatedConstraints.video.mediaSource = updatedConstraints.video.mediaSource[i];
               break;
             }
+            i++;
           }
           updatedConstraints.video.mediaSource = typeof updatedConstraints.video.mediaSource === 'string' ?
             updatedConstraints.video.mediaSource : null;
         }
 
         // Invalid mediaSource for firefox, only "screen" and "window" are supported
-        if (['screen', 'window'].indexOf(updatedConstraints.video.mediaSource) === -1) {
+        if (mediaSourcesList.indexOf(updatedConstraints.video.mediaSource) === -1) {
           failureCb(new Error('GetUserMedia: Only "screen" and "window" are supported as mediaSource constraints'));
           return;
         }
@@ -90,7 +96,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
             // Reference: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
             // Firefox 51 and below throws the following errors when screensharing is disabled, in which we can
             //   trigger installation for legacy extension (which no longer can be used) to enable screensharing
-            if (['NotAllowedError', 'PermissionDeniedError', 'SecurityError'].indexOf(error.name) > -1 &&
+            if (useExtensionErrors.indexOf(error.name) > -1 &&
             // Note that "https:" should be required for screensharing 
               window.webrtcDetectedVersion < 52 && window.parent.location.protocol === 'https:') {
               // Render the notification bar to install legacy Firefox (for 51 and below) extension
@@ -152,28 +158,44 @@ AdapterJS.defineMediaSourcePolyfill = function () {
         }
 
         var updatedConstraints = clone(constraints);
+        // See: https://developer.chrome.com/extensions/desktopCapture#type-DesktopCaptureSourceType
+        var mediaSourcesList = ['window', 'screen', 'tab', 'audio'];
 
-        // Check against non "screen" or "window"
-        if (!(['window', 'screen', 'tab'].indexOf(updatedConstraints.video.mediaSource) > -1 ||
-        // Check against Array not containing either - ["tab", "window", "screen"]
-          (Array.isArray(updatedConstraints.video.mediaSource) &&
-          (updatedConstraints.video.mediaSource.indexOf('window') > -1 ||
-          updatedConstraints.video.mediaSource.indexOf('screen') > -1 ||
-          updatedConstraints.video.mediaSource.indexOf('tab') > -1)))) {
-          // Check against returning "audio" or ["audio"] without "tab"
-          if (Array.isArray(updatedConstraints.video.mediaSource) ?
-            updatedConstraints.video.mediaSource.indexOf('audio') > -1 :
-            updatedConstraints.video.mediaSource === 'audio') {
-            failureCb(new Error('GetUserMedia: "audio" mediaSource must be provided with ["audio", "tab"]'));
-          } else {
-            failureCb(new Error('GetUserMedia: Only "screen", "window", "tab" are supported as mediaSource constraints'));
+        // Check against non valid sources
+        if (typeof updatedConstraints.video.mediaSource === 'string' &&
+          mediaSourcesList.indexOf(updatedConstraints.video.mediaSource) > -1 &&
+          updatedConstraints.video.mediaSource !== 'audio') {
+          updatedConstraints.video.mediaSource = [updatedConstraints.video.mediaSource];
+        // Loop array and remove invalid sources
+        } else if (Array.isArray(updatedConstraints.video.mediaSource)) {
+          var i = 0;
+          var outputMediaSource = [];
+          while (i < mediaSourcesList.length) {
+            var j = 0;
+            while (j < updatedConstraints.video.mediaSource.length) {
+              if (mediaSourcesList[i] === updatedConstraints.video.mediaSource[j]) {
+                outputMediaSource.push(updatedConstraints.video.mediaSource[j]);
+              }
+              j++;
+            }
+            index++;
           }
-          return;
+          updatedConstraints.video.mediaSource = outputMediaSource;
+        } else {
+          updatedConstraints.video.mediaSource = [];
         }
 
+        // Check against returning "audio" or ["audio"] without "tab"
+        if (updatedConstraints.video.mediaSource.indexOf('audio') > -1 &&
+          updatedConstraints.video.mediaSource.indexOf('tab') === -1) {
+          failureCb(new Error('GetUserMedia: "audio" mediaSource must be provided with ["audio", "tab"]'));
+          return;
+        // No valid sources specified
+        } else if (updatedConstraints.video.mediaSource.length === 0) {
+          failureCb(new Error('GetUserMedia: Only "screen", "window", "tab" are supported as mediaSource constraints'));
+          return;
         // Warn users that no tab audio will be used because constraints.audio must be enabled
-        if (Array.isArray(updatedConstraints.video.mediaSource) &&
-          updatedConstraints.video.mediaSource.indexOf('tab') > -1 &&
+        } else if (updatedConstraints.video.mediaSource.indexOf('tab') > -1 &&
           updatedConstraints.video.mediaSource.indexOf('audio') > -1 && !updatedConstraints.audio) {
           console.warn('Audio must be requested if "tab" and "audio" mediaSource constraints is requested');
         }
@@ -326,7 +348,7 @@ AdapterJS.defineMediaSourcePolyfill = function () {
       iframe.style.display = 'none';
 
       // Listen to iframe messages
-      var getSourceIdFromIFrame = function (cb) {
+      var getSourceIdFromIFrame = function (sources, cb) {
         window.addEventListener('message', function iframeListener (evt) {
           // Unload since it should be replied once if success or failure
           window.removeEventListener('message', iframeListener);
@@ -408,11 +430,11 @@ AdapterJS.defineMediaSourcePolyfill = function () {
               }
             } else {
               clearInterval(intervalChecker);
-              getSourceIdFromIFrame(cb);
+              getSourceIdFromIFrame(sources, cb);
             }
           }, 100);
         } else {
-          getSourceIdFromIFrame(cb);
+          getSourceIdFromIFrame(sources, cb);
         }
       };
 
