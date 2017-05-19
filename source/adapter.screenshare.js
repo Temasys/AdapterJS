@@ -487,7 +487,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
         throw new Error('GetUserMedia: (.., .., failureCb) argument required');
       }
 
-      if (constraints.video && typeof constraints.video === 'string' && constraints.video.hasOwnProperty('mediaSource')) {
+      if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
         var updatedConstraints = clone(constraints);
 
         // Wait for plugin to be ready
