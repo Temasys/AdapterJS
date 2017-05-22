@@ -12,9 +12,7 @@ AdapterJS.extensionInfo =  AdapterJS.extensionInfo || {
   chrome: {
     extensionId: 'ljckddiekopnnjoeaiofddfhgnbdoafc',
     extensionLink: 'https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc',
-    // Flag for extension versions that does not honor the "mediaSource" flag
-    legacy: true,
-    // Deprecated! Define this to use iframe method
+    // Deprecated! Define this to use iframe method that works with previous extension codebase that does not honor "mediaSource" flag
     iframeLink: 'https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html'
   },
   // Required only for Firefox 51 and below
@@ -430,7 +428,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
         iframe.contentWindow.postMessage({
           captureSourceId: true,
           sources: sources,
-          legacy: AdapterJS.extensionInfo.chrome.legacy,
+          legacy: true,
           extensionId: AdapterJS.extensionInfo.chrome.extensionId,
           extensionLink: AdapterJS.extensionInfo.chrome.extensionLink
         }, '*');
