@@ -21,7 +21,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | Browsers          | Min. Version | OS Platform              | Screensharing             | 
 | ----------------- | ------------ | ------------------------ | ------------------------- | 
 | Chrome \ Chromium | `38`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc))         |
-| Firefox           | `33`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
+| Firefox           | `33`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension for `51` and below](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
 | Opera             | `26`         | MacOS / Win / Ubuntu / Android |  -                        | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
 | Bowser            | `0.6.1`      | iOS 9.x only**           |  -                        |
@@ -241,12 +241,14 @@ AdapterJS `0.12.0`+ offers cross-browser screensharing in Chrome `34`+, Firefox 
 
 To use the screensharing functionality, reference `publish/adapter.screenshare.js` and add the `mediaSource: 'window'` setting to the video media constraints. This requires HTTPS!
 
+Note that the the `mediaSource` property takes in String, or Array in which multiple sources is supported for Chrome / Opera sources. For Firefox, if an Array is provided, it takes the first item in the Array.
+
 **Example:**
 
 ```javascript
 window.navigator.getUserMedia({
   video: {
-    mediaSource: 'window' || 'screen'
+    mediaSource: 'window' || 'screen' || ['tab', 'audio'] || ['window' || 'screen']
   }
 }, function (stream) {
   console.log('Received stream', stream);
