@@ -529,6 +529,8 @@ AdapterJS._defineMediaSourcePolyfill = function () {
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
             updatedConstraints.video.optional.push({ sourceId: sourceId });
 
+            // TODO: Should we even remove the "mediaSource" flag actually?
+            // Keeping this for now as borrowing off previous logic to prevent breaking anything
             if ([AdapterJS.WebRTCPlugin.plugin.screensharingKey, 'Screensharing'].indexOf(sourceId) > -1) {
               delete updatedConstraints.video.mediaSource;
             }
