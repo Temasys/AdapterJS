@@ -86,7 +86,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
             updatedConstraints.video.mediaSource : null;
         }
 
-        // Invalid mediaSource for firefox, only "screen" and "window" are supported
+        // Invalid mediaSource for firefox, only specified sources are supported
         if (mediaSourcesList.indexOf(updatedConstraints.video.mediaSource) === -1) {
           failureCb(new Error('GetUserMedia: Only "screen" and "window" are supported as mediaSource constraints'));
           return;
