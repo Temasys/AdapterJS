@@ -22,8 +22,9 @@ AdapterJS.extensionInfo =  AdapterJS.extensionInfo || {
     extensionLink: 'https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/'
   },
   opera: {
-    extensionId: 'jbjibcfdghfanokgdpaohadjdaegfhij',
-    extensionLink: 'https://addons.opera.com/extensions/details/temasys-webrtc-tools'
+    // Define the extensionId and extensionLink to integrate the Opera screensharing extension
+    extensionId: null,
+    extensionLink: null
   }
 };
 
@@ -181,6 +182,13 @@ AdapterJS._defineMediaSourcePolyfill = function () {
           } else {
             failureCb(new Error('GetUserMedia: Only "screen" are supported as mediaSource constraints for Android'));
           }
+          return;
+        }
+
+        // Backwards compability for Opera browsers not working when not configured
+        if (!(window.webrtcDetectedBrowser === 'opera' ? !!AdapterJS.extensionInfo.opera.extensionId : 
+          window.webrtcDetectedBrowser === 'chrome')) {
+          failureCb(new Error('Current browser does not support screensharing'));
           return;
         }
 
@@ -503,14 +511,17 @@ AdapterJS._defineMediaSourcePolyfill = function () {
                 updatedConstraints.video.mediaSource.indexOf('screen') > -1 &&
                 updatedConstraints.video.mediaSource.indexOf('window') > -1) {
                 sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
+                updatedConstraints.video.mediaSource = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
               // Param: ["screen"] or "screen"
               } else if ((Array.isArray(updatedConstraints.video.mediaSource) && 
                 updatedConstraints.video.mediaSource.indexOf('screen') > -1) || updatedConstraints.video.mediaSource === 'screen') {
                 sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen;
+                updatedConstraints.video.mediaSource = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen;
               // Param: ["window"] or "window"
               } else if ((Array.isArray(updatedConstraints.video.mediaSource) && 
                 updatedConstraints.video.mediaSource.indexOf('window') > -1) || updatedConstraints.video.mediaSource === 'window') {
                 sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window;
+                updatedConstraints.video.mediaSource = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window;
               } else {
                 failureCb(new Error('GetUserMedia: Only "screen", "window", ["screen", "window"] are supported as mediaSource constraints'));
                 return;
@@ -519,7 +530,10 @@ AdapterJS._defineMediaSourcePolyfill = function () {
 
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
             updatedConstraints.video.optional.push({ sourceId: sourceId });
-            delete updatedConstraints.video.mediaSource;
+
+            if ([AdapterJS.WebRTCPlugin.plugin.screensharingKey, 'Screensharing'].indexOf(sourceId) > -1) {
+              delete updatedConstraints.video.mediaSource;
+            }
 
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
 
