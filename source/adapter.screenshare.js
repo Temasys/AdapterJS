@@ -49,19 +49,23 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     return copy;
   };
 
+  var checkIfConstraintsIsValid = function (constraints, successCb, failureCb) {
+    // Append checks for overrides as these are mandatory
+    // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
+    if (!(constraints && typeof constraints === 'object')) {
+      throw new Error('GetUserMedia: (constraints, .., ..) argument required');
+    } else if (typeof successCb !== 'function') {
+      throw new Error('GetUserMedia: (.., successCb, ..) argument required');
+    } else if (typeof failureCb !== 'function') {
+      throw new Error('GetUserMedia: (.., .., failureCb) argument required');
+    }
+  };
+
   if (window.navigator.mozGetUserMedia) {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      // Append checks for overrides as these are mandatory
-      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
-      if (!(constraints && typeof constraints === 'object')) {
-        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
-      } else if (typeof successCb !== 'function') {
-        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
-      } else if (typeof failureCb !== 'function') {
-        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
-      }
+      checkIfConstraintsIsValid(constraints, successCb, failureCb);
 
       // Prevent accessing property from Boolean errors
       if (constraints.video && typeof constraints.video === 'object' &&
@@ -149,15 +153,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     var iframe = document.createElement('iframe');
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      // Append checks for overrides as these are mandatory
-      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
-      if (!(constraints && typeof constraints === 'object')) {
-        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
-      } else if (typeof successCb !== 'function') {
-        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
-      } else if (typeof failureCb !== 'function') {
-        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
-      }
+      checkIfConstraintsIsValid(constraints, successCb, failureCb);
 
       // Prevent accessing property from Boolean errors
       if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
@@ -483,15 +479,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
-      // Append checks for overrides as these are mandatory
-      // Browsers (not Firefox since they went Promise based) does these checks and they can be quite useful
-      if (!(constraints && typeof constraints === 'object')) {
-        throw new Error('GetUserMedia: (constraints, .., ..) argument required');
-      } else if (typeof successCb !== 'function') {
-        throw new Error('GetUserMedia: (.., successCb, ..) argument required');
-      } else if (typeof failureCb !== 'function') {
-        throw new Error('GetUserMedia: (.., .., failureCb) argument required');
-      }
+      checkIfConstraintsIsValid(constraints, successCb, failureCb);
 
       if (constraints.video && typeof constraints.video === 'object' && constraints.video.hasOwnProperty('mediaSource')) {
         var updatedConstraints = clone(constraints);
