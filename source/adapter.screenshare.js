@@ -489,24 +489,25 @@ AdapterJS._defineMediaSourcePolyfill = function () {
           // Check if screensharing feature is available
           if (!!AdapterJS.WebRTCPlugin.plugin.HasScreensharingFeature && !!AdapterJS.WebRTCPlugin.plugin.isScreensharingAvailable) {
             // Do strict checks for the source ID - "screen", "window" or ["screen", "window"]
-            var sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKey || 'Screensharing';
+            // Note that the screen/window can be JS selected using constraints.video.optional[n].screenId
 
             if (AdapterJS.WebRTCPlugin.plugin.screensharingKeys) {
               // Param: ["screen", "window"]
-              if (Array.isArray(updatedConstraints.video.mediaSource) && 
-                updatedConstraints.video.mediaSource.indexOf('screen') > -1 &&
-                updatedConstraints.video.mediaSource.indexOf('window') > -1) {
-                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
+              // Legacy: Also s upport for "Screensharing" and "screensharing"
+              if ((Array.isArray(updatedConstraints.video.mediaSource) && 
+                    updatedConstraints.video.mediaSource.indexOf('screen') > -1 &&
+                    updatedConstraints.video.mediaSource.indexOf('window') > -1)
+                  || updatedConstraints.video.mediaSource === AdapterJS.WebRTCPlugin.plugin.screensharingKey
+                  || updatedConstraints.video.mediaSource === AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow
+                 ) {
                 updatedConstraints.video.mediaSource = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow;
               // Param: ["screen"] or "screen"
               } else if ((Array.isArray(updatedConstraints.video.mediaSource) && 
                 updatedConstraints.video.mediaSource.indexOf('screen') > -1) || updatedConstraints.video.mediaSource === 'screen') {
-                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen;
                 updatedConstraints.video.mediaSource = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen;
               // Param: ["window"] or "window"
               } else if ((Array.isArray(updatedConstraints.video.mediaSource) && 
                 updatedConstraints.video.mediaSource.indexOf('window') > -1) || updatedConstraints.video.mediaSource === 'window') {
-                sourceId = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window;
                 updatedConstraints.video.mediaSource = AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window;
               } else {
                 failureCb(new Error('GetUserMedia: Only "screen", "window", ["screen", "window"] are supported as mediaSource constraints'));
@@ -514,8 +515,9 @@ AdapterJS._defineMediaSourcePolyfill = function () {
               }
             }
 
+            // Support for legacy plugins : set the sourceId to the mediaSource value
             updatedConstraints.video.optional = updatedConstraints.video.optional || [];
-            updatedConstraints.video.optional.push({ sourceId: sourceId });
+            updatedConstraints.video.optional.push({ sourceId: updatedConstraints.video.mediaSource });
 
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
 
