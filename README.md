@@ -259,7 +259,8 @@ window.navigator.getUserMedia({
 
 **List of available sources:**
 
-|  |  | Supported |
+| Sources | Description | Browsers that supports it |
+| ------- | ----------- | --------- |
 | `"window"`  | Fetches the list of application windows | Chrome, Opera, Firefox, IE, Safari |
 | `"screen"`  | Fetches the list of display screens     | Chrome, Opera, Firefox, IE, Safari |
 | `"tab"`  | Fetches the list of browser tabs | Chrome, Opera |
