@@ -612,6 +612,11 @@ if ( (navigator.mozGetUserMedia ||
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
+  // Store the original native RTCPC in msRTCPeerConnection object
+  if (navigator.userAgent.match(/Edge\/(\d+).(\d+)$/) && window.RTCPeerConnection) {
+    window.msRTCPeerConnection = window.RTCPeerConnection;
+  }
+
 /* jshint ignore:start */
 @Goo@include('third_party/adapter/out/adapter.js', {})
 /* jshint ignore:end */
