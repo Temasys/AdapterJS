@@ -296,6 +296,7 @@ AdapterJS.WebRTCPlugin.pluginInfo = {};
  */
 // To get virtual webcams. false by default
 // AdapterJS.options.getAllCams = true;
+
 // To prevent the install prompt when the plugin in not yet installed. false by default
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
@@ -304,12 +305,16 @@ AdapterJS.WebRTCPlugin.pluginInfo = {};
  */
 // Configure plugin installation bar text when requiring installation
 // AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION = 'xxx';
+
 // Configure plugin installation bar text when not supported for WebRTC plugin and no WebRTC functionalities
 // AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED = 'xxx';
+
 // Configure plugin button text.
 // AdapterJS.TEXT.PLUGIN.BUTTON = 'xxx';
+
 // Configure refresh page after plugin installation bar text
 // AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH = 'xxx';
+
 // Configure refresh page after plugin installation bar button text
 // AdapterJS.TEXT.REFRESH.BUTTON = 'xxx';
 
@@ -319,16 +324,22 @@ AdapterJS.WebRTCPlugin.pluginInfo = {};
  */
 // Configure the extension ID for Chrome
 // AdapterJS.extensionInfo.chrome.extensionId = 'xxxx';
+
 // Configure the extension webstore link for Chrome
 // AdapterJS.extensionInfo.chrome.extensionLink = 'xxxx';
+
 // Configure the extension iframe link (detectRTC) for Chrome - for older Chrome extension codebase
 // AdapterJS.extensionInfo.chrome.iframeLink = 'xxxx';
+
 // Configure the extension iframe link (detectRTC) for Chrome - for older Chrome extension codebase
 // AdapterJS.extensionInfo.chrome.iframeLink = 'xxxx'; // https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html
+
 // Configure the addon link (legacy if available and uploaded before restriction) for Firefox 51 and below
 // AdapterJS.extensionInfo.firefox.extensionLink = 'xxxx';
-// Configure the extension ID for Opera
+
+// Configure the extension ID for Opera. If not configured, screensharing will not be supported on Opera browser.
 // AdapterJS.extensionInfo.opera.extensionId = 'xxxx';
+
 // Configure the extension webstore link for Opera
 // AdapterJS.extensionInfo.opera.extensionLink = 'xxxx';
 
@@ -337,12 +348,16 @@ AdapterJS.WebRTCPlugin.pluginInfo = {};
  */
 // Configure the extension installation bar text for Firefox 51 and below
 // AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF = 'xxxx';
+
 // Configure the extension installation button text for Firefox 51 and below
 // AdapterJS.TEXT.EXTENSION.BUTTON_FF = 'xxxx';
+
 // Configure the extension installation bar text for Chrome and Opera
 // AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME = 'xxxx';
+
 // Configure the extension installation button text for Chrome and Opera
 // AdapterJS.TEXT.EXTENSION.BUTTON_CHROME = 'xxxx';
+
 // Configure the refresh after extension installed
 // AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH = 'xxxx';
 ```
