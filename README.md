@@ -22,7 +22,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | ----------------- | ------------ | ------------------------ | ------------------------- | 
 | Chrome \ Chromium | `38`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc))         |
 | Firefox           | `33`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension for `51` and below](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
-| Opera             | `26`         | MacOS / Win / Ubuntu / Android |  -                        | 
+| Opera             | `26`         | MacOS / Win / Ubuntu / Android |  Yes (if configured with extension)                       | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
 | Bowser            | `0.6.1`      | iOS 9.x only**           |  -                        |
 | Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
@@ -255,6 +255,95 @@ window.navigator.getUserMedia({
 }, function (error) {
   console.log('Failed getting stream', error);
 });
+```
+
+**List of available sources:**
+
+|  |  | Supported |
+| `"window"`  | Fetches the list of application windows | Chrome, Opera, Firefox, IE, Safari |
+| `"screen"`  | Fetches the list of display screens     | Chrome, Opera, Firefox, IE, Safari |
+| `"tab"`  | Fetches the list of browser tabs | Chrome, Opera |
+| `"browser"`  | Fetches the list of browser windows | Firefox (Requires to configure `about:config` to enable `media.getusermedia.browser.enabled`)  |
+| `"application"`  | Fetches the list of applications | Firefox |
+| `"camera"`  | Fetches the list of cameras | Firefox |
+| `["tab", "audio"]`  | Fetches `"tab"` with its audio | Chrome, Opera (Enable `constraints.audio` to retrieve tab audio) |
+| `["window", "screen"]`  | Fetches `"screen"` and `"window"` | Chrome, Opera, IE, Safari |
+| `["window", "screen", "tab"]` | Fetches `"screen"`, `"window"` and `"tab"` | Chrome, Opera, IE, Safari |
+| `["window", "tab"]` | Fetches `"window"` and `"tab"` | Chrome, Opera |
+| `["screen", "tab"]` | Fetches `"screen"` and `"tab"` | Chrome, Opera |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow`  | Same as `["window","screen"]` | IE, Safari |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screensharingKey` | Deprecated. Same as `["window","screen"]`. | IE, Safari |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen`  | Same as `"screen"` | IE, Safari |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window` | Deprecated. Same as `"window"`. | IE, Safari |
+
+
+## Configuring AdapterJS
+
+To configure your AdapterJS, configure this before referencing the script for `adapter.screenshare.js` or `adapter.debug.js` as an example:
+
+```
+var AdapterJS = {};
+AdapterJS.WebRTCPlugin = {};
+
+/**
+ * Configure plugin info. Reference "source/pluginInfo.js"
+ */
+AdapterJS.WebRTCPlugin.pluginInfo = {};
+
+/**
+ * Configure plugin settings
+ */
+// To get virtual webcams. false by default
+// AdapterJS.options.getAllCams = true;
+// To prevent the install prompt when the plugin in not yet installed. false by default
+// AdapterJS.options.hidePluginInstallPrompt = true;
+
+/**
+ * Configure plugin installation bar text. Uses default when not provided.
+ */
+// Configure plugin installation bar text when requiring installation
+// AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION = 'xxx';
+// Configure plugin installation bar text when not supported for WebRTC plugin and no WebRTC functionalities
+// AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED = 'xxx';
+// Configure plugin button text.
+// AdapterJS.TEXT.PLUGIN.BUTTON = 'xxx';
+// Configure refresh page after plugin installation bar text
+// AdapterJS.TEXT.REFRESH.REQUIRE_REFRESH = 'xxx';
+// Configure refresh page after plugin installation bar button text
+// AdapterJS.TEXT.REFRESH.BUTTON = 'xxx';
+
+
+/**
+ * Configure extension settings. For developers using "adapter.screenshare.js"
+ */
+// Configure the extension ID for Chrome
+// AdapterJS.extensionInfo.chrome.extensionId = 'xxxx';
+// Configure the extension webstore link for Chrome
+// AdapterJS.extensionInfo.chrome.extensionLink = 'xxxx';
+// Configure the extension iframe link (detectRTC) for Chrome - for older Chrome extension codebase
+// AdapterJS.extensionInfo.chrome.iframeLink = 'xxxx';
+// Configure the extension iframe link (detectRTC) for Chrome - for older Chrome extension codebase
+// AdapterJS.extensionInfo.chrome.iframeLink = 'xxxx'; // https://cdn.temasys.com.sg/skylink/extensions/detectRTC.html
+// Configure the addon link (legacy if available and uploaded before restriction) for Firefox 51 and below
+// AdapterJS.extensionInfo.firefox.extensionLink = 'xxxx';
+// Configure the extension ID for Opera
+// AdapterJS.extensionInfo.opera.extensionId = 'xxxx';
+// Configure the extension webstore link for Opera
+// AdapterJS.extensionInfo.opera.extensionLink = 'xxxx';
+
+/**
+ * Configure extension installation bar text. Uses default when not provided.
+ */
+// Configure the extension installation bar text for Firefox 51 and below
+// AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF = 'xxxx';
+// Configure the extension installation button text for Firefox 51 and below
+// AdapterJS.TEXT.EXTENSION.BUTTON_FF = 'xxxx';
+// Configure the extension installation bar text for Chrome and Opera
+// AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_CHROME = 'xxxx';
+// Configure the extension installation button text for Chrome and Opera
+// AdapterJS.TEXT.EXTENSION.BUTTON_CHROME = 'xxxx';
+// Configure the refresh after extension installed
+// AdapterJS.TEXT.EXTENSION.REQUIRE_REFRESH = 'xxxx';
 ```
 
 ## Setup this project
