@@ -269,7 +269,7 @@ window.navigator.getUserMedia({
 | `"camera"`  | Fetches the list of cameras | Firefox |
 | `["tab", "audio"]`  | Fetches `"tab"` with its audio | Chrome, Opera (Enable `constraints.audio` to retrieve tab audio) |
 | `["window", "screen"]`  | Fetches `"screen"` and `"window"` | Chrome, Opera, IE, Safari |
-| `["window", "screen", "tab"]` | Fetches `"screen"`, `"window"` and `"tab"` | Chrome, Opera, IE, Safari |
+| `["window", "screen", "tab"]` | Fetches `"screen"`, `"window"` and `"tab"` | Chrome, Opera |
 | `["window", "tab"]` | Fetches `"window"` and `"tab"` | Chrome, Opera |
 | `["screen", "tab"]` | Fetches `"screen"` and `"tab"` | Chrome, Opera |
 | `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow`  | Same as `["window","screen"]` | IE, Safari |
