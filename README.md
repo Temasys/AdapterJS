@@ -22,7 +22,7 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | ----------------- | ------------ | ------------------------ | ------------------------- | 
 | Chrome \ Chromium | `38`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension](https://chrome.google.com/webstore/detail/skylink-webrtc-tools/ljckddiekopnnjoeaiofddfhgnbdoafc))         |
 | Firefox           | `33`         | MacOS / Win / Ubuntu / Android | Yes (w [Extension for `51` and below](https://addons.mozilla.org/en-US/firefox/addon/skylink-webrtc-tools/))         |
-| Opera             | `26`         | MacOS / Win / Ubuntu / Android |  -                        | 
+| Opera             | `26`         | MacOS / Win / Ubuntu / Android |  Yes (if configured with extension)                       | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
 | Bowser            | `0.6.1`      | iOS 9.x only**           |  -                        |
 | Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
@@ -255,6 +255,59 @@ window.navigator.getUserMedia({
 }, function (error) {
   console.log('Failed getting stream', error);
 });
+```
+
+**List of valid screensharing (`mediaSource`) sources:**
+
+| Sources | Description | Browsers that supports it |
+| ------- | ----------- | --------- |
+| `"window"`  | Fetches the list of application windows | Chrome, Opera, Firefox, IE, Safari |
+| `"screen"`  | Fetches the list of display screens     | Chrome, Opera, Firefox, IE, Safari |
+| `"tab"`  | Fetches the list of browser tabs | Chrome, Opera |
+| `"browser"`  | Fetches the list of browser windows | Firefox (Requires to configure `about:config` to enable `media.getusermedia.browser.enabled`)  |
+| `"application"`  | Fetches the list of applications | Firefox |
+| `"camera"`  | Fetches the list of cameras | Firefox |
+| `["tab", "audio"]`  | Fetches `"tab"` with its audio | Chrome, Opera (Enable `constraints.audio` to retrieve tab audio) |
+| `["window", "screen"]`  | Fetches `"screen"` and `"window"` | Chrome, Opera, IE, Safari |
+| `["window", "screen", "tab"]` | Fetches `"screen"`, `"window"` and `"tab"` | Chrome, Opera |
+| `["window", "tab"]` | Fetches `"window"` and `"tab"` | Chrome, Opera |
+| `["screen", "tab"]` | Fetches `"screen"` and `"tab"` | Chrome, Opera |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screenOrWindow`  | Same as `["window","screen"]` | IE, Safari |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screensharingKey` | Deprecated. Same as `["window","screen"]`. | IE, Safari |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.screen`  | Same as `"screen"` | IE, Safari |
+| `AdapterJS.WebRTCPlugin.plugin.screensharingKeys.window` | Deprecated. Same as `"window"`. | IE, Safari |
+
+
+**Configuring extension settings:**
+
+To configure your AdapterJS screensharing extensions, configure this before referencing the script for `adapter.screenshare.js` as an example:
+
+```
+var AdapterJS = {};
+
+/**
+ * Configure extension settings. For developers using "adapter.screenshare.js"
+ */
+AdapterJS.extensionInfo = {
+  chrome: {
+    // Configure the extension ID for Chrome
+    extensionId: 'xxx',
+    // Configure the extension webstore link for Chrome
+    extensionLink: 'xxx',
+    // Configure the extension iframe link (detectRTC) for Chrome - for older Chrome extension codebase
+    iframeLink: 'xxx'
+  },
+  firefox: {
+    // Configure the addon link (legacy if available and uploaded before restriction) for Firefox 51 and below
+    extensionLink: 'xxx'
+  },
+  opera: {
+    // Configure the extension ID for Opera
+    extensionId: 'xxx',
+    // Configure the extension webstore link for Opera
+    extensionLink: 'xxx'
+  }
+};
 ```
 
 ## Setup this project
