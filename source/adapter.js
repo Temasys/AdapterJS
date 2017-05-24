@@ -1134,6 +1134,15 @@ if ( (navigator.mozGetUserMedia ||
           }
           return (name === 'deviceId') ? 'sourceId' : name;
         };
+
+        // HACK : Specially handling: if deviceId is an object with exact property,
+        //          change it such that deviceId value is not in exact property
+        // Reason : AJS-286 (deviceId in WebRTC samples not in the format specified as specifications)
+        if ( oldname('', key) === 'sourceId' && r.exact !== undefined ) {
+          r.ideal = r.exact;
+          r.exact = undefined;
+        }
+
         if (r.ideal !== undefined) {
           cc.optional = cc.optional || [];
           var oc = {};
