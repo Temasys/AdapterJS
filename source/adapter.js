@@ -1121,7 +1121,11 @@ if ( (navigator.mozGetUserMedia ||
       }
       var cc = {};
       Object.keys(c).forEach(function(key) {
-        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+        if (key === 'require' || key === 'advanced') {
+          return;
+        }
+        if (typeof c[key] === 'string') {
+          cc[key] = c[key];
           return;
         }
         var r = (typeof c[key] === 'object') ? c[key] : {ideal: c[key]};
