@@ -257,7 +257,7 @@ window.navigator.getUserMedia({
 });
 ```
 
-**List of available sources:**
+**List of valid screensharing (`mediaSource`) sources:**
 
 | Sources | Description | Browsers that supports it |
 | ------- | ----------- | --------- |
