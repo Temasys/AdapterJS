@@ -1,4 +1,4 @@
-/*! adapterjs - v0.14.2-6d236da - 2017-05-22 */
+/*! adapterjs - v0.14.3-6d236da - 2017-05-24 */
 
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
@@ -12,7 +12,7 @@ AdapterJS.options = AdapterJS.options || {};
 // AdapterJS.options.hidePluginInstallPrompt = true;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.14.2-6d236da';
+AdapterJS.VERSION = '0.14.3-6d236da';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -636,6 +636,11 @@ if ( (navigator.mozGetUserMedia ||
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
 
+  // Store the original native RTCPC in msRTCPeerConnection object
+  if (navigator.userAgent.match(/Edge\/(\d+).(\d+)$/) && window.RTCPeerConnection) {
+    window.msRTCPeerConnection = window.RTCPeerConnection;
+  }
+
 /* jshint ignore:start */
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.adapter = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(requirecopy,module,exports){
  /* eslint-env node */
@@ -862,6 +867,15 @@ SDPUtils.parseSsrcMedia = function(line) {
   return parts;
 };
 
+// Extracts the MID (RFC 5888) from a media section.
+// returns the MID or undefined if no mid line was found.
+SDPUtils.getMid = function(mediaSection) {
+  var mid = SDPUtils.matchPrefix(mediaSection, 'a=mid:')[0];
+  if (mid) {
+    return mid.substr(6);
+  }
+}
+
 // Extracts DTLS parameters from SDP media section or sessionpart.
 // FIXME: for consistency with other functions this should only
 //   get the fingerprint line as input. See also getIceParameters.
@@ -873,10 +887,11 @@ SDPUtils.getDtlsParameters = function(mediaSection, sessionpart) {
     return line.indexOf('a=fingerprint:') === 0;
   })[0].substr(14);
   // Note: a=setup line is ignored since we use the 'auto' role.
+  // Note2: 'algorithm' is not case sensitive except in Edge.
   var dtlsParameters = {
     role: 'auto',
     fingerprints: [{
-      algorithm: fpLine.split(' ')[0],
+      algorithm: fpLine.split(' ')[0].toLowerCase(),
       value: fpLine.split(' ')[1]
     }]
   };
@@ -982,8 +997,21 @@ SDPUtils.writeRtpDescription = function(kind, caps) {
     sdp += SDPUtils.writeFmtp(codec);
     sdp += SDPUtils.writeRtcpFb(codec);
   });
-  // FIXME: add headerExtensions, fecMechanismş and rtcp.
+  var maxptime = 0;
+  caps.codecs.forEach(function(codec) {
+    if (codec.maxptime > maxptime) {
+      maxptime = codec.maxptime;
+    }
+  });
+  if (maxptime > 0) {
+    sdp += 'a=maxptime:' + maxptime + '\r\n';
+  }
   sdp += 'a=rtcp-mux\r\n';
+
+  caps.headerExtensions.forEach(function(extension) {
+    sdp += SDPUtils.writeExtmap(extension);
+  });
+  // FIXME: write fecMechanisms.
   return sdp;
 };
 
@@ -1024,7 +1052,6 @@ SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
         ssrc: primarySsrc,
         codecPayloadType: parseInt(codec.parameters.apt, 10),
         rtx: {
-          payloadType: codec.payloadType,
           ssrc: secondarySsrc
         }
       };
@@ -1060,6 +1087,61 @@ SDPUtils.parseRtpEncodingParameters = function(mediaSection) {
   return encodingParameters;
 };
 
+// parses http://draft.ortc.org/#rtcrtcpparameters*
+SDPUtils.parseRtcpParameters = function(mediaSection) {
+  var rtcpParameters = {};
+
+  var cname;
+  // Gets the first SSRC. Note that with RTX there might be multiple
+  // SSRCs.
+  var remoteSsrc = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+      .map(function(line) {
+        return SDPUtils.parseSsrcMedia(line);
+      })
+      .filter(function(obj) {
+        return obj.attribute === 'cname';
+      })[0];
+  if (remoteSsrc) {
+    rtcpParameters.cname = remoteSsrc.value;
+    rtcpParameters.ssrc = remoteSsrc.ssrc;
+  }
+
+  // Edge uses the compound attribute instead of reducedSize
+  // compound is !reducedSize
+  var rsize = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-rsize');
+  rtcpParameters.reducedSize = rsize.length > 0;
+  rtcpParameters.compound = rsize.length === 0;
+
+  // parses the rtcp-mux attrіbute.
+  // Note that Edge does not support unmuxed RTCP.
+  var mux = SDPUtils.matchPrefix(mediaSection, 'a=rtcp-mux');
+  rtcpParameters.mux = mux.length > 0;
+
+  return rtcpParameters;
+};
+
+// parses either a=msid: or a=ssrc:... msid lines an returns
+// the id of the MediaStream and MediaStreamTrack.
+SDPUtils.parseMsid = function(mediaSection) {
+  var parts;
+  var spec = SDPUtils.matchPrefix(mediaSection, 'a=msid:');
+  if (spec.length === 1) {
+    parts = spec[0].substr(7).split(' ');
+    return {stream: parts[0], track: parts[1]};
+  }
+  var planB = SDPUtils.matchPrefix(mediaSection, 'a=ssrc:')
+  .map(function(line) {
+    return SDPUtils.parseSsrcMedia(line);
+  })
+  .filter(function(parts) {
+    return parts.attribute === 'msid';
+  });
+  if (planB.length > 0) {
+    parts = planB[0].value.split(' ');
+    return {stream: parts[0], track: parts[1]};
+  }
+};
+
 SDPUtils.writeSessionBoilerplate = function() {
   // FIXME: sess-id should be an NTP timestamp.
   return 'v=0\r\n' +
@@ -1092,17 +1174,31 @@ SDPUtils.writeMediaSection = function(transceiver, caps, type, stream) {
     sdp += 'a=inactive\r\n';
   }
 
-  // FIXME: for RTX there might be multiple SSRCs. Not implemented in Edge yet.
   if (transceiver.rtpSender) {
+    // spec.
     var msid = 'msid:' + stream.id + ' ' +
         transceiver.rtpSender.track.id + '\r\n';
     sdp += 'a=' + msid;
+
+    // for Chrome.
     sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
         ' ' + msid;
+    if (transceiver.sendEncodingParameters[0].rtx) {
+      sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+          ' ' + msid;
+      sdp += 'a=ssrc-group:FID ' +
+          transceiver.sendEncodingParameters[0].ssrc + ' ' +
+          transceiver.sendEncodingParameters[0].rtx.ssrc +
+          '\r\n';
+    }
   }
   // FIXME: this should be written by writeRtpDescription.
   sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].ssrc +
       ' cname:' + SDPUtils.localCName + '\r\n';
+  if (transceiver.rtpSender && transceiver.sendEncodingParameters[0].rtx) {
+    sdp += 'a=ssrc:' + transceiver.sendEncodingParameters[0].rtx.ssrc +
+        ' cname:' + SDPUtils.localCName + '\r\n';
+  }
   return sdp;
 };
 
@@ -1125,6 +1221,16 @@ SDPUtils.getDirection = function(mediaSection, sessionpart) {
     return SDPUtils.getDirection(sessionpart);
   }
   return 'sendrecv';
+};
+
+SDPUtils.getKind = function(mediaSection) {
+  var lines = SDPUtils.splitLines(mediaSection);
+  var mline = lines[0].split(' ');
+  return mline[0].substr(2);
+};
+
+SDPUtils.isRejected = function(mediaSection) {
+  return mediaSection.split(' ', 2)[1] === '0';
 };
 
 // Expose public methods.
@@ -3765,7 +3871,11 @@ module.exports = {
       }
       var cc = {};
       Object.keys(c).forEach(function(key) {
-        if (key === 'require' || key === 'advanced' || key === 'mediaSource') {
+        if (key === 'require' || key === 'advanced') {
+          return;
+        }
+        if (typeof c[key] === 'string') {
+          cc[key] = c[key];
           return;
         }
         var r = (typeof c[key] === 'object') ? c[key] : {ideal: c[key]};
@@ -3778,6 +3888,15 @@ module.exports = {
           }
           return (name === 'deviceId') ? 'sourceId' : name;
         };
+
+        // HACK : Specially handling: if deviceId is an object with exact property,
+        //          change it such that deviceId value is not in exact property
+        // Reason : AJS-286 (deviceId in WebRTC samples not in the format specified as specifications)
+        if ( oldname('', key) === 'sourceId' && r.exact !== undefined ) {
+          r.ideal = r.exact;
+          r.exact = undefined;
+        }
+
         if (r.ideal !== undefined) {
           cc.optional = cc.optional || [];
           var oc = {};
