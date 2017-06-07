@@ -355,7 +355,12 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedBrowser   = 'safari';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 7;
-    webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : null;
+    if (webrtcDetectedVersion >= 11) {
+      webrtcDetectedType = 'safari';
+    } else {
+      // Legacy
+      webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : null;
+    }
     webrtcDetectedDCSupport = isMobile.length === 0 ? 'SCTP' : null;
 
   }
@@ -602,7 +607,10 @@ webrtcDetectedVersion = null;
 webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
-if ( (navigator.mozGetUserMedia ||
+AdapterJS.parseWebrtcDetectedBrowser();
+// debugger;
+if ( webrtcDetectedType === 'safari' || // WWDC quick fix
+    (navigator.mozGetUserMedia ||
       navigator.webkitGetUserMedia ||
       (navigator.mediaDevices &&
        navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)))
@@ -764,6 +772,15 @@ if ( (navigator.mozGetUserMedia ||
         }
       }
       return iceServers;
+    };
+  } else if (webrtcDetectedType === 'safari') {
+    attachMediaStream = function(element, stream) {
+      element.srcObject = stream;
+      return element;
+    };
+    reattachMediaStream = function(to, from) {
+      to.srcObject = from.srcObject;
+      return to;
     };
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // Attach a media stream to an element.
