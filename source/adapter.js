@@ -601,6 +601,9 @@ webrtcDetectedVersion = null;
 // The minimum browser version still supported by AJS.
 webrtcMinimumVersion  = null;
 
+// The type of DC supported by the browser
+webrtcDetectedDCSupport = null;
+
 // Check for browser types and react accordingly
 if ( (navigator.mozGetUserMedia ||
       navigator.webkitGetUserMedia ||
