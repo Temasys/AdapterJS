@@ -192,7 +192,7 @@ AdapterJS.TEXT = {
   PLUGIN: {
     REQUIRE_INSTALLATION: 'This website requires you to install a WebRTC-enabling plugin ' +
       'to work on this browser.',
-    NOT_SUPPORTED: navigator.userAgent,
+    NOT_SUPPORTED: 'Your browser does not support WebRTC.',
     BUTTON: 'Install Now'
   },
   REFRESH: {
