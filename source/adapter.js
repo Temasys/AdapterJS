@@ -357,7 +357,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 7;
     if (AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604) { // Has native webrtc capabilities
-      webrtcDetectedType = 'safari';
+      webrtcDetectedType = 'AppleWebKit';
     } else {
       // Legacy
       webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : null;
@@ -609,14 +609,7 @@ webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
 AdapterJS.parseWebrtcDetectedBrowser();
-// debugger;
-if ( webrtcDetectedType === 'safari' || // WWDC quick fix
-    ((navigator.mozGetUserMedia ||
-      navigator.webkitGetUserMedia ||
-      (navigator.mediaDevices &&
-       navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)))
-    && !((navigator.userAgent.match(/android/ig) || []).length === 0 &&
-        (navigator.userAgent.match(/chrome/ig) || []).length === 0 && navigator.userAgent.indexOf('Safari/') > 0))) {
+if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -774,7 +767,7 @@ if ( webrtcDetectedType === 'safari' || // WWDC quick fix
       }
       return iceServers;
     };
-  } else if (webrtcDetectedType === 'safari') {
+  } else if (webrtcDetectedType === 'AppleWebKit') {
     attachMediaStream = function(element, stream) {
       element.srcObject = stream;
       return element;

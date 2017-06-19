@@ -475,7 +475,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     // Nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
-  } else if (webrtcDetectedType === 'safari') {
+  } else if (webrtcDetectedType === 'AppleWebKit') {
     // don't do anythinbg. Screensharing is not supported
   } else {
     baseGetUserMedia = window.navigator.getUserMedia;
