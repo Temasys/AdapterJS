@@ -158,14 +158,8 @@ __TemWebRTCReady0 = function () {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
   } else {
-    var timer = setInterval(function () {
-      if (document.readyState === 'complete') {
-        // TODO: update comments, we wait for the document to be ready
-        clearInterval(timer);
-        AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
-        AdapterJS.maybeThroughWebRTCReady();
-      }
-    }, 100);
+    // Try again in 100ms
+    setTimeout(__TemWebRTCReady0, 100);
   }
 };
 
