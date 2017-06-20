@@ -154,7 +154,7 @@ AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
-  if (document.readyState === 'complete') {
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
   } else {
@@ -373,7 +373,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
 
 AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback) {
   // only inject once the page is ready
-  if (document.readyState !== 'complete') {
+  if (document.readyState !== 'interactive' && document.readyState !== 'complete') {
     return;
   }
 
@@ -909,7 +909,7 @@ if ( (navigator.mozGetUserMedia ||
 
   AdapterJS.WebRTCPlugin.injectPlugin = function () {
     // only inject once the page is ready
-    if (document.readyState !== 'complete') {
+    if (document.readyState !== 'interactive' && document.readyState !== 'complete') {
       return;
     }
 
