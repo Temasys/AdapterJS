@@ -19,7 +19,6 @@
     }
   ],
   "scripts": {
-    "postinstall": "npm --prefix third_party/adapter install third_party/adapter",
     "version": "grunt publish",
     "prepublish": "grunt publish",
     "test": "./test.sh;"
@@ -55,7 +54,8 @@
     "karma-safari-launcher": "^0.1.1",
     "karma-script-launcher": "0.1.0",
     "mocha": "2.1.0",
-    "requirejs": "^2.1.19"
+    "requirejs": "^2.1.19",
+    "webrtc-adapter": "^2.0.3"
   },
   "testling": {
     "files": "tmp/*.js",

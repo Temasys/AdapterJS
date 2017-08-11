@@ -10,7 +10,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-replace');
     grunt.loadNpmTasks('grunt-include-replace');
     grunt.loadNpmTasks('grunt-karma');
-    grunt.loadNpmTasks('grunt-githash');
     grunt.loadNpmTasks('grunt-string-replace');
 
     grunt.initConfig({
@@ -23,22 +22,10 @@ module.exports = function(grunt) {
       production: 'publish',
       bamboo: 'bamboo',
 
-      // webrtc-adapter submodule
-      webrtcAdapterSubmodule: 'third_party/adapter/',
-      googleAdapterPath: '<%= webrtcAdapterSubmodule %>/out/adapter.js',
-
       pluginInfoRoot: grunt.option('pluginInfoRoot') || '<%= source %>',
       pluginInfoFile: grunt.option('pluginInfoFile') || 'pluginInfo.js',
 
-      githash: {
-        submodule: {
-          options: {
-            dir: '<%= webrtcAdapterSubmodule %>'
-          }
-        },
-      },
-
-      version: '<%= pkg.version %>-<%= githash.submodule.short %>',
+      version: '<%= pkg.version %>',
 
       clean: {
         production: ['<%= production %>/'],
@@ -323,13 +310,6 @@ module.exports = function(grunt) {
         grunt.log.writeln('bamboo/vars file successfully created');
     });
 
-    grunt.registerTask('CheckSubmodules', 'Checks that third_party/adapter is properly checked out', function() {
-      if(!grunt.file.exists(grunt.config.get('googleAdapterPath'))) {
-        grunt.fail.fatal('Couldn\'t find ' + grunt.config.get('googleAdapterPath') + '\n' +
-                      'Output would be incomplete. Did you remember to initialize submodules?\nPlease run: git submodule update --init');
-      }
-    });
-
     grunt.registerTask('CheckPluginInfo', 'Checks for existing config file', function() {
       var fullPath = grunt.config.get('pluginInfoRoot') + '/' + grunt.config.get('pluginInfoFile');
       grunt.verbose.writeln('Checking that the plugin info file exists.');
@@ -356,8 +336,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('publish', [
-        'githash',
-        'CheckSubmodules',
         'CheckPluginInfo',
         // 'webrtc-adapter',
         'versionise',
