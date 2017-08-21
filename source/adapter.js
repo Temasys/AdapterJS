@@ -366,11 +366,12 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
 
   }
 
-  window.webrtcDetectedBrowser   = webrtcDetectedBrowser;
-  window.webrtcDetectedVersion   = webrtcDetectedVersion;
-  window.webrtcMinimumVersion    = webrtcMinimumVersion;
-  window.webrtcDetectedType      = webrtcDetectedType; // Scope it to window for better consistency
-  window.webrtcDetectedDCSupport = webrtcDetectedDCSupport; // Scope it to window for better consistency
+  // Scope it to AdapterJS and window for better consistency
+  AdapterJS.webrtcDetectedBrowser   = window.webrtcDetectedBrowser   = webrtcDetectedBrowser;
+  AdapterJS.webrtcDetectedVersion   = window.webrtcDetectedVersion   = webrtcDetectedVersion;
+  AdapterJS.webrtcMinimumVersion    = window.webrtcMinimumVersion    = webrtcMinimumVersion;
+  AdapterJS.webrtcDetectedType      = window.webrtcDetectedType      = webrtcDetectedType;
+  AdapterJS.webrtcDetectedDCSupport = window.webrtcDetectedDCSupport = webrtcDetectedDCSupport; 
 };
 
 AdapterJS.addEvent = function(elem, evnt, func) {
@@ -462,9 +463,9 @@ checkMediaDataChannelSettings =
     return;
   }
   var beOfferer = true;
-  var isLocalFirefox = webrtcDetectedBrowser === 'firefox';
+  var isLocalFirefox = AdapterJS.webrtcDetectedBrowser === 'firefox';
   // Nightly version does not require MozDontOfferDataChannel for interop
-  var isLocalFirefoxInterop = webrtcDetectedType === 'moz' && webrtcDetectedVersion > 30;
+  var isLocalFirefoxInterop = AdapterJS.webrtcDetectedType === 'moz' && AdapterJS.webrtcDetectedVersion > 30;
   var isPeerFirefox = peerBrowserAgent === 'firefox';
   var isPeerFirefoxInterop = peerBrowserAgent === 'firefox' &&
     ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
@@ -609,7 +610,7 @@ webrtcMinimumVersion  = null;
 
 // Check for browser types and react accordingly
 AdapterJS.parseWebrtcDetectedBrowser();
-if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
+if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType) > -1) {
 
   ///////////////////////////////////////////////////////////////////
   // INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -625,8 +626,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
   ///////////////////////////////////////////////////////////////////
-
-  AdapterJS.parseWebrtcDetectedBrowser();
 
   ///////////////////////////////////////////////////////////////////
   // EXTENSION FOR CHROME, FIREFOX AND EDGE
@@ -674,7 +673,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
       if (urlParts[0].indexOf('stun') === 0) {
         iceServer = { urls : [url] };
       } else if (urlParts[0].indexOf('turn') === 0) {
-        if (webrtcDetectedVersion < 27) {
+        if (AdapterJS.webrtcDetectedVersion < 27) {
           var turnUrlParts = url.split('?');
           if (turnUrlParts.length === 1 ||
             turnUrlParts[1].indexOf('transport=udp') === 0) {
@@ -710,7 +709,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
   } else if ( navigator.webkitGetUserMedia ) {
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
-      if (webrtcDetectedVersion >= 43) {
+      if (AdapterJS.webrtcDetectedVersion >= 43) {
         element.srcObject = stream;
       } else if (typeof element.src !== 'undefined') {
         element.src = URL.createObjectURL(stream);
@@ -722,7 +721,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
     };
 
     reattachMediaStream = function(to, from) {
-      if (webrtcDetectedVersion >= 43) {
+      if (AdapterJS.webrtcDetectedVersion >= 43) {
         to.srcObject = from.srcObject;
       } else {
         to.src = from.src;
@@ -751,7 +750,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
       console.warn('createIceServers is deprecated. It should be replaced with an application level implementation.');
 
       var iceServers = [];
-      if (webrtcDetectedVersion >= 34) {
+      if (AdapterJS.webrtcDetectedVersion >= 34) {
         iceServers = {
           'urls' : urls,
           'credential' : password,
@@ -767,7 +766,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
       }
       return iceServers;
     };
-  } else if (webrtcDetectedType === 'AppleWebKit') {
+  } else if (AdapterJS.webrtcDetectedType === 'AppleWebKit') {
     attachMediaStream = function(element, stream) {
       element.srcObject = stream;
       return element;
@@ -793,9 +792,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
   // to support the plugin's logic
   attachMediaStream_base = attachMediaStream;
 
-  if (webrtcDetectedBrowser === 'opera') {
+  if (AdapterJS.webrtcDetectedBrowser === 'opera') {
     attachMediaStream_base = function (element, stream) {
-      if (webrtcDetectedVersion > 38) {
+      if (AdapterJS.webrtcDetectedVersion > 38) {
         element.srcObject = stream;
       } else if (typeof element.src !== 'undefined') {
         element.src = URL.createObjectURL(stream);
@@ -805,8 +804,8 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
   }
 
   attachMediaStream = function (element, stream) {
-    if ((webrtcDetectedBrowser === 'chrome' ||
-         webrtcDetectedBrowser === 'opera') &&
+    if ((AdapterJS.webrtcDetectedBrowser === 'chrome' ||
+         AdapterJS.webrtcDetectedBrowser === 'opera') &&
         !stream) {
       // Chrome does not support "src = null"
       element.src = '';
@@ -889,7 +888,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
     /* jshint +W020 */
   }
   AdapterJS.parseWebrtcDetectedBrowser();
-  isIE = webrtcDetectedBrowser === 'IE';
+  isIE = AdapterJS.webrtcDetectedBrowser === 'IE';
 
   /* jshint -W035 */
   AdapterJS.WebRTCPlugin.WaitForPluginReady = function() {
@@ -934,7 +933,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(webrtcDetectedType) > -1) {
 
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTING;
 
-    if (webrtcDetectedBrowser === 'IE' && webrtcDetectedVersion <= 10) {
+    if (AdapterJS.webrtcDetectedBrowser === 'IE' && AdapterJS.webrtcDetectedVersion <= 10) {
       var frag = document.createDocumentFragment();
       AdapterJS.WebRTCPlugin.plugin = document.createElement('div');
       AdapterJS.WebRTCPlugin.plugin.innerHTML = '<object id="' +
