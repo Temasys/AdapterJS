@@ -61,7 +61,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     }
   };
 
-  if (window.navigator.mozGetUserMedia) {
+  if (AdapterJS.webrtcDetectedType === 'moz') {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
@@ -148,7 +148,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
       });
     };*/
 
-  } else if (window.navigator.webkitGetUserMedia && AdapterJS.webrtcDetectedBrowser !== 'safari') {
+  } else if (AdapterJS.webrtcDetectedType === 'webkit') {
     baseGetUserMedia = window.navigator.getUserMedia;
     var iframe = document.createElement('iframe');
 
@@ -470,14 +470,15 @@ AdapterJS._defineMediaSourcePolyfill = function () {
       (document.body || document.documentElement).appendChild(iframe);
     }
 
-  } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+  } else if (AdapterJS.webrtcDetectedBrowser === 'edge') {
     // Note: Not overriding getUserMedia() to reject "mediaSource" as to prevent "Invalid calling object" errors.
     // Nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
   } else if (AdapterJS.webrtcDetectedType === 'AppleWebKit') {
     // don't do anything. Screensharing is not supported
-  } else {
+    console.warn('Safari does not support screensharing feature in getUserMedia');
+  } else if (AdapterJS.webrtcDetectedType === 'plugin') {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {

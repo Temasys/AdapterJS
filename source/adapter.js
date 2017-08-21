@@ -5,9 +5,15 @@ AdapterJS.options = AdapterJS.options || {};
 
 // uncomment to get virtual webcams
 // AdapterJS.options.getAllCams = true;
+AdapterJS.options.getAllCams = !!AdapterJS.options.getAllCams;
 
 // uncomment to prevent the install prompt when the plugin in not yet installed
 // AdapterJS.options.hidePluginInstallPrompt = true;
+AdapterJS.options.hidePluginInstallPrompt = !!AdapterJS.options.hidePluginInstallPrompt;
+
+// uncomment to force the use of the plugin on Safari
+// AdapterJS.options.forceSafariPlugin = true;
+AdapterJS.options.forceSafariPlugin = !!AdapterJS.options.forceSafariPlugin;
 
 // AdapterJS version
 AdapterJS.VERSION = '@@version';
@@ -351,19 +357,17 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     hasMatch = navigator.userAgent.match(/version\/(\d+)/i) || [];
     AppleWebKitBuild = navigator.userAgent.match(/AppleWebKit\/(\d+)/i) || [];
 
-    var isMobile = navigator.userAgent.match(/(iPhone|iPad)/gi) || [];
-
+    var isMobile      = navigator.userAgent.match(/(iPhone|iPad)/gi) || [];
+    var hasNativeImpl = AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604;
     webrtcDetectedBrowser   = 'safari';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
     webrtcMinimumVersion    = 7;
-    if (AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604) { // Has native webrtc capabilities
-      webrtcDetectedType = 'AppleWebKit';
-    } else {
-      // Legacy
-      webrtcDetectedType      = isMobile.length === 0 ? 'plugin' : null;
+    if (isMobile) {
+      webrtcDetectedType    = hasNativeImpl ? 'AppleWebKit' : null;
+    } else { // desktop
+      webrtcDetectedType    = hasNativeImpl && !AdapterJS.options.forceSafariPlugin ? 'AppleWebKit' : 'plugin';
     }
-    webrtcDetectedDCSupport = isMobile.length === 0 ? 'SCTP' : null;
-
+    webrtcDetectedDCSupport = 'SCTP'; 
   }
 
   // Scope it to AdapterJS and window for better consistency
@@ -887,7 +891,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     console.groupEnd = function (arg) {};
     /* jshint +W020 */
   }
-  AdapterJS.parseWebrtcDetectedBrowser();
   isIE = AdapterJS.webrtcDetectedBrowser === 'IE';
 
   /* jshint -W035 */
@@ -1022,6 +1025,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return variable !== null && variable !== undefined;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// CreateIceServer
+    ////////////////////////////////////////////////////////////////////////////
     createIceServer = function (url, username, password) {
       var iceServer = null;
       var urlParts = url.split(':');
@@ -1041,6 +1047,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return iceServer;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// CreateIceServers
+    ////////////////////////////////////////////////////////////////////////////
     createIceServers = function (urls, username, password) {
       var iceServers = [];
       for (var i = 0; i < urls.length; ++i) {
@@ -1049,17 +1058,26 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return iceServers;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// RTCSessionDescription
+    ////////////////////////////////////////////////////////////////////////////
     RTCSessionDescription = function (info) {
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
       return AdapterJS.WebRTCPlugin.plugin.
         ConstructSessionDescription(info.type, info.sdp);
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// MediaStream
+    ////////////////////////////////////////////////////////////////////////////
     MediaStream = function (mediaStreamOrTracks) {
       AdapterJS.WebRTCPlugin.WaitForPluginReady();
       return AdapterJS.WebRTCPlugin.plugin.MediaStream(mediaStreamOrTracks);
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// RTCPeerConnection
+    ////////////////////////////////////////////////////////////////////////////
     RTCPeerConnection = function (servers, constraints) {
       // Validate server argumenr
       if (!(servers === undefined ||
@@ -1121,6 +1139,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       }
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// MediaStreamTrack
+    ////////////////////////////////////////////////////////////////////////////
     MediaStreamTrack = function(){};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
@@ -1194,6 +1215,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return cc;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// getUserMedia
+    ////////////////////////////////////////////////////////////////////////////
     getUserMedia = function (constraints, successCallback, failureCallback) {
       var cc = {};
       cc.audio = constraints.audio ?
@@ -1208,9 +1232,10 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     };
     window.navigator.getUserMedia = getUserMedia;
 
-    // Defined mediaDevices when promises are available
-    if ( !navigator.mediaDevices &&
-      typeof Promise !== 'undefined') {
+    ////////////////////////////////////////////////////////////////////////////
+    /// mediaDevices
+    ////////////////////////////////////////////////////////////////////////////
+    if (typeof Promise !== 'undefined') {
       requestUserMedia = function(constraints) {
         return new Promise(function(resolve, reject) {
           try {
@@ -1237,6 +1262,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       }};
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// attachMediaStream
+    ////////////////////////////////////////////////////////////////////////////
     attachMediaStream = function (element, stream) {
       if (!element || !element.parentNode) {
         return;
@@ -1320,6 +1348,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return newElement;
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// reattachMediaStream
+    ////////////////////////////////////////////////////////////////////////////
     reattachMediaStream = function (to, from) {
       var stream = null;
       var children = from.children;
@@ -1365,6 +1396,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       }
     };
 
+    ////////////////////////////////////////////////////////////////////////////
+    /// RTCIceCandidate
+    ////////////////////////////////////////////////////////////////////////////
     RTCIceCandidate = function (candidate) {
       if (!candidate.sdpMid) {
         candidate.sdpMid = '';
