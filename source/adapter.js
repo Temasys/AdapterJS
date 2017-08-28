@@ -612,6 +612,9 @@ webrtcDetectedVersion = null;
 // The minimum browser version still supported by AJS.
 webrtcMinimumVersion  = null;
 
+// The requestUserMedia used by plugin gUM
+requestUserMedia = null;
+
 // Check for browser types and react accordingly
 AdapterJS.parseWebrtcDetectedBrowser();
 if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType) > -1) {
@@ -779,6 +782,13 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       to.srcObject = from.srcObject;
       return to;
     };
+
+    // Polyfill getUserMedia()
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.getUserMedia = getUserMedia = function (constraints, successCb, errorCb) {
+        navigator.mediaDevices.getUserMedia(constraints).then(successCb).catch(errorCb);
+      };
+    }
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
@@ -891,7 +901,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     console.groupEnd = function (arg) {};
     /* jshint +W020 */
   }
-  isIE = AdapterJS.webrtcDetectedBrowser === 'IE';
 
   /* jshint -W035 */
   AdapterJS.WebRTCPlugin.WaitForPluginReady = function() {
@@ -966,7 +975,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       AdapterJS.WebRTCPlugin.plugin.id =
         AdapterJS.WebRTCPlugin.pluginInfo.pluginId;
       // IE will only start the plugin if it's ACTUALLY visible
-      if (isIE) {
+      if (AdapterJS.webrtcDetectedBrowser === 'IE') {
         AdapterJS.WebRTCPlugin.plugin.width = '1px';
         AdapterJS.WebRTCPlugin.plugin.height = '1px';
       } else { // The size of the plugin on Safari should be 0x0px
@@ -992,7 +1001,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
 
   AdapterJS.WebRTCPlugin.isPluginInstalled =
     function (comName, plugName, plugType, installedCb, notInstalledCb) {
-    if (!isIE) {
+    if (AdapterJS.webrtcDetectedBrowser !== 'IE') {
       var pluginArray = navigator.mimeTypes;
       for (var i = 0; i < pluginArray.length; i++) {
         if (pluginArray[i].type.indexOf(plugType) >= 0) {
@@ -1447,7 +1456,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
         window.open(downloadLink, '_top');
 
         var pluginInstallInterval = setInterval(function(){
-          if(! isIE) {
+          if(AdapterJS.webrtcDetectedBrowser !== 'IE') {
             navigator.plugins.refresh(false);
           }
           AdapterJS.WebRTCPlugin.isPluginInstalled(
