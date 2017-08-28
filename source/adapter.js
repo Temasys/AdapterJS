@@ -612,6 +612,9 @@ webrtcDetectedVersion = null;
 // The minimum browser version still supported by AJS.
 webrtcMinimumVersion  = null;
 
+// The requestUserMedia used by plugin gUM
+requestUserMedia = null;
+
 // Check for browser types and react accordingly
 AdapterJS.parseWebrtcDetectedBrowser();
 if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType) > -1) {
