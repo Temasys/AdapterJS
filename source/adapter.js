@@ -782,6 +782,13 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       to.srcObject = from.srcObject;
       return to;
     };
+
+    // Polyfill getUserMedia()
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.getUserMedia = getUserMedia = function (constraints, successCb, errorCb) {
+        navigator.mediaDevices.getUserMedia(constraints).then(successCb).catch(errorCb);
+      };
+    }
   } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
