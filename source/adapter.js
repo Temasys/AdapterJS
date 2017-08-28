@@ -357,7 +357,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     hasMatch = navigator.userAgent.match(/version\/(\d+)/i) || [];
     AppleWebKitBuild = navigator.userAgent.match(/AppleWebKit\/(\d+)/i) || [];
 
-    var isMobile      = navigator.userAgent.match(/(iPhone|iPad)/gi) || [];
+    var isMobile      = navigator.userAgent.match(/(iPhone|iPad)/gi);
     var hasNativeImpl = AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604;
     webrtcDetectedBrowser   = 'safari';
     webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
