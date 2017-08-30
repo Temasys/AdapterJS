@@ -615,7 +615,7 @@ if ( (navigator.mozGetUserMedia ||
   }
 
 /* jshint ignore:start */
-@Goo@include('third_party/adapter/out/adapter.js', {})
+@Goo@include('node_modules/webrtc-adapter/out/adapter.js', {})
 /* jshint ignore:end */
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
