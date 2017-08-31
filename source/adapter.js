@@ -1210,6 +1210,63 @@ if ( (navigator.mozGetUserMedia ||
       }};
     }
 
+    AdapterJS.replaceElement = function(element) {
+      var elementId = element.id.length === 0 ? Math.random().toString(36).slice(2) : element.id;
+      var tag;
+      var nodeName = element.nodeName.toLowerCase();
+      switch(nodeName) {
+        case 'audio':
+          tag = AdapterJS.WebRTCPlugin.TAGS.AUDIO;
+          break;
+        case 'video':
+          tag = AdapterJS.WebRTCPlugin.TAGS.VIDEO;
+          break;
+        default:
+          tag = AdapterJS.WebRTCPlugin.TAGS.NONE;
+      }
+
+      var frag = document.createDocumentFragment();
+      var temp = document.createElement('div');
+      var classHTML = '';
+      if (element.className) {
+        classHTML = 'class="' + element.className + '" ';
+      } else if (element.attributes && element.attributes['class']) {
+        classHTML = 'class="' + element.attributes['class'].value + '" ';
+      }
+
+      temp.innerHTML =
+        '<object id="' + elementId + '" ' + classHTML + 'type="' + AdapterJS.WebRTCPlugin.pluginInfo.type + '">' +
+          '<param name="pluginId" value="' + elementId + '" /> ' +
+          '<param name="pageId" value="' + AdapterJS.WebRTCPlugin.pageId + '" /> ' +
+          '<param name="windowless" value="true" /> ' +
+          // '<param name="streamId" value="' + streamId + '" /> ' + // legacy support (plugin < 0.8.883)
+          '<param name="tag" value="' + tag + '" /> ' +
+        '</object>';
+      while (temp.firstChild) {
+        frag.appendChild(temp.firstChild);
+      }
+
+      var height = '';
+      var width = '';
+      if (element.clientWidth || element.clientHeight) {
+        width = element.clientWidth;
+        height = element.clientHeight;
+      }
+      else if (element.width || element.height) {
+        width = element.width;
+        height = element.height;
+      }
+
+      element.parentNode.insertBefore(frag, element);
+      frag = document.getElementById(elementId);
+      frag.width = width;
+      frag.height = height;
+      element.parentNode.removeChild(element);
+      var newElement = document.getElementById(elementId);
+      AdapterJS.forwardEventHandlers(newElement, element, Object.getPrototypeOf(element));
+      return newElement;
+    };
+
     attachMediaStream = function (element, stream) {
       if (!element || !element.parentNode) {
         return;
@@ -1225,101 +1282,61 @@ if ( (navigator.mozGetUserMedia ||
         streamId = stream.id;
       }
 
-      var elementId = element.id.length === 0 ? Math.random().toString(36).slice(2) : element.id;
+      // var elementId = element.id.length === 0 ? Math.random().toString(36).slice(2) : element.id;
       var nodeName = element.nodeName.toLowerCase();
-      if (nodeName !== 'object') { // not a plugin <object> tag yet
-        var tag;
-        switch(nodeName) {
-          case 'audio':
-            tag = AdapterJS.WebRTCPlugin.TAGS.AUDIO;
-            break;
-          case 'video':
-            tag = AdapterJS.WebRTCPlugin.TAGS.VIDEO;
-            break;
-          default:
-            tag = AdapterJS.WebRTCPlugin.TAGS.NONE;
-          }
-
-        var frag = document.createDocumentFragment();
-        var temp = document.createElement('div');
-        var classHTML = '';
-        if (element.className) {
-          classHTML = 'class="' + element.className + '" ';
-        } else if (element.attributes && element.attributes['class']) {
-          classHTML = 'class="' + element.attributes['class'].value + '" ';
-        }
-
-        temp.innerHTML = '<object id="' + elementId + '" ' + classHTML +
-          'type="' + AdapterJS.WebRTCPlugin.pluginInfo.type + '">' +
-          '<param name="pluginId" value="' + elementId + '" /> ' +
-          '<param name="pageId" value="' + AdapterJS.WebRTCPlugin.pageId + '" /> ' +
-          '<param name="windowless" value="true" /> ' +
-          '<param name="streamId" value="' + streamId + '" /> ' + // legacy support (plugin < 0.8.883)
-          '<param name="tag" value="' + tag + '" /> ' +
-          '</object>';
-        while (temp.firstChild) {
-          frag.appendChild(temp.firstChild);
-        }
-
-        var height = '';
-        var width = '';
-        if (element.clientWidth || element.clientHeight) {
-          width = element.clientWidth;
-          height = element.clientHeight;
-        }
-        else if (element.width || element.height) {
-          width = element.width;
-          height = element.height;
-        }
-
-        element.parentNode.insertBefore(frag, element);
-        frag = document.getElementById(elementId);
-        frag.width = width;
-        frag.height = height;
-        element.parentNode.removeChild(element);
-      } else { // already an <object> tag, just change the stream id
-        var children = element.children;
-        for (var i = 0; i !== children.length; ++i) {
-          if (children[i].name === 'streamId') {
-            children[i].value = streamId;
-            break;
-          }
-        }
-      }
-      var newElement = document.getElementById(elementId);
-      if (typeof newElement.srcObject !== 'undefined') {
-        newElement.srcObject = stream;
-      } else {
-        // Legacy support (plugin < 0.8.883)
-        newElement.setStreamId(streamId);
-      }
-      AdapterJS.forwardEventHandlers(newElement, element, Object.getPrototypeOf(element));
+      var newElement = nodeName === 'object' ? element : AdapterJS.replaceElement(element);
+      AdapterJS.WebRTCPlugin.plugin.attachMS(newElement.getInternalId(), stream);
+      // if (nodeName !== 'object') { // not a plugin <object> tag yet
+      //   newElement = AdapterJS.replaceElement(element);
+      // } else { // already an <object> tag, just change the stream id
+      //   var children = element.children;
+      //   for (var i = 0; i !== children.length; ++i) {
+      //     if (children[i].name === 'streamId') {
+      //       children[i].value = streamId;
+      //       break;
+      //     }
+      //   }
+      // }
+      // var newElement = document.getElementById(elementId);
+      // window.renderer = newElement.renderer;
+      // window.renderer.setStream(stream);
+      // if (typeof newElement.srcObject !== 'undefined') {
+      //   newElement.srcObject = stream;
+      // } else {
+      //   // Legacy support (plugin < 0.8.883)
+      //   newElement.setStreamId(streamId);
+      // }
 
       return newElement;
     };
 
     reattachMediaStream = function (to, from) {
-      var stream = null;
-      if (typeof from.srcObject !== 'undefined') {
-        stream = from.srcObject;
-      } else {
-        // Legacy support (plugin < 0.8.883)
-        var children = from.children;
-        for (var i = 0; i !== children.length; ++i) {
-          if (children[i].name === 'streamId') {
-            AdapterJS.WebRTCPlugin.WaitForPluginReady();
-            stream = AdapterJS.WebRTCPlugin.plugin
-              .getStreamWithId(AdapterJS.WebRTCPlugin.pageId, children[i].value);
-            break;
-          }
-        }
-      }
+      // assumes from is already a plugin <object>
+      var nodeName = to.nodeName.toLowerCase();
+      var newTo = nodeName === 'object' ? to : AdapterJS.replaceElement(to);
+      plugin0.reattachMS(newTo, from);
+      return newTo;
+      // var stream = null;
+      // if (typeof from.srcObject !== 'undefined') {
+      //   stream = from.srcObject;
+      // } else {
+      //   // Legacy support (plugin < 0.8.883)
+      //   var children = from.children;
+      //   for (var i = 0; i !== children.length; ++i) {
+      //     if (children[i].name === 'streamId') {
+      //       AdapterJS.WebRTCPlugin.WaitForPluginReady();
+      //       stream = AdapterJS.WebRTCPlugin.plugin
+      //         .getStreamWithId(AdapterJS.WebRTCPlugin.pageId, children[i].value);
+      //       break;
+      //     }
+      //   }
+      // }
 
-      if (stream !== null) {
-        return attachMediaStream(to, stream);
-      } else {
-        console.log('Could not find the stream associated with this element');
-      }
+      // if (stream !== null) {
+      //   return attachMediaStream(to, stream);
+      // } else {
+      //   console.log('Could not find the stream associated with this element');
+      // }
     };
 
     // Propagate attachMediaStream and gUM in window and AdapterJS
