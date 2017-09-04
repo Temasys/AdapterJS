@@ -12,7 +12,7 @@ var gUMTimeout = 15000;
 var testItemTimeout = 120000;
 
 // Stress test, popping plugin elements in and out 'POP_REQUESTS' times
-var POP_REQUESTS = 100;
+var POP_REQUESTS = 20;
 
 // !!! THIS TEST ONLY APPLIES FOR PLUGIN-BASED BROWSERS !!!
 if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
@@ -61,25 +61,24 @@ if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') {
       this.timeout(testItemTimeout);
 
       var popCount = 0;
-      var t;
 
+      var onplayHandler = function() {
+        if (++popCount >= POP_REQUESTS) {
+          done();
+        } else {
+          replaceVideoElement();
+        }
+      }
       var replaceVideoElement = function() {
-        clearTimeout(t);
         document.body.removeChild(video);
         video = document.createElement('video');
         document.body.appendChild(video);
-        video.onplay = replaceVideoElement;
+        video.onplay = onplayHandler ;
         video = attachMediaStream(video, stream);
-        t = setTimeout(replaceVideoElement, 500);
-
         expect(video.valid).to.equal(true);
-        if (++popCount >= POP_REQUESTS) {
-          clearTimeout(t);
-          done();
-        }
       };
       replaceVideoElement();
     });
 
   }); // describe('Plugin Object | Stability'
-} // if(webrtcDetectedBrowser === 'safari' || webrtcDetectedBrowser === 'IE') 
+}
