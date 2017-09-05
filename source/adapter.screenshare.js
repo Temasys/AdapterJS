@@ -61,7 +61,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     }
   };
 
-  if (window.navigator.mozGetUserMedia) {
+  if (AdapterJS.webrtcDetectedType === 'moz') {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
@@ -112,7 +112,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
             //   trigger installation for legacy extension (which no longer can be used) to enable screensharing
             if (useExtensionErrors.indexOf(error.name) > -1 &&
             // Note that "https:" should be required for screensharing 
-              window.webrtcDetectedVersion < 52 && window.parent.location.protocol === 'https:') {
+              AdapterJS.webrtcDetectedVersion < 52 && window.parent.location.protocol === 'https:') {
               // Render the notification bar to install legacy Firefox (for 51 and below) extension
               AdapterJS.renderNotificationBar(AdapterJS.TEXT.EXTENSION.REQUIRE_INSTALLATION_FF,
                 AdapterJS.TEXT.EXTENSION.BUTTON_FF, function (e) {
@@ -148,7 +148,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
       });
     };*/
 
-  } else if (window.navigator.webkitGetUserMedia && window.webrtcDetectedBrowser !== 'safari') {
+  } else if (AdapterJS.webrtcDetectedType === 'webkit') {
     baseGetUserMedia = window.navigator.getUserMedia;
     var iframe = document.createElement('iframe');
 
@@ -180,8 +180,8 @@ AdapterJS._defineMediaSourcePolyfill = function () {
         }
 
         // Backwards compability for Opera browsers not working when not configured
-        if (!(window.webrtcDetectedBrowser === 'opera' ? !!AdapterJS.extensionInfo.opera.extensionId : 
-          window.webrtcDetectedBrowser === 'chrome')) {
+        if (!(AdapterJS.webrtcDetectedBrowser === 'opera' ? !!AdapterJS.extensionInfo.opera.extensionId : 
+          AdapterJS.webrtcDetectedBrowser === 'chrome')) {
           failureCb(new Error('Current browser does not support screensharing'));
           return;
         }
@@ -269,12 +269,12 @@ AdapterJS._defineMediaSourcePolyfill = function () {
 
         // Communicate with detectRTC (iframe) method to retrieve source ID
         // Opera browser should not use iframe method
-        if (AdapterJS.extensionInfo.chrome.iframeLink && window.webrtcDetectedBrowser !== 'opera') {
+        if (AdapterJS.extensionInfo.chrome.iframeLink && AdapterJS.webrtcDetectedBrowser !== 'opera') {
           iframe.getSourceId(updatedConstraints.video.mediaSource, fetchStream);
         // Communicate with extension directly (needs updated extension code)
         } else {
-          var extensionId = AdapterJS.extensionInfo[window.webrtcDetectedBrowser === 'opera' ? 'opera' : 'chrome'].extensionId;
-          var extensionLink = AdapterJS.extensionInfo[window.webrtcDetectedBrowser === 'opera' ? 'opera' : 'chrome'].extensionLink;
+          var extensionId = AdapterJS.extensionInfo[AdapterJS.webrtcDetectedBrowser === 'opera' ? 'opera' : 'chrome'].extensionId;
+          var extensionLink = AdapterJS.extensionInfo[AdapterJS.webrtcDetectedBrowser === 'opera' ? 'opera' : 'chrome'].extensionLink;
           var icon = document.createElement('img');
           icon.src = 'chrome-extension://' + extensionId + '/icon.png';
 
@@ -344,7 +344,7 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     };
 
     // Start loading the iframe
-    if (window.webrtcDetectedBrowser === 'chrome') {
+    if (AdapterJS.webrtcDetectedBrowser === 'chrome') {
       var states = {
         loaded: false,
         error: false
@@ -470,12 +470,15 @@ AdapterJS._defineMediaSourcePolyfill = function () {
       (document.body || document.documentElement).appendChild(iframe);
     }
 
-  } else if (navigator.mediaDevices && navigator.userAgent.match(/Edge\/(\d+).(\d+)$/)) {
+  } else if (AdapterJS.webrtcDetectedBrowser === 'edge') {
     // Note: Not overriding getUserMedia() to reject "mediaSource" as to prevent "Invalid calling object" errors.
     // Nothing here because edge does not support screensharing
     console.warn('Edge does not support screensharing feature in getUserMedia');
 
-  } else {
+  } else if (AdapterJS.webrtcDetectedType === 'AppleWebKit') {
+    // don't do anything. Screensharing is not supported
+    console.warn('Safari does not support screensharing feature in getUserMedia');
+  } else if (AdapterJS.webrtcDetectedType === 'plugin') {
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
