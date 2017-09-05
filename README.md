@@ -25,11 +25,14 @@ AdapterJS provides polyfills and cross-browser helpers for WebRTC. It wraps arou
 | Opera             | `26`         | MacOS / Win / Ubuntu / Android |  Yes (if configured with extension)                       | 
 | Edge              | `13.10547`^  | Win                      |  -                        |
 | Bowser            | `0.6.1`      | iOS 9.x only**           |  -                        |
-| Safari (Native)   | `11`         | MacOS 10.13.x and iOS 11 |  No. Use Safari with the Temasys plugin |
-| Safari (Plugin)   | `7`***          | MacOS                    | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
+| Safari (Native)   | `11`         | MacOS 10.13.x and iOS 11 |  No. Use Safari with the Temasys plugin*** |
+| Safari (Plugin)   | `7`          | MacOS                    | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
 | IE (Plugin)       | `9`          | Win                      | Yes ([custom build Plugin](https://temasys.io/plugin/#commercial-licensing)) |
+
 *Note that currently Edge doesn't support `RTCDataChannel` API.
+
 **There seems to be issues for Bowser version `0.6.1` working with iOS 10.x version.
+
 *** To use the Temasys plugin on Safari 11 and above, set the flag ```AdapterJS.options.forceSafariPlugin = true``` BEFORE including AdapterJS.
 
 ### How it looks like if WebRTC is not supported by browser
