@@ -311,11 +311,10 @@ AdapterJS.extensionInfo = {
 ```
 
 ## Setup this project
-1. Copy this repository with submodules (`git clone --recursive ...`), or run `git submodule init` and `git submodule update`.
-2. Install or update to at lest version `0.10.26` of node and version `1.4.6 `of npm.
-3. Install `grunt-cli`. (See: http://gruntjs.com/getting-started)
-4. Run `npm install` to install dev dependencies.
-5. Run `npm install -g browserify` and `npm install -g testling` (might require sudo) to install the necessary tools to test locally
+1. Install or update to at lest version `0.10.26` of node and version `1.4.6 `of npm.
+2. Install `grunt-cli`. (See: http://gruntjs.com/getting-started)
+3. Run `npm install` to install dev dependencies.
+4. Run `npm install -g browserify` and `npm install -g testling` (might require sudo) to install the necessary tools to test locally
 
 
 ## Development
@@ -343,9 +342,6 @@ You can configure the browser to test in `Gruntfile.js` (see the karma target).
 You can also run `grunt karma` to run the test and bypass the publish step.
 
 (Mac only) If you are testing the Temasys WebRTC Plugin, you can run `osascript tests/mac.watcher.scpt` to automatically validate the permission popup.
-
-##### `third_party/`
-The `webrtc/adapter` dependency linked repo at commit version.
 
 ## License
 APACHE 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html

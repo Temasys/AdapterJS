@@ -160,18 +160,12 @@ AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
-  if (document.readyState === 'complete') {
+  if (document.readyState === 'interactive' || document.readyState === 'complete') {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
   } else {
-    var timer = setInterval(function () {
-      if (document.readyState === 'complete') {
-        // TODO: update comments, we wait for the document to be ready
-        clearInterval(timer);
-        AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
-        AdapterJS.maybeThroughWebRTCReady();
-      }
-    }, 100);
+    // Try again in 100ms
+    setTimeout(__TemWebRTCReady0, 100);
   }
 };
 
@@ -390,7 +384,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
 
 AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback) {
   // only inject once the page is ready
-  if (document.readyState !== 'complete') {
+  if (document.readyState !== 'interactive' && document.readyState !== 'complete') {
     return;
   }
 
@@ -612,6 +606,9 @@ webrtcDetectedVersion = null;
 // The minimum browser version still supported by AJS.
 webrtcMinimumVersion  = null;
 
+// The type of DC supported by the browser
+webrtcDetectedDCSupport = null;
+
 // The requestUserMedia used by plugin gUM
 requestUserMedia = null;
 
@@ -628,7 +625,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   }
 
 /* jshint ignore:start */
-@Goo@include('third_party/adapter/out/adapter.js', {})
+@Goo@include('node_modules/webrtc-adapter/out/adapter.js', {})
 /* jshint ignore:end */
 
   // END OF INJECTION OF GOOGLE'S ADAPTER.JS CONTENT
@@ -934,7 +931,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
 
   AdapterJS.WebRTCPlugin.injectPlugin = function () {
     // only inject once the page is ready
-    if (document.readyState !== 'complete') {
+    if (document.readyState !== 'interactive' && document.readyState !== 'complete') {
       return;
     }
 
