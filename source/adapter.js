@@ -1,3 +1,14 @@
+// Polyfill forEach which is not supported in IE 8
+if (typeof Array.prototype.forEach !== 'function') {
+  Array.prototype.forEach = function (fn) {
+    var index = 0;
+    while (index < this.length) {
+      fn(this[index], index);
+      index++;
+    }
+  };
+}
+
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
 
