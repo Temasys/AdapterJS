@@ -149,6 +149,18 @@ AdapterJS.WebRTCPlugin.WaitForPluginReady = null;
 // This methid will use an interval to wait for the plugin to be ready.
 AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 
+AdapterJS.documentReady = function () {
+  if (typeof AdapterJS.webrtcDetectedBrowser === 'undefined')
+    AdapterJS.parseWebrtcDetectedBrowser();
+
+  if (AdapterJS.webrtcDetectedBrowser === 'IE'
+      && AdapterJS.webrtcDetectedVersion < 11) {
+    return document.readyState === 'complete'; // IE 11 doesn't like readyState interactive
+  } else {
+    return document.readyState === 'interactive' || document.readyState === 'complete';
+  }
+}
+
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
 // details to the plugin.
@@ -160,7 +172,7 @@ AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 __TemWebRTCReady0 = function () {
-  if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  if (AdapterJS.documentReady()) {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
   } else {
@@ -384,7 +396,7 @@ AdapterJS.addEvent = function(elem, evnt, func) {
 
 AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback) {
   // only inject once the page is ready
-  if (document.readyState !== 'interactive' && document.readyState !== 'complete') {
+  if (!AdapterJS.documentReady()) {
     return;
   }
 
@@ -931,7 +943,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
 
   AdapterJS.WebRTCPlugin.injectPlugin = function () {
     // only inject once the page is ready
-    if (document.readyState !== 'interactive' && document.readyState !== 'complete') {
+    if (!AdapterJS.documentReady()) {
       return;
     }
 
