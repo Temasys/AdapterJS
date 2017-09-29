@@ -11,6 +11,11 @@ AdapterJS.options.getAllCams = !!AdapterJS.options.getAllCams;
 // AdapterJS.options.hidePluginInstallPrompt = true;
 AdapterJS.options.hidePluginInstallPrompt = !!AdapterJS.options.hidePluginInstallPrompt;
 
+// uncomment to allow document.readyState==='interactive" on all browser
+// by default, interactive is not allowed in IE 9 and 10, as it might happen before a <body> is defined
+// AdapterJS.options.alwaysAllowInteractiveState = true;
+AdapterJS.options.alwaysAllowInteractiveState = !!AdapterJS.options.alwaysAllowInteractiveState;
+
 // uncomment to force the use of the plugin on Safari
 // AdapterJS.options.forceSafariPlugin = true;
 AdapterJS.options.forceSafariPlugin = !!AdapterJS.options.forceSafariPlugin;
@@ -153,11 +158,12 @@ AdapterJS.documentReady = function () {
   if (typeof AdapterJS.webrtcDetectedBrowser === 'undefined')
     AdapterJS.parseWebrtcDetectedBrowser();
 
-  if (AdapterJS.webrtcDetectedBrowser === 'IE'
-      && AdapterJS.webrtcDetectedVersion < 11) {
-    return document.readyState === 'complete'; // IE 11 doesn't like readyState interactive
-  } else {
+  if ( AdapterJS.webrtcDetectedBrowser !== 'IE'
+    || AdapterJS.webrtcDetectedVersion > 10 
+    || AdapterJS.options.alwaysAllowInteractiveState) {
     return document.readyState === 'interactive' || document.readyState === 'complete';
+  } else {
+    return document.readyState === 'complete'; // IE 11 doesn't like readyState interactive
   }
 }
 
