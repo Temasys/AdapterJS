@@ -155,16 +155,7 @@ AdapterJS.WebRTCPlugin.WaitForPluginReady = null;
 AdapterJS.WebRTCPlugin.callWhenPluginReady = null;
 
 AdapterJS.documentReady = function () {
-  if (typeof AdapterJS.webrtcDetectedBrowser === 'undefined')
-    AdapterJS.parseWebrtcDetectedBrowser();
-
-  if ( AdapterJS.webrtcDetectedBrowser !== 'IE'
-    || AdapterJS.webrtcDetectedVersion > 10 
-    || AdapterJS.options.alwaysAllowInteractiveState) {
-    return document.readyState === 'interactive' || document.readyState === 'complete';
-  } else {
-    return document.readyState === 'complete'; // IE 11 doesn't like readyState interactive
-  }
+  return (document.readyState === 'interactive' && !!document.body) || document.readyState === 'complete';
 }
 
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
