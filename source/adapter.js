@@ -196,6 +196,7 @@ AdapterJS.TEXT = {
   PLUGIN: {
     REQUIRE_INSTALLATION: 'This website requires you to install a WebRTC-enabling plugin ' +
       'to work on this browser.',
+    REQUIRE_RESTART: 'Your plugin is being downloaded. Please run the installer, and restart your browser to begin using it.',
     NOT_SUPPORTED: 'Your browser does not support WebRTC.',
     BUTTON: 'Install Now'
   },
@@ -1436,6 +1437,11 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     };
 
   AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv = function () {
+    if (!AdapterJS.documentReady()) {
+      return;
+    }
+    document.removeEventListener('readystatechange', AdapterJS.WebRTCPlugin.pluginNeededButNotInstalledCbPriv);
+
     if (AdapterJS.options.hidePluginInstallPrompt) {
       return;
     }
@@ -1456,22 +1462,31 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, function () {
         window.open(downloadLink, '_top');
 
-        var pluginInstallInterval = setInterval(function(){
-          if(AdapterJS.webrtcDetectedBrowser !== 'IE') {
-            navigator.plugins.refresh(false);
-          }
-          AdapterJS.WebRTCPlugin.isPluginInstalled(
-            AdapterJS.WebRTCPlugin.pluginInfo.prefix,
-            AdapterJS.WebRTCPlugin.pluginInfo.plugName,
-            AdapterJS.WebRTCPlugin.pluginInfo.type,
-            function() { // plugin now installed
-              clearInterval(pluginInstallInterval);
-              AdapterJS.WebRTCPlugin.defineWebRTCInterface();
-            },
-            function() {
-              // still no plugin detected, nothing to do
-            });
-        } , 500);
+        if (webrtcDetectedBrowser === 'safari'
+            && webrtcDetectedVersion == 11) {
+          // Safari 11 doesn't have a way to reload the list of plugins
+          AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.REQUIRE_RESTART);
+        } else {
+          // IE or Safari 10-
+          // Try to reload the list of plugins,
+          // start the plugin once available
+          var pluginInstallInterval = setInterval(function(){
+            if(AdapterJS.webrtcDetectedBrowser !== 'IE') { // IE auto-refreshes
+              navigator.plugins.refresh(false);
+            }
+            AdapterJS.WebRTCPlugin.isPluginInstalled(
+                AdapterJS.WebRTCPlugin.pluginInfo.prefix,
+                AdapterJS.WebRTCPlugin.pluginInfo.plugName,
+                AdapterJS.WebRTCPlugin.pluginInfo.type,
+                function() { // plugin now installed
+                  clearInterval(pluginInstallInterval);
+                  AdapterJS.WebRTCPlugin.defineWebRTCInterface();
+                },
+                function() {
+                  // still no plugin detected, nothing to do
+                });
+          } , 500);
+        }
       });
     } else { // no download link, just print a generic explanation
       AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
