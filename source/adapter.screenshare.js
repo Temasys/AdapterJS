@@ -377,16 +377,11 @@ AdapterJS._defineMediaSourcePolyfill = function () {
       // Listen to iframe messages
       var getSourceIdFromIFrame = function (sources, cb) {
         window.addEventListener('message', function iframeListener (evt) {
-          // Unload since it should be replied once if success or failure
-          window.removeEventListener('message', iframeListener);
-          // If no data is returned, it is incorrect
-          if (!evt.data) {
-            cb({
-              success: false,
-              error: new Error('Failed retrieving response')
-            });
+          if (!(evt.data && typeof evt.data === 'object')) {
+            return;
           // Extension not installed
           } else if (evt.data.chromeExtensionStatus === 'not-installed') {
+            window.removeEventListener('message', iframeListener);
             cb({
               success: false,
               error: new Error('Extension is not installed'),
@@ -395,27 +390,24 @@ AdapterJS._defineMediaSourcePolyfill = function () {
             });
           // Extension not enabled
           } else if (evt.data.chromeExtensionStatus === 'installed-disabled') {
+            window.removeEventListener('message', iframeListener);
             cb({
               success: false,
               error: new Error('Extension is disabled')
             });
           // Permission denied for retrieval
           } else if (evt.data.chromeMediaSourceId === 'PermissionDeniedError') {
+            window.removeEventListener('message', iframeListener);
             cb({
               success: false,
               error: new Error('Permission denied for screen retrieval')
             });
           // Source ID retrieved
           } else if (evt.data.chromeMediaSourceId && typeof evt.data.chromeMediaSourceId === 'string') {
+            window.removeEventListener('message', iframeListener);
             cb({
               success: true,
               sourceId: evt.data.chromeMediaSourceId
-            });
-          // Unknown error which is invalid state whereby iframe is not returning correctly and source cannot be retrieved correctly
-          } else {
-            cb({
-              success: false,
-              error: new Error('Failed retrieving selected screen')
             });
           }
         });
