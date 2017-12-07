@@ -462,7 +462,7 @@ var webrtcDetectedType = null;
 // Cross-browser compability.
 // - This is only for SCTP based support browsers.
 // the 'urls' attribute.
-var checkMediaDataChannelSettings =
+AdapterJS.checkMediaDataChannelSettings =
   function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
   if (typeof callback !== 'function') {
     return;
@@ -512,7 +512,7 @@ var checkMediaDataChannelSettings =
 //   - Firefox (offerer) : 'checking' > 'connected'
 //   - Firefox (answerer): 'checking' > 'connected'
 // TODO: that should be AdapterJS.checkIceConnectionState
-var checkIceConnectionState = function (peerId, iceConnectionState, callback) {
+AdapterJS.checkIceConnectionState = function (peerId, iceConnectionState, callback) {
   if (typeof callback !== 'function') {
     console.warn('No callback specified in checkIceConnectionState. Aborted.');
     return;
