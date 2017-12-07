@@ -809,7 +809,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
 
   // Need to override attachMediaStream and reattachMediaStream
   // to support the plugin's logic
-  attachMediaStream_base = attachMediaStream;
+  var attachMediaStream_base = attachMediaStream;
 
   if (AdapterJS.webrtcDetectedBrowser === 'opera') {
     attachMediaStream_base = function (element, stream) {
@@ -833,7 +833,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     }
     return element;
   };
-  reattachMediaStream_base = reattachMediaStream;
+  var reattachMediaStream_base = reattachMediaStream;
   reattachMediaStream = function (to, from) {
     reattachMediaStream_base(to, from);
     return to;
