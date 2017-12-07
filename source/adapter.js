@@ -591,14 +591,14 @@ var RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
 
 // Get UserMedia (only difference is the prefix).
 // Code from Adam Barth.
-var getUserMedia = null;
+var getUserMedia = (typeof getUserMedia  === 'function') ?
+  getUserMedia  : null;
 
 // Attach a media stream to an element.
 var attachMediaStream = null;
 
 // Re-attach a media stream to an element.
 var reattachMediaStream = null;
-
 
 // Detected browser agent name. Types are:
 // - 'firefox': Firefox browser.
@@ -618,7 +618,8 @@ var webrtcMinimumVersion  = null;
 var webrtcDetectedDCSupport = null;
 
 // The requestUserMedia used by plugin gUM
-var requestUserMedia = null;
+var requestUserMedia = (typeof requestUserMedia === 'function') ?
+  requestUserMedia : null;
 
 // Check for browser types and react accordingly
 AdapterJS.parseWebrtcDetectedBrowser();
