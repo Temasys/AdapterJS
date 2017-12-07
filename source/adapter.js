@@ -1,3 +1,5 @@
+'use strict'
+
 // Adapter's interface.
 var AdapterJS = AdapterJS || {};
 
@@ -163,7 +165,7 @@ AdapterJS.documentReady = function () {
 // TemPluginLoaded function might be called on Chrome/Firefox.
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
-__TemWebRTCReady0 = function () {
+var __TemWebRTCReady0 = function () {
   if (AdapterJS.documentReady()) {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
@@ -354,7 +356,7 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
   // Detect Safari
   } else if (/constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification) || navigator.userAgent.match(/AppleWebKit\/(\d+)\./) || navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
     hasMatch = navigator.userAgent.match(/version\/(\d+)/i) || [];
-    AppleWebKitBuild = navigator.userAgent.match(/AppleWebKit\/(\d+)/i) || [];
+    var AppleWebKitBuild = navigator.userAgent.match(/AppleWebKit\/(\d+)/i) || [];
 
     var isMobile      = navigator.userAgent.match(/(iPhone|iPad)/gi);
     var hasNativeImpl = AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604;
@@ -454,13 +456,13 @@ AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback)
 // - 'moz': Mozilla implementation of webRTC.
 // - 'webkit': WebKit implementation of webRTC.
 // - 'plugin': Using the plugin implementation.
-webrtcDetectedType = null;
+var webrtcDetectedType = null;
 
 // Set the settings for creating DataChannels, MediaStream for
 // Cross-browser compability.
 // - This is only for SCTP based support browsers.
 // the 'urls' attribute.
-checkMediaDataChannelSettings =
+var checkMediaDataChannelSettings =
   function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
   if (typeof callback !== 'function') {
     return;
@@ -509,7 +511,8 @@ checkMediaDataChannelSettings =
 //   - Chrome (answerer) : 'checking' > 'connected'
 //   - Firefox (offerer) : 'checking' > 'connected'
 //   - Firefox (answerer): 'checking' > 'connected'
-checkIceConnectionState = function (peerId, iceConnectionState, callback) {
+// TODO: that should be AdapterJS.checkIceConnectionState
+var checkIceConnectionState = function (peerId, iceConnectionState, callback) {
   if (typeof callback !== 'function') {
     console.warn('No callback specified in checkIceConnectionState. Aborted.');
     return;
@@ -554,7 +557,7 @@ checkIceConnectionState = function (peerId, iceConnectionState, callback) {
 //   - If Stun - Create iceServer with stun url.
 //   - Else - Create iceServer with turn url
 //   - This is a WebRTC Function
-createIceServer = null;
+var createIceServer = null;
 
 // Firefox:
 // - Creates IceServers for Firefox
@@ -568,33 +571,33 @@ createIceServer = null;
 // - Creates Ice Servers for Plugin Browsers
 //   - Multiple Urls support
 //   - This is a WebRTC Function
-createIceServers = null;
+var createIceServers = null;
 //------------------------------------------------------------
 
 //Creates MediaStream object.
-MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
+var MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
 
 //The RTCPeerConnection object.
-RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
+var RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
   RTCPeerConnection : null;
 
 // Creates RTCSessionDescription object for Plugin Browsers
-RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
+var RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
   RTCSessionDescription : null;
 
 // Creates RTCIceCandidate object for Plugin Browsers
-RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
+var RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
   RTCIceCandidate : null;
 
 // Get UserMedia (only difference is the prefix).
 // Code from Adam Barth.
-getUserMedia = null;
+var getUserMedia = null;
 
 // Attach a media stream to an element.
-attachMediaStream = null;
+var attachMediaStream = null;
 
 // Re-attach a media stream to an element.
-reattachMediaStream = null;
+var reattachMediaStream = null;
 
 
 // Detected browser agent name. Types are:
@@ -603,19 +606,19 @@ reattachMediaStream = null;
 // - 'opera': Opera browser.
 // - 'safari': Safari browser.
 // - 'IE' - Internet Explorer browser.
-webrtcDetectedBrowser = null;
+var webrtcDetectedBrowser = null;
 
 // Detected browser version.
-webrtcDetectedVersion = null;
+var webrtcDetectedVersion = null;
 
 // The minimum browser version still supported by AJS.
-webrtcMinimumVersion  = null;
+var webrtcMinimumVersion  = null;
 
 // The type of DC supported by the browser
-webrtcDetectedDCSupport = null;
+var webrtcDetectedDCSupport = null;
 
 // The requestUserMedia used by plugin gUM
-requestUserMedia = null;
+var requestUserMedia = null;
 
 // Check for browser types and react accordingly
 AdapterJS.parseWebrtcDetectedBrowser();
@@ -1153,7 +1156,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     ////////////////////////////////////////////////////////////////////////////
     /// MediaStreamTrack
     ////////////////////////////////////////////////////////////////////////////
-    MediaStreamTrack = function(){};
+    var MediaStreamTrack = function(){};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.GetSources(callback);
