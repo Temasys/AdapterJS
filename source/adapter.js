@@ -545,7 +545,7 @@ AdapterJS.checkIceConnectionState = function (peerId, iceConnectionState, callba
 // - Create iceServer with stun url.
 // - Create iceServer with turn url.
 //   - Ignore the transport parameter from TURN url for FF version <=27.
-//   - Return null for createIceServer if transport=tcp.
+//   - Return null for AdapterJS.createIceServer if transport=tcp.
 // - FF 27 and above supports transport parameters in TURN url,
 // - So passing in the full url to create iceServer.
 // Chrome:
@@ -557,7 +557,7 @@ AdapterJS.checkIceConnectionState = function (peerId, iceConnectionState, callba
 //   - If Stun - Create iceServer with stun url.
 //   - Else - Create iceServer with turn url
 //   - This is a WebRTC Function
-var createIceServer = null;
+AdapterJS.createIceServer = null;
 
 // Firefox:
 // - Creates IceServers for Firefox
@@ -571,7 +571,7 @@ var createIceServer = null;
 // - Creates Ice Servers for Plugin Browsers
 //   - Multiple Urls support
 //   - This is a WebRTC Function
-var createIceServers = null;
+AdapterJS.createIceServers = null;
 //------------------------------------------------------------
 
 //Creates MediaStream object.
@@ -643,8 +643,8 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   ///////////////////////////////////////////////////////////////////
   // EXTENSION FOR CHROME, FIREFOX AND EDGE
   // Includes legacy functions
-  // -- createIceServer
-  // -- createIceServers
+  // -- AdapterJS.createIceServer
+  // -- AdapterJS.createIceServers
   // -- MediaStreamTrack.getSources
   //
   // and additional shims
@@ -653,7 +653,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   // -- requestUserMedia
   // -- a call to AdapterJS.maybeThroughWebRTCReady (notifies WebRTC is ready)
 
-  // Add support for legacy functions createIceServer and createIceServers
+  // Add support for legacy functions AdapterJS.createIceServer and AdapterJS.createIceServers
   if ( navigator.mozGetUserMedia ) {
     // Shim for MediaStreamTrack.getSources.
     MediaStreamTrack.getSources = function(successCb) {
@@ -677,8 +677,8 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return to;
     };
 
-    createIceServer = function (url, username, password) {
-      console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
+    AdapterJS.createIceServer = function (url, username, password) {
+      console.warn('AdapterJS.createIceServer is deprecated. It should be replaced with an application level implementation.');
       // Note: Google's import of AJS will auto-reverse to 'url': '...' for FF < 38
 
       var iceServer = null;
@@ -707,12 +707,12 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return iceServer;
     };
 
-    createIceServers = function (urls, username, password) {
-      console.warn('createIceServers is deprecated. It should be replaced with an application level implementation.');
+    AdapterJS.createIceServers = function (urls, username, password) {
+      console.warn('AdapterJS.createIceServers is deprecated. It should be replaced with an application level implementation.');
 
       var iceServers = [];
       for (i = 0; i < urls.length; i++) {
-        var iceServer = createIceServer(urls[i], username, password);
+        var iceServer = AdapterJS.createIceServer(urls[i], username, password);
         if (iceServer !== null) {
           iceServers.push(iceServer);
         }
@@ -742,8 +742,8 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return to;
     };
 
-    createIceServer = function (url, username, password) {
-      console.warn('createIceServer is deprecated. It should be replaced with an application level implementation.');
+    AdapterJS.createIceServer = function (url, username, password) {
+      console.warn('AdapterJS.createIceServer is deprecated. It should be replaced with an application level implementation.');
 
       var iceServer = null;
       var urlParts = url.split(':');
@@ -759,8 +759,8 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return iceServer;
     };
 
-    createIceServers = function (urls, username, password) {
-      console.warn('createIceServers is deprecated. It should be replaced with an application level implementation.');
+    AdapterJS.createIceServers = function (urls, username, password) {
+      console.warn('AdapterJS.createIceServers is deprecated. It should be replaced with an application level implementation.');
 
       var iceServers = [];
       if (AdapterJS.webrtcDetectedVersion >= 34) {
@@ -771,7 +771,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
         };
       } else {
         for (i = 0; i < urls.length; i++) {
-          var iceServer = createIceServer(urls[i], username, password);
+          var iceServer = AdapterJS.createIceServer(urls[i], username, password);
           if (iceServer !== null) {
             iceServers.push(iceServer);
           }
@@ -877,8 +877,8 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   // -- RTCPeerConnection
   // -- RTCSessionDescription
   // -- RTCIceCandidate
-  // -- createIceServer
-  // -- createIceServers
+  // -- AdapterJS.createIceServer
+  // -- AdapterJS.createIceServers
   // -- attachMediaStream
   // -- reattachMediaStream
   // -- webrtcDetectedBrowser
@@ -1041,9 +1041,9 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    /// CreateIceServer
+    /// AdapterJS.createIceServer
     ////////////////////////////////////////////////////////////////////////////
-    createIceServer = function (url, username, password) {
+    AdapterJS.createIceServer = function (url, username, password) {
       var iceServer = null;
       var urlParts = url.split(':');
       if (urlParts[0].indexOf('stun') === 0) {
@@ -1063,12 +1063,12 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     };
 
     ////////////////////////////////////////////////////////////////////////////
-    /// CreateIceServers
+    /// AdapterJS.createIceServers
     ////////////////////////////////////////////////////////////////////////////
-    createIceServers = function (urls, username, password) {
+    AdapterJS.createIceServers = function (urls, username, password) {
       var iceServers = [];
       for (var i = 0; i < urls.length; ++i) {
-        iceServers.push(createIceServer(urls[i], username, password));
+        iceServers.push(AdapterJS.createIceServer(urls[i], username, password));
       }
       return iceServers;
     };
