@@ -458,122 +458,6 @@ AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback)
 // - 'plugin': Using the plugin implementation.
 var webrtcDetectedType = null;
 
-// Set the settings for creating DataChannels, MediaStream for
-// Cross-browser compability.
-// - This is only for SCTP based support browsers.
-// the 'urls' attribute.
-AdapterJS.checkMediaDataChannelSettings =
-  function (peerBrowserAgent, peerBrowserVersion, callback, constraints) {
-  if (typeof callback !== 'function') {
-    return;
-  }
-  var beOfferer = true;
-  var isLocalFirefox = AdapterJS.webrtcDetectedBrowser === 'firefox';
-  // Nightly version does not require MozDontOfferDataChannel for interop
-  var isLocalFirefoxInterop = AdapterJS.webrtcDetectedType === 'moz' && AdapterJS.webrtcDetectedVersion > 30;
-  var isPeerFirefox = peerBrowserAgent === 'firefox';
-  var isPeerFirefoxInterop = peerBrowserAgent === 'firefox' &&
-    ((peerBrowserVersion) ? (peerBrowserVersion > 30) : false);
-
-  // Resends an updated version of constraints for MozDataChannel to work
-  // If other userAgent is firefox and user is firefox, remove MozDataChannel
-  if ((isLocalFirefox && isPeerFirefox) || (isLocalFirefoxInterop)) {
-    try {
-      delete constraints.mandatory.MozDontOfferDataChannel;
-    } catch (error) {
-      console.error('Failed deleting MozDontOfferDataChannel');
-      console.error(error);
-    }
-  } else if ((isLocalFirefox && !isPeerFirefox)) {
-    constraints.mandatory.MozDontOfferDataChannel = true;
-  }
-  if (!isLocalFirefox) {
-    // temporary measure to remove Moz* constraints in non Firefox browsers
-    for (var prop in constraints.mandatory) {
-      if (constraints.mandatory.hasOwnProperty(prop)) {
-        if (prop.indexOf('Moz') !== -1) {
-          delete constraints.mandatory[prop];
-        }
-      }
-    }
-  }
-  // Firefox (not interopable) cannot offer DataChannel as it will cause problems to the
-  // interopability of the media stream
-  if (isLocalFirefox && !isPeerFirefox && !isLocalFirefoxInterop) {
-    beOfferer = false;
-  }
-  callback(beOfferer, constraints);
-};
-
-// Handles the differences for all browsers ice connection state output.
-// - Tested outcomes are:
-//   - Chrome (offerer)  : 'checking' > 'completed' > 'completed'
-//   - Chrome (answerer) : 'checking' > 'connected'
-//   - Firefox (offerer) : 'checking' > 'connected'
-//   - Firefox (answerer): 'checking' > 'connected'
-// TODO: that should be AdapterJS.checkIceConnectionState
-AdapterJS.checkIceConnectionState = function (peerId, iceConnectionState, callback) {
-  if (typeof callback !== 'function') {
-    console.warn('No callback specified in checkIceConnectionState. Aborted.');
-    return;
-  }
-  peerId = (peerId) ? peerId : 'peer';
-
-  if (!AdapterJS._iceConnectionFiredStates[peerId] ||
-    iceConnectionState === AdapterJS._iceConnectionStates.disconnected ||
-    iceConnectionState === AdapterJS._iceConnectionStates.failed ||
-    iceConnectionState === AdapterJS._iceConnectionStates.closed) {
-    AdapterJS._iceConnectionFiredStates[peerId] = [];
-  }
-  iceConnectionState = AdapterJS._iceConnectionStates[iceConnectionState];
-  if (AdapterJS._iceConnectionFiredStates[peerId].indexOf(iceConnectionState) < 0) {
-    AdapterJS._iceConnectionFiredStates[peerId].push(iceConnectionState);
-    if (iceConnectionState === AdapterJS._iceConnectionStates.connected) {
-      setTimeout(function () {
-        AdapterJS._iceConnectionFiredStates[peerId]
-          .push(AdapterJS._iceConnectionStates.done);
-        callback(AdapterJS._iceConnectionStates.done);
-      }, 1000);
-    }
-    callback(iceConnectionState);
-  }
-  return;
-};
-
-// Firefox:
-// - Creates iceServer from the url for Firefox.
-// - Create iceServer with stun url.
-// - Create iceServer with turn url.
-//   - Ignore the transport parameter from TURN url for FF version <=27.
-//   - Return null for AdapterJS.createIceServer if transport=tcp.
-// - FF 27 and above supports transport parameters in TURN url,
-// - So passing in the full url to create iceServer.
-// Chrome:
-// - Creates iceServer from the url for Chrome M33 and earlier.
-//   - Create iceServer with stun url.
-//   - Chrome M28 & above uses below TURN format.
-// Plugin:
-// - Creates Ice Server for Plugin Browsers
-//   - If Stun - Create iceServer with stun url.
-//   - Else - Create iceServer with turn url
-//   - This is a WebRTC Function
-AdapterJS.createIceServer = null;
-
-// Firefox:
-// - Creates IceServers for Firefox
-//   - Use .url for FireFox.
-//   - Multiple Urls support
-// Chrome:
-// - Creates iceServers from the urls for Chrome M34 and above.
-//   - .urls is supported since Chrome M34.
-//   - Multiple Urls support
-// Plugin:
-// - Creates Ice Servers for Plugin Browsers
-//   - Multiple Urls support
-//   - This is a WebRTC Function
-AdapterJS.createIceServers = null;
-//------------------------------------------------------------
-
 //Creates MediaStream object.
 var MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
 
@@ -643,8 +527,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   ///////////////////////////////////////////////////////////////////
   // EXTENSION FOR CHROME, FIREFOX AND EDGE
   // Includes legacy functions
-  // -- AdapterJS.createIceServer
-  // -- AdapterJS.createIceServers
   // -- MediaStreamTrack.getSources
   //
   // and additional shims
@@ -653,7 +535,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   // -- requestUserMedia
   // -- a call to AdapterJS.maybeThroughWebRTCReady (notifies WebRTC is ready)
 
-  // Add support for legacy functions AdapterJS.createIceServer and AdapterJS.createIceServers
+  // Add support for legacy functions
   if ( navigator.mozGetUserMedia ) {
     // Shim for MediaStreamTrack.getSources.
     MediaStreamTrack.getSources = function(successCb) {
@@ -677,48 +559,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return to;
     };
 
-    AdapterJS.createIceServer = function (url, username, password) {
-      console.warn('AdapterJS.createIceServer is deprecated. It should be replaced with an application level implementation.');
-      // Note: Google's import of AJS will auto-reverse to 'url': '...' for FF < 38
-
-      var iceServer = null;
-      var urlParts = url.split(':');
-      if (urlParts[0].indexOf('stun') === 0) {
-        iceServer = { urls : [url] };
-      } else if (urlParts[0].indexOf('turn') === 0) {
-        if (AdapterJS.webrtcDetectedVersion < 27) {
-          var turnUrlParts = url.split('?');
-          if (turnUrlParts.length === 1 ||
-            turnUrlParts[1].indexOf('transport=udp') === 0) {
-            iceServer = {
-              urls : [turnUrlParts[0]],
-              credential : password,
-              username : username
-            };
-          }
-        } else {
-          iceServer = {
-            urls : [url],
-            credential : password,
-            username : username
-          };
-        }
-      }
-      return iceServer;
-    };
-
-    AdapterJS.createIceServers = function (urls, username, password) {
-      console.warn('AdapterJS.createIceServers is deprecated. It should be replaced with an application level implementation.');
-
-      var iceServers = [];
-      for (i = 0; i < urls.length; i++) {
-        var iceServer = AdapterJS.createIceServer(urls[i], username, password);
-        if (iceServer !== null) {
-          iceServers.push(iceServer);
-        }
-      }
-      return iceServers;
-    };
   } else if ( navigator.webkitGetUserMedia ) {
     // Attach a media stream to an element.
     attachMediaStream = function(element, stream) {
@@ -742,43 +582,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
       return to;
     };
 
-    AdapterJS.createIceServer = function (url, username, password) {
-      console.warn('AdapterJS.createIceServer is deprecated. It should be replaced with an application level implementation.');
-
-      var iceServer = null;
-      var urlParts = url.split(':');
-      if (urlParts[0].indexOf('stun') === 0) {
-        iceServer = { 'url' : url };
-      } else if (urlParts[0].indexOf('turn') === 0) {
-        iceServer = {
-          'url' : url,
-          'credential' : password,
-          'username' : username
-        };
-      }
-      return iceServer;
-    };
-
-    AdapterJS.createIceServers = function (urls, username, password) {
-      console.warn('AdapterJS.createIceServers is deprecated. It should be replaced with an application level implementation.');
-
-      var iceServers = [];
-      if (AdapterJS.webrtcDetectedVersion >= 34) {
-        iceServers = {
-          'urls' : urls,
-          'credential' : password,
-          'username' : username
-        };
-      } else {
-        for (i = 0; i < urls.length; i++) {
-          var iceServer = AdapterJS.createIceServer(urls[i], username, password);
-          if (iceServer !== null) {
-            iceServers.push(iceServer);
-          }
-        }
-      }
-      return iceServers;
-    };
   } else if (AdapterJS.webrtcDetectedType === 'AppleWebKit') {
     attachMediaStream = function(element, stream) {
       element.srcObject = stream;
@@ -877,8 +680,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
   // -- RTCPeerConnection
   // -- RTCSessionDescription
   // -- RTCIceCandidate
-  // -- AdapterJS.createIceServer
-  // -- AdapterJS.createIceServers
   // -- attachMediaStream
   // -- reattachMediaStream
   // -- webrtcDetectedBrowser
@@ -1038,39 +839,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
 
     AdapterJS.isDefined = function (variable) {
       return variable !== null && variable !== undefined;
-    };
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// AdapterJS.createIceServer
-    ////////////////////////////////////////////////////////////////////////////
-    AdapterJS.createIceServer = function (url, username, password) {
-      var iceServer = null;
-      var urlParts = url.split(':');
-      if (urlParts[0].indexOf('stun') === 0) {
-        iceServer = {
-          'url' : url,
-          'hasCredentials' : false
-        };
-      } else if (urlParts[0].indexOf('turn') === 0) {
-        iceServer = {
-          'url' : url,
-          'hasCredentials' : true,
-          'credential' : password,
-          'username' : username
-        };
-      }
-      return iceServer;
-    };
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// AdapterJS.createIceServers
-    ////////////////////////////////////////////////////////////////////////////
-    AdapterJS.createIceServers = function (urls, username, password) {
-      var iceServers = [];
-      for (var i = 0; i < urls.length; ++i) {
-        iceServers.push(AdapterJS.createIceServer(urls[i], username, password));
-      }
-      return iceServers;
     };
 
     ////////////////////////////////////////////////////////////////////////////
