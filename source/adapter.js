@@ -165,11 +165,7 @@ AdapterJS.documentReady = function () {
 // TemPluginLoaded function might be called on Chrome/Firefox.
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
-<<<<<<< HEAD
-var __TemWebRTCReady0 = function () {
-=======
 window.__TemWebRTCReady0 = function () {
->>>>>>> TWP-798-jo-multiple-AJS
   if (AdapterJS.documentReady()) {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
@@ -460,33 +456,33 @@ AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback)
 // - 'moz': Mozilla implementation of webRTC.
 // - 'webkit': WebKit implementation of webRTC.
 // - 'plugin': Using the plugin implementation.
-var webrtcDetectedType = null;
+window.webrtcDetectedType = null;
 
 //Creates MediaStream object.
-var MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
+window.MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
 
 //The RTCPeerConnection object.
-var RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
+window.RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
   RTCPeerConnection : null;
 
 // Creates RTCSessionDescription object for Plugin Browsers
-var RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
+window.RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
   RTCSessionDescription : null;
 
 // Creates RTCIceCandidate object for Plugin Browsers
-var RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
+window.RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
   RTCIceCandidate : null;
 
 // Get UserMedia (only difference is the prefix).
 // Code from Adam Barth.
-var getUserMedia = (typeof getUserMedia  === 'function') ?
+window.getUserMedia = (typeof getUserMedia  === 'function') ?
   getUserMedia  : null;
 
 // Attach a media stream to an element.
-var attachMediaStream = null;
+window.attachMediaStream = null;
 
 // Re-attach a media stream to an element.
-var reattachMediaStream = null;
+window.reattachMediaStream = null;
 
 // Detected browser agent name. Types are:
 // - 'firefox': Firefox browser.
@@ -494,19 +490,19 @@ var reattachMediaStream = null;
 // - 'opera': Opera browser.
 // - 'safari': Safari browser.
 // - 'IE' - Internet Explorer browser.
-var webrtcDetectedBrowser = null;
+window.webrtcDetectedBrowser = null;
 
 // Detected browser version.
-var webrtcDetectedVersion = null;
+window.webrtcDetectedVersion = null;
 
 // The minimum browser version still supported by AJS.
-var webrtcMinimumVersion  = null;
+window.webrtcMinimumVersion  = null;
 
 // The type of DC supported by the browser
-var webrtcDetectedDCSupport = null;
+window.webrtcDetectedDCSupport = null;
 
 // The requestUserMedia used by plugin gUM
-var requestUserMedia = (typeof requestUserMedia === 'function') ?
+window.requestUserMedia = (typeof requestUserMedia === 'function') ?
   requestUserMedia : null;
 
 // Check for browser types and react accordingly
