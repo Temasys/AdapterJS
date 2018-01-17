@@ -165,7 +165,11 @@ AdapterJS.documentReady = function () {
 // TemPluginLoaded function might be called on Chrome/Firefox.
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
+<<<<<<< HEAD
 var __TemWebRTCReady0 = function () {
+=======
+window.__TemWebRTCReady0 = function () {
+>>>>>>> TWP-798-jo-multiple-AJS
   if (AdapterJS.documentReady()) {
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.READY;
     AdapterJS.maybeThroughWebRTCReady();
@@ -749,8 +753,28 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     if (AdapterJS.WebRTCPlugin.pluginState !== AdapterJS.WebRTCPlugin.PLUGIN_STATES.INITIALIZING) {
       return;
     }
-
     AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTING;
+
+    var existing = document.getElementById(AdapterJS.WebRTCPlugin.pluginInfo.pluginId);
+    if (!!existing) {
+      // There is already a plugin injected in the DOM.
+      // Probably from multiple calls to node's require(AJS);
+      // Take the existing one, and make it this AJS's plugin
+      AdapterJS.WebRTCPlugin.plugin = existing;
+      AdapterJS.WebRTCPlugin.pluginState = AdapterJS.WebRTCPlugin.PLUGIN_STATES.INJECTED;
+      if (AdapterJS.WebRTCPlugin.plugin.valid) {
+        window[AdapterJS.WebRTCPlugin.pluginInfo.onload](); // call onload function to unlock AJS
+      } else {
+        // wait for plugin.valid with an interval
+        var pluginValidInterval = setInterval(function () {
+          if (AdapterJS.WebRTCPlugin.plugin.valid) {
+            clearInterval(pluginValidInterval);
+            window[AdapterJS.WebRTCPlugin.pluginInfo.onload](); // call onload function to unlock AJS
+          }
+        }, 100);
+      }
+      return;
+    }
 
     if (AdapterJS.webrtcDetectedBrowser === 'IE' && AdapterJS.webrtcDetectedVersion <= 10) {
       var frag = document.createDocumentFragment();
