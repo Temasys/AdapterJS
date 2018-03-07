@@ -471,6 +471,30 @@ AdapterJS._defineMediaSourcePolyfill = function () {
     // don't do anything. Screensharing is not supported
     console.warn('Safari does not support screensharing feature in getUserMedia');
   } else if (AdapterJS.webrtcDetectedType === 'plugin') {
+
+
+    AdapterJS.WebRTCPlugin.parseVersion = function(version) {
+      var components = version.split(".");
+      var parsed = {
+        major:    parseInt(components[0]),
+        minor:    parseInt(components[1]),
+        revision: parseInt(components[2]),
+      }
+      return parsed;
+    };
+
+    AdapterJS.WebRTCPlugin.isVersionGreater = function(v1, v2) {
+      // Parse v1 and v2
+      var parsedV1 = AdapterJS.WebRTCPlugin.parseVersion(v1);
+      var parsedV2 = AdapterJS.WebRTCPlugin.parseVersion(v2);
+
+      // Compare major, minor, revision
+      return (parsedV1.major > parsedV2.major)
+          || (parsedV1.major == parsedV2.major && parsedV1.minor > parsedV2.minor)
+          || (parsedV1.major == parsedV2.major && parsedV1.minor == parsedV2.minor && parsedV1.revision > parsedV2.revision);
+    }
+
+
     baseGetUserMedia = window.navigator.getUserMedia;
 
     navigator.getUserMedia = function (constraints, successCb, failureCb) {
@@ -511,8 +535,10 @@ AdapterJS._defineMediaSourcePolyfill = function () {
             }
 
             // Support for legacy plugins : set the sourceId to the mediaSource value
-            updatedConstraints.video.optional = updatedConstraints.video.optional || [];
-            updatedConstraints.video.optional.push({ sourceId: updatedConstraints.video.mediaSource });
+            if (!AdapterJS.WebRTCPlugin.isVersionGreater(AdapterJS.WebRTCPlugin.plugin.VERSION, '0.8.874')) {
+              updatedConstraints.video.optional = updatedConstraints.video.optional || [];
+              updatedConstraints.video.optional.push({ sourceId: updatedConstraints.video.mediaSource });
+            }
 
             baseGetUserMedia(updatedConstraints, successCb, failureCb);
 

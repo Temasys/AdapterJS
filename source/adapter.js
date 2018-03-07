@@ -1048,8 +1048,10 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
           }
         });
       };
-      navigator.mediaDevices = {getUserMedia: requestUserMedia,
-                                enumerateDevices: function() {
+      if (typeof(navigator.mediaDevices) === 'undefined')
+        navigator.mediaDevices = {};
+      navigator.mediaDevices.getUserMedia = requestUserMedia;
+      navigator.mediaDevices.enumerateDevices = function() {
         return new Promise(function(resolve) {
           var kinds = {audio: 'audioinput', video: 'videoinput'};
           return MediaStreamTrack.getSources(function(devices) {
@@ -1062,7 +1064,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
             }));
           });
         });
-      }};
+      };
     }
 
     ////////////////////////////////////////////////////////////////////////////
