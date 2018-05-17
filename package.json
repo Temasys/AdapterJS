@@ -1,7 +1,7 @@
 {
   "name": "adapterjs",
   "description": "Creating a common API for WebRTC in the browser",
-  "version": "0.15.1",
+  "version": "0.15.2",
   "homepage": "https://temasys.github.io/",
   "author": {
     "name": "Temasys Communications Pte. Ltd.",
@@ -55,7 +55,7 @@
     "karma-script-launcher": "0.1.0",
     "mocha": "2.1.0",
     "requirejs": "^2.1.19",
-    "webrtc-adapter": "5.0.6"
+    "webrtc-adapter": "6.1.5"
   },
   "testling": {
     "files": "tmp/*.js",
