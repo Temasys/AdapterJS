@@ -1,4 +1,4 @@
-/*! adapterjs - v0.15.1 - 2018-03-07 */
+/*! adapterjs - v0.15.2 - 2018-05-28 */
 
 'use strict'
 
@@ -20,7 +20,7 @@ AdapterJS.options.hidePluginInstallPrompt = !!AdapterJS.options.hidePluginInstal
 AdapterJS.options.forceSafariPlugin = !!AdapterJS.options.forceSafariPlugin;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.15.1';
+AdapterJS.VERSION = '0.15.2';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -5716,14 +5716,19 @@ module.exports = {
     var downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLink;
     if(downloadLink) { // if download link
       var popupString;
-      if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) { // is portal link
-       popupString = 'This website requires you to install the ' +
-        ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink +
-        '" target="_blank">' + AdapterJS.WebRTCPlugin.pluginInfo.companyName +
-        ' WebRTC Plugin</a>' +
-        ' to work on this browser.';
+      if (AdapterJS.WebRTCPlugin.pluginInfo.companyName) {
+        // Show the company name and if possible a link to their portal
+        popupString = 'This website requires you to install the ';
+        if (AdapterJS.WebRTCPlugin.pluginInfo.portalLink) {
+          popupString += ' <a href="' + AdapterJS.WebRTCPlugin.pluginInfo.portalLink +
+            '" target="_blank">' + AdapterJS.WebRTCPlugin.pluginInfo.companyName +
+            ' WebRTC Plugin</a>';
+        } else {
+          popupString += AdapterJS.WebRTCPlugin.pluginInfo.companyName + ' WebRTC Plugin';
+        }
+        popupString += ' to work on this browser.';
       } else { // no portal link, just print a generic explanation
-       popupString = AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION;
+        popupString = AdapterJS.TEXT.PLUGIN.REQUIRE_INSTALLATION;
       }
 
       AdapterJS.renderNotificationBar(popupString, AdapterJS.TEXT.PLUGIN.BUTTON, function () {
