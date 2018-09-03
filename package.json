@@ -55,7 +55,7 @@
     "karma-script-launcher": "0.1.0",
     "mocha": "2.1.0",
     "requirejs": "^2.1.19",
-    "webrtc-adapter": "6.2.1"
+    "webrtc-adapter": "6.3.2"
   },
   "testling": {
     "files": "tmp/*.js",
