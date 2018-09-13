@@ -833,13 +833,17 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     function (comName, plugName, plugType, installedCb, notInstalledCb) {
     if (AdapterJS.webrtcDetectedBrowser !== 'IE') {
       var pluginArray = navigator.mimeTypes;
-      for (var i = 0; i < pluginArray.length; i++) {
-        if (pluginArray[i].type.indexOf(plugType) >= 0) {
-          installedCb();
-          return;
+      if (typeof pluginArray !== 'undefined') {
+        for (var i = 0; i < pluginArray.length; i++) {
+          if (pluginArray[i].type.indexOf(plugType) >= 0) {
+            installedCb();
+            return;
+          }
         }
+        notInstalledCb();
+      } else {
+        AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
       }
-      notInstalledCb();
     } else {
       try {
         var axo = new ActiveXObject(comName + '.' + plugName);
