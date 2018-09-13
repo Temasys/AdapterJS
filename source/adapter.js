@@ -843,7 +843,6 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
         notInstalledCb();
       } else {
         AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
-        notInstalledCb();
       }
     } else {
       try {
