@@ -1,4 +1,4 @@
-/*! adapterjs - v0.15.3 - 2018-09-05 */
+/*! adapterjs - v0.15.4 - 2019-01-07 */
 
 'use strict'
 
@@ -20,7 +20,7 @@ AdapterJS.options.hidePluginInstallPrompt = !!AdapterJS.options.hidePluginInstal
 AdapterJS.options.forceSafariPlugin = !!AdapterJS.options.forceSafariPlugin;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.15.3';
+AdapterJS.VERSION = '0.15.4';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -259,6 +259,56 @@ AdapterJS._iceConnectionFiredStates = [];
 // Check if WebRTC Interface is defined.
 AdapterJS.isDefined = null;
 
+// -----------------------------------------------------------
+// Detected webrtc implementation. Types are:
+// - 'moz': Mozilla implementation of webRTC.
+// - 'webkit': WebKit implementation of webRTC.
+// - 'plugin': Using the plugin implementation.
+window.webrtcDetectedType = null;
+
+//Creates MediaStream object.
+window.MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
+
+//The RTCPeerConnection object.
+window.RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
+  RTCPeerConnection : null;
+
+// Creates RTCSessionDescription object for Plugin Browsers
+window.RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
+  RTCSessionDescription : null;
+
+// Creates RTCIceCandidate object for Plugin Browsers
+window.RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
+  RTCIceCandidate : null;
+
+// Get UserMedia (only difference is the prefix).
+// Code from Adam Barth.
+window.getUserMedia = (typeof getUserMedia  === 'function') ?
+  getUserMedia  : null;
+
+// Attach a media stream to an element.
+window.attachMediaStream = null;
+
+// Re-attach a media stream to an element.
+window.reattachMediaStream = null;
+
+// Detected browser agent name. Types are:
+// - 'firefox': Firefox browser.
+// - 'chrome': Chrome browser.
+// - 'opera': Opera browser.
+// - 'safari': Safari browser.
+// - 'IE' - Internet Explorer browser.
+window.webrtcDetectedBrowser = null;
+
+// Detected browser version.
+window.webrtcDetectedVersion = null;
+
+// The minimum browser version still supported by AJS.
+window.webrtcMinimumVersion  = null;
+
+// The type of DC supported by the browser
+window.webrtcDetectedDCSupport = null;
+
 // This function helps to retrieve the webrtc detected browser information.
 // This sets:
 // - webrtcDetectedBrowser: The browser agent name.
@@ -275,11 +325,11 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
   if ((!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0) {
     hasMatch = navigator.userAgent.match(/OPR\/(\d+)/i) || [];
 
-    webrtcDetectedBrowser   = 'opera';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 26;
-    webrtcDetectedType      = 'webkit';
-    webrtcDetectedDCSupport = 'SCTP'; // Opera 20+ uses Chrome 33
+    window.webrtcDetectedBrowser   = 'opera';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    window.webrtcMinimumVersion    = 26;
+    window.webrtcDetectedType      = 'webkit';
+    window.webrtcDetectedDCSupport = 'SCTP'; // Opera 20+ uses Chrome 33
 
   // Detect Bowser on iOS
   } else if (navigator.userAgent.match(/Bowser\/[0-9.]*/g)) {
@@ -287,11 +337,11 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
 
     var chromiumVersion = parseInt((navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [])[2] || '0', 10);
 
-    webrtcDetectedBrowser   = 'bowser';
-    webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
-    webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = 'webkit';
-    webrtcDetectedDCSupport = chromiumVersion > 30 ? 'SCTP' : 'RTP';
+    window.webrtcDetectedBrowser   = 'bowser';
+    window.webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
+    window.webrtcMinimumVersion    = 0;
+    window.webrtcDetectedType      = 'webkit';
+    window.webrtcDetectedDCSupport = chromiumVersion > 30 ? 'SCTP' : 'RTP';
 
 
   // Detect Opera on iOS (does not support WebRTC yet)
@@ -299,47 +349,47 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     hasMatch = navigator.userAgent.match(/OPiOS\/([0-9]+)\./);
 
     // Browser which do not support webrtc yet
-    webrtcDetectedBrowser   = 'opera';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = null;
-    webrtcDetectedDCSupport = null;
+    window.webrtcDetectedBrowser   = 'opera';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    window.webrtcMinimumVersion    = 0;
+    window.webrtcDetectedType      = null;
+    window.webrtcDetectedDCSupport = null;
 
   // Detect Chrome on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('CriOS') > 0) {
     hasMatch = navigator.userAgent.match(/CriOS\/([0-9]+)\./) || [];
 
-    webrtcDetectedBrowser   = 'chrome';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = null;
-    webrtcDetectedDCSupport = null;
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    window.webrtcMinimumVersion    = 0;
+    window.webrtcDetectedType      = null;
+    window.webrtcDetectedBrowser   = 'chrome';
+    window.webrtcDetectedDCSupport = null;
 
   // Detect Firefox on iOS (does not support WebRTC yet)
   } else if (navigator.userAgent.indexOf('FxiOS') > 0) {
     hasMatch = navigator.userAgent.match(/FxiOS\/([0-9]+)\./) || [];
 
     // Browser which do not support webrtc yet
-    webrtcDetectedBrowser   = 'firefox';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 0;
-    webrtcDetectedType      = null;
-    webrtcDetectedDCSupport = null;
+    window.webrtcDetectedBrowser   = 'firefox';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    window.webrtcMinimumVersion    = 0;
+    window.webrtcDetectedType      = null;
+    window.webrtcDetectedDCSupport = null;
 
   // Detect IE (6-11)
   } else if (/*@cc_on!@*/false || !!document.documentMode) {
     hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
 
-    webrtcDetectedBrowser   = 'IE';
-    webrtcDetectedVersion   = parseInt(hasMatch[1], 10);
-    webrtcMinimumVersion    = 9;
-    webrtcDetectedType      = 'plugin';
-    webrtcDetectedDCSupport = 'SCTP';
+    window.webrtcDetectedBrowser   = 'IE';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1], 10);
+    window.webrtcMinimumVersion    = 9;
+    window.webrtcDetectedType      = 'plugin';
+    window.webrtcDetectedDCSupport = 'SCTP';
 
     if (!webrtcDetectedVersion) {
       hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
 
-      webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
+      window.webrtcDetectedVersion = parseInt(hasMatch[1] || '0', 10);
     }
 
   // Detect Edge (20+)
@@ -349,33 +399,33 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
     // Previous webrtc/adapter uses minimum version as 10547 but checking in the Edge release history,
     // It's close to 13.10547 and ObjectRTC API is fully supported in that version
 
-    webrtcDetectedBrowser   = 'edge';
-    webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
-    webrtcMinimumVersion    = 13.10547;
-    webrtcDetectedType      = 'ms';
-    webrtcDetectedDCSupport = null;
+    window.webrtcDetectedBrowser   = 'edge';
+    window.webrtcDetectedVersion   = parseFloat((hasMatch[0] || '0/0').split('/')[1], 10);
+    window.webrtcMinimumVersion    = 13.10547;
+    window.webrtcDetectedType      = 'ms';
+    window.webrtcDetectedDCSupport = null;
 
   // Detect Firefox (1.0+)
   // Placed before Safari check to ensure Firefox on Android is detected
   } else if (typeof InstallTrigger !== 'undefined' || navigator.userAgent.indexOf('irefox') > 0) {
     hasMatch = navigator.userAgent.match(/Firefox\/([0-9]+)\./) || [];
 
-    webrtcDetectedBrowser   = 'firefox';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 33;
-    webrtcDetectedType      = 'moz';
-    webrtcDetectedDCSupport = 'SCTP';
+    window.webrtcDetectedBrowser   = 'firefox';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    window.webrtcMinimumVersion    = 33;
+    window.webrtcDetectedType      = 'moz';
+    window.webrtcDetectedDCSupport = 'SCTP';
 
   // Detect Chrome (1+ and mobile)
   // Placed before Safari check to ensure Chrome on Android is detected
   } else if ((!!window.chrome && !!window.chrome.webstore) || navigator.userAgent.indexOf('Chrom') > 0) {
     hasMatch = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./i) || [];
 
-    webrtcDetectedBrowser   = 'chrome';
-    webrtcDetectedVersion   = parseInt(hasMatch[2] || '0', 10);
-    webrtcMinimumVersion    = 38;
-    webrtcDetectedType      = 'webkit';
-    webrtcDetectedDCSupport = webrtcDetectedVersion > 30 ? 'SCTP' : 'RTP'; // Chrome 31+ supports SCTP without flags
+    window.webrtcDetectedBrowser   = 'chrome';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[2] || '0', 10);
+    window.webrtcMinimumVersion    = 38;
+    window.webrtcDetectedType      = 'webkit';
+    window.webrtcDetectedDCSupport = window.webrtcDetectedVersion > 30 ? 'SCTP' : 'RTP'; // Chrome 31+ supports SCTP without flags
 
   // Detect Safari
   } else if (/constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification) || navigator.userAgent.match(/AppleWebKit\/(\d+)\./) || navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
@@ -384,26 +434,26 @@ AdapterJS.parseWebrtcDetectedBrowser = function () {
 
     var isMobile      = navigator.userAgent.match(/(iPhone|iPad)/gi);
     var hasNativeImpl = AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604;
-    webrtcDetectedBrowser   = 'safari';
-    webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
-    webrtcMinimumVersion    = 7;
+    window.webrtcDetectedBrowser   = 'safari';
+    window.webrtcDetectedVersion   = parseInt(hasMatch[1] || '0', 10);
+    window.webrtcMinimumVersion    = 7;
     if (isMobile) {
-      webrtcDetectedType    = hasNativeImpl ? 'AppleWebKit' : null;
+      window.webrtcDetectedType    = hasNativeImpl ? 'AppleWebKit' : null;
     } else { // desktop
-      var majorVersion = webrtcDetectedVersion;
+      var majorVersion = window.webrtcDetectedVersion;
       var minorVersion = parseInt(hasMatch[2] || '0', 10);
       var nativeImplIsOverridable = majorVersion == 11 && minorVersion < 2;
-      webrtcDetectedType    = hasNativeImpl && !(AdapterJS.options.forceSafariPlugin && nativeImplIsOverridable) ? 'AppleWebKit' : 'plugin';
+      window.webrtcDetectedType    = hasNativeImpl && !(AdapterJS.options.forceSafariPlugin && nativeImplIsOverridable) ? 'AppleWebKit' : 'plugin';
     }
-    webrtcDetectedDCSupport = 'SCTP'; 
+    window.webrtcDetectedDCSupport = 'SCTP'; 
   }
 
   // Scope it to AdapterJS and window for better consistency
-  AdapterJS.webrtcDetectedBrowser   = window.webrtcDetectedBrowser   = webrtcDetectedBrowser;
-  AdapterJS.webrtcDetectedVersion   = window.webrtcDetectedVersion   = webrtcDetectedVersion;
-  AdapterJS.webrtcMinimumVersion    = window.webrtcMinimumVersion    = webrtcMinimumVersion;
-  AdapterJS.webrtcDetectedType      = window.webrtcDetectedType      = webrtcDetectedType;
-  AdapterJS.webrtcDetectedDCSupport = window.webrtcDetectedDCSupport = webrtcDetectedDCSupport; 
+  AdapterJS.webrtcDetectedBrowser   = window.webrtcDetectedBrowser;
+  AdapterJS.webrtcDetectedVersion   = window.webrtcDetectedVersion;
+  AdapterJS.webrtcMinimumVersion    = window.webrtcMinimumVersion;
+  AdapterJS.webrtcDetectedType      = window.webrtcDetectedType;
+  AdapterJS.webrtcDetectedDCSupport = window.webrtcDetectedDCSupport;
 };
 
 AdapterJS.addEvent = function(elem, evnt, func) {
@@ -478,55 +528,6 @@ AdapterJS.renderNotificationBar = function (message, buttonText, buttonCallback)
   }, 300);
 };
 
-// -----------------------------------------------------------
-// Detected webrtc implementation. Types are:
-// - 'moz': Mozilla implementation of webRTC.
-// - 'webkit': WebKit implementation of webRTC.
-// - 'plugin': Using the plugin implementation.
-window.webrtcDetectedType = null;
-
-//Creates MediaStream object.
-window.MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
-
-//The RTCPeerConnection object.
-window.RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
-  RTCPeerConnection : null;
-
-// Creates RTCSessionDescription object for Plugin Browsers
-window.RTCSessionDescription = (typeof RTCSessionDescription === 'function') ?
-  RTCSessionDescription : null;
-
-// Creates RTCIceCandidate object for Plugin Browsers
-window.RTCIceCandidate = (typeof RTCIceCandidate === 'function') ?
-  RTCIceCandidate : null;
-
-// Get UserMedia (only difference is the prefix).
-// Code from Adam Barth.
-window.getUserMedia = (typeof getUserMedia  === 'function') ?
-  getUserMedia  : null;
-
-// Attach a media stream to an element.
-window.attachMediaStream = null;
-
-// Re-attach a media stream to an element.
-window.reattachMediaStream = null;
-
-// Detected browser agent name. Types are:
-// - 'firefox': Firefox browser.
-// - 'chrome': Chrome browser.
-// - 'opera': Opera browser.
-// - 'safari': Safari browser.
-// - 'IE' - Internet Explorer browser.
-window.webrtcDetectedBrowser = null;
-
-// Detected browser version.
-window.webrtcDetectedVersion = null;
-
-// The minimum browser version still supported by AJS.
-window.webrtcMinimumVersion  = null;
-
-// The type of DC supported by the browser
-window.webrtcDetectedDCSupport = null;
 
 // The requestUserMedia used by plugin gUM
 window.requestUserMedia = (typeof requestUserMedia === 'function') ?
@@ -6263,13 +6264,17 @@ module.exports = {
     function (comName, plugName, plugType, installedCb, notInstalledCb) {
     if (AdapterJS.webrtcDetectedBrowser !== 'IE') {
       var pluginArray = navigator.mimeTypes;
-      for (var i = 0; i < pluginArray.length; i++) {
-        if (pluginArray[i].type.indexOf(plugType) >= 0) {
-          installedCb();
-          return;
+      if (typeof pluginArray !== 'undefined') {
+        for (var i = 0; i < pluginArray.length; i++) {
+          if (pluginArray[i].type.indexOf(plugType) >= 0) {
+            installedCb();
+            return;
+          }
         }
+        notInstalledCb();
+      } else {
+        AdapterJS.renderNotificationBar(AdapterJS.TEXT.PLUGIN.NOT_SUPPORTED);
       }
-      notInstalledCb();
     } else {
       try {
         var axo = new ActiveXObject(comName + '.' + plugName);
