@@ -938,7 +938,18 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
         if (iceServers) {
           servers.iceServers = iceServers;
         }
-        return AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
+        var pc = AdapterJS.WebRTCPlugin.plugin.PeerConnection(servers);
+
+        pc.createOffer_ = function(constraints) {
+          var this_ = this;
+          var promise = new Promise(function(resolve, reject) {
+            this_.createOffer(resolve, reject, constraints);
+          });
+          return promise;
+        };
+
+        return pc;
+
       } else {
         var mandatory = (constraints && constraints.mandatory) ?
           constraints.mandatory : null;
