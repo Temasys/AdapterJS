@@ -12,6 +12,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-karma');
     grunt.loadNpmTasks('grunt-string-replace');
 
+    grunt.loadNpmTasks('grunt-browserify');
+
     grunt.initConfig({
 
       pkg: grunt.file.readJSON('package.json'),
@@ -26,6 +28,22 @@ module.exports = function(grunt) {
       pluginInfoFile: grunt.option('pluginInfoFile') || 'pluginInfo.js',
 
       version: '<%= pkg.version %>',
+
+      browserify: {
+        adapter: {
+          src: ['./source/adapter2.js'],
+          dest: './out/adapter2.js',
+          options: {
+            // browserifyOptions: { debug: true },
+            transform: [['babelify', {presets: ['@babel/preset-env']}]],
+            // browserifyOptions: {
+            //   // Exposes shim methods in a global object to the browser.
+            //   // The tests require this.
+            //   standalone: 'adapter'
+            // }
+          }
+        },
+      },
 
       clean: {
         production: ['<%= production %>/'],
@@ -360,4 +378,8 @@ module.exports = function(grunt) {
       'publish',
       'karma'
     ]);
+
+
+
+    grunt.registerTask('build', ['browserify']);
 };
