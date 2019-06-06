@@ -31,7 +31,7 @@ module.exports = function(grunt) {
 
       browserify: {
         adapter: {
-          src: ['./source/adapter2.js'],
+          src: ['./src/adapter2.js'],
           dest: './out/adapter2.js',
           options: {
             // browserifyOptions: { debug: true },
