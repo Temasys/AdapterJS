@@ -84,37 +84,25 @@ function getUserMedia(constraints) {
   })
 };
 
-////////////////////////////////////////////////////////////////////////////
-/// mediaDevices
-////////////////////////////////////////////////////////////////////////////
-// if (typeof Promise !== 'undefined') {
-//   requestUserMedia = function(constraints) {
-//     return new Promise(function(resolve, reject) {
-//       try {
-//         getUserMedia(constraints, resolve, reject);
-//       } catch (error) {
-//         reject(error);
-//       }
-//     });
-//   };
-//   if (typeof(navigator.mediaDevices) === 'undefined')
-//     navigator.mediaDevices = {};
-//   navigator.mediaDevices.getUserMedia = requestUserMedia;
-//   navigator.mediaDevices.enumerateDevices = function() {
-//     return new Promise(function(resolve) {
-//       var kinds = {audio: 'audioinput', video: 'videoinput'};
-//       return MediaStreamTrack.getSources(function(devices) {
-//         resolve(devices.map(function(device) {
-//           return {label: device.label,
-//                   kind: kinds[device.kind],
-//                   id: device.id,
-//                   deviceId: device.id,
-//                   groupId: ''};
-//         }));
-//       });
-//     });
-//   };
-// }
+function enumerateDevices() {
+  return new Promise((resolve, reject) => {
+    pluginManager.callWhenPluginReady(() => {
+      pluginManager.plugin().GetSources((devices) => {
+        var kinds = {audio: 'audioinput', video: 'videoinput'}; // TODO: support audio output
+        var formatted = devices.map((d) => {
+          return {
+            label:      d.label,
+            kind:       kinds[d.kind],
+            id:         d.id,
+            deviceId:   d.id,
+            groupId:    ''
+          };
+        });
+        resolve(formatted);
+      });
+    });
+  });
+}
 
 export function shimGetUserMedia(window, pm) {
   pluginManager = pm;
@@ -129,7 +117,9 @@ export function shimGetUserMedia(window, pm) {
   // };
   
   window.navigator.getUserMedia = getUserMedia;
+
   window.navigator.mediaDevices = {
     getUserMedia: getUserMedia,
-  };  
+    enumerateDevices: enumerateDevices,
+  };
 }
