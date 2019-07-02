@@ -83,4 +83,5 @@ bamboo
 doc
 tests/gen
 tests/results
+out
 
