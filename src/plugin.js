@@ -52,7 +52,11 @@ var options = { // TODO: make this configurable
   getAllCams: false,
   hidePluginInstallPrompt: false
 };
-let w = null;
+let window_ = null; // TODO: remove me if possible
+
+let onwebrtcreadyDone = false;
+let onwebrtcreadies = []; // TODO rename to onWebRTCReadyCallbacks
+
 
 ////////////////////////////////////////////////////////////////////////////
 /// 
@@ -61,7 +65,7 @@ let w = null;
 ////////////////////////////////////////////////////////////////////////////
 
 function init(window) {
-  w = window;
+  window_ = window;
   browserDetails = detectBrowser(window);
   pluginState = PLUGIN_STATES.INITIALIZING;
 }
@@ -105,6 +109,13 @@ function addEvent(elem, evnt, func) {
   }
 };
 
+// Bind arguments starting after however many are passed in.
+function bind_trailing_args(fn, ...bound_args) {
+    return function(...args) {
+        return fn(...args, ...bound_args);
+    };
+}
+
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
 // details to the plugin.
@@ -118,20 +129,23 @@ function addEvent(elem, evnt, func) {
 function onPluginLoaded() {
   if (documentReady()) {
     pluginState = PLUGIN_STATES.READY;
-    AdapterJS.maybeThroughWebRTCReady();
+    maybeThroughWebRTCReady();
   } else {
     // Try again in 100ms
     setTimeout(__TemWebRTCReady0, 100);
   }
 }
 
-// Bind arguments starting after however many are passed in.
-function bind_trailing_args(fn, ...bound_args) {
-    return function(...args) {
-        return fn(...args, ...bound_args);
-    };
-}
+function maybeThroughWebRTCReady() {
+  if (onwebrtcreadyDone) return;
+  onwebrtcreadyDone = true;
 
+  onwebrtcreadies.forEach(function (callback) {
+    if (typeof(callback) === 'function') {
+      callback(plugin !== null);
+    }
+  });
+};
 
 ////////////////////////////////////////////////////////////////////////////
 /// 
@@ -171,7 +185,7 @@ export function injectPlugin(window) {
   if (!documentReady()) {
     addEvent(document
           , 'readystatechange'
-          , bind_trailing_args(injectPlugin, w));
+          , bind_trailing_args(injectPlugin, window));
     return;
   }
 
@@ -226,8 +240,7 @@ export function injectPlugin(window) {
     document.body.appendChild(frag);
 
     // Need to re-fetch the plugin
-    plugin =
-      document.getElementById(config.pluginId);
+    plugin = document.getElementById(config.pluginId);
   } else {
     // Load Plugin
     plugin = document.createElement('object');
@@ -258,7 +271,37 @@ export function injectPlugin(window) {
 };
 
 export function setLogLevel(logLevel) {
-    AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
-      plugin.setLogLevel(logLevel);
-    });
+  AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
+    plugin.setLogLevel(logLevel);
+  });
+};
+
+// Sets a callback function to be called when the WebRTC interface is ready.
+// The first argument is the function to callback.\
+// Throws an error if the first argument is not a function
+
+export function webRTCReady(callback) {
+  if (typeof callback !== 'function') {
+    throw new Error('Callback provided is not a function');
+  }
+
+  var defineScreensharingAndCallback = function () {
+    // Make users having requirejs to use the webRTCReady function to define first
+    // When you set a setTimeout(definePolyfill, 0), it overrides the WebRTC function
+    // This is be more than 0s
+    // if (typeof window_.require === 'function' &&
+    //   typeof AdapterJS._defineMediaSourcePolyfill === 'function') {
+    //   AdapterJS._defineMediaSourcePolyfill(); // TODO: this is for screensharing
+    // }
+
+    // All WebRTC interfaces are ready, just call the callback
+    callback(null !== plugin);
   };
+
+  if (onwebrtcreadyDone) {
+    defineScreensharingAndCallback();
+  } else {
+    // will be triggered automatically when your browser/plugin is ready.
+    onwebrtcreadies.push(defineScreensharingAndCallback);
+  }
+};
