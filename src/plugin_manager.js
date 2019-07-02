@@ -45,7 +45,7 @@ const TEXT = {
 
 let pluginState = PLUGIN_STATES.NONE;
 let pluginId = config.pluginId;
-let plugin = null;
+let pluginObject = null;
 let pageId = Math.random().toString(36).slice(2);
 var browserDetails = null;
 var options = { // TODO: make this configurable
@@ -142,7 +142,7 @@ function maybeThroughWebRTCReady() {
 
   onwebrtcreadies.forEach(function (callback) {
     if (typeof(callback) === 'function') {
-      callback(plugin !== null);
+      callback(pluginObject !== null);
     }
   });
 };
@@ -202,14 +202,14 @@ export function injectPlugin(window) {
     // There is already a plugin injected in the DOM.
     // Probably from multiple calls to node's require(AJS);
     // Take the existing one, and make it this AJS's plugin
-    plugin = existing;
+    pluginObject = existing;
     pluginState = PLUGIN_STATES.INJECTED;
-    if (plugin.valid) {
+    if (pluginObject.valid) {
       window[config.onload](); // call onload function to unlock AJS
     } else {
       // wait for plugin.valid with an interval
       var pluginValidInterval = setInterval(function () {
-        if (plugin.valid) {
+        if (pluginObject.valid) {
           clearInterval(pluginValidInterval);
           window[config.onload](); // call onload function to unlock AJS
         }
@@ -220,8 +220,8 @@ export function injectPlugin(window) {
 
   if (browserDetails.browser === 'IE' && browserDetails.version <= 10) {
     var frag = document.createDocumentFragment();
-    plugin = document.createElement('div');
-    plugin.innerHTML = '<object id="' +
+    pluginObject = document.createElement('div');
+    pluginObject.innerHTML = '<object id="' +
       config.pluginId + '" type="' +
       config.type + '" ' + 'width="1" height="1">' +
       '<param name="pluginId" value="' +
@@ -234,29 +234,28 @@ export function injectPlugin(window) {
       (options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
 
       '</object>';
-    while (plugin.firstChild) {
-      frag.appendChild(plugin.firstChild);
+    while (pluginObject.firstChild) {
+      frag.appendChild(pluginObject.firstChild);
     }
     document.body.appendChild(frag);
 
     // Need to re-fetch the plugin
-    plugin = document.getElementById(config.pluginId);
+    pluginObject = document.getElementById(config.pluginId);
   } else {
     // Load Plugin
-    plugin = document.createElement('object');
-    plugin.id =
-      config.pluginId;
+    pluginObject = document.createElement('object');
+    pluginObject.id = config.pluginId;
     // IE will only start the plugin if it's ACTUALLY visible
     if (browserDetails.browser === 'IE') {
-      plugin.width = '1px';
-      plugin.height = '1px';
+      pluginObject.width = '1px';
+      pluginObject.height = '1px';
     } else { // The size of the plugin on Safari should be 0x0px
             // so that the autorisation prompt is at the top
-      plugin.width = '0px';
-      plugin.height = '0px';
+      pluginObject.width = '0px';
+      pluginObject.height = '0px';
     }
-    plugin.type = config.type;
-    plugin.innerHTML = '<param name="onload" value="' +
+    pluginObject.type = config.type;
+    pluginObject.innerHTML = '<param name="onload" value="' +
       config.onload + '">' +
       '<param name="pluginId" value="' +
       config.pluginId + '">' +
@@ -264,15 +263,15 @@ export function injectPlugin(window) {
       (options.getAllCams ? '<param name="forceGetAllCams" value="True" />':'') +
       '<param name="pageId" value="' + pageId + '">' +
       '<param name="tag" value="' + PLUGIN_TAGS.NONE + '" />';
-    document.body.appendChild(plugin);
+    document.body.appendChild(pluginObject);
   }
 
   pluginState = PLUGIN_STATES.INJECTED;
 };
 
 export function setLogLevel(logLevel) {
-  AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
-    plugin.setLogLevel(logLevel);
+  callWhenPluginReady(function() {
+    pluginObject.setLogLevel(logLevel);
   });
 };
 
@@ -295,7 +294,7 @@ export function webRTCReady(callback) {
     // }
 
     // All WebRTC interfaces are ready, just call the callback
-    callback(null !== plugin);
+    callback(null !== pluginObject);
   };
 
   if (onwebrtcreadyDone) {
@@ -304,4 +303,8 @@ export function webRTCReady(callback) {
     // will be triggered automatically when your browser/plugin is ready.
     onwebrtcreadies.push(defineScreensharingAndCallback);
   }
+};
+
+export function plugin() {
+  return pluginObject;
 };
