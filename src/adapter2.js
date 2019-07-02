@@ -2,6 +2,7 @@
 
 console.log('AdapterJS');
 
+import '@babel/polyfill';
 import adapter from 'webrtc-adapter/dist/adapter_core';
 
 // import * as config          from './config';

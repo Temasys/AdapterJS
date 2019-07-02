@@ -72,16 +72,16 @@ function constraintsToPlugin(c) {
 ////////////////////////////////////////////////////////////////////////////
 /// getUserMedia
 ////////////////////////////////////////////////////////////////////////////
-function getUserMedia(constraints, successCallback, failureCallback) {
+function getUserMedia(constraints) {
   var cc = {};
-  cc.audio = constraints.audio ?
-    constraintsToPlugin(constraints.audio) : false;
-  cc.video = constraints.video ?
-    constraintsToPlugin(constraints.video) : false;
+  cc.audio = constraints.audio ? constraintsToPlugin(constraints.audio) : false;
+  cc.video = constraints.video ? constraintsToPlugin(constraints.video) : false;
 
-  pluginManager.callWhenPluginReady(function() {
-    pluginManager.plugin().getUserMedia(cc, successCallback, failureCallback);
-  });
+  return new Promise((resolve, reject) => {  
+    pluginManager.callWhenPluginReady(() => {
+      pluginManager.plugin().getUserMedia(cc, resolve, reject);
+    });
+  })
 };
 
 ////////////////////////////////////////////////////////////////////////////
@@ -129,6 +129,7 @@ export function shimGetUserMedia(window, pm) {
   // };
   
   window.navigator.getUserMedia = getUserMedia;
-
-  
+  window.navigator.mediaDevices = {
+    getUserMedia: getUserMedia,
+  };  
 }
