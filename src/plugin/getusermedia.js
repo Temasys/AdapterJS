@@ -1,10 +1,20 @@
 'use strict';
 
-// let window_ = null;
+////////////////////////////////////////////////////////////////////////////
+/// 
+/// local variables
+/// 
+////////////////////////////////////////////////////////////////////////////
+
 let pluginManager = null;
 
-// getUserMedia constraints shim.
-// Copied from Chrome
+
+////////////////////////////////////////////////////////////////////////////
+/// 
+/// Internal functions
+/// 
+////////////////////////////////////////////////////////////////////////////
+
 function constraintsToPlugin(c) {
   if (typeof c !== 'object' || c.mandatory || c.optional) {
     return c;
@@ -69,9 +79,6 @@ function constraintsToPlugin(c) {
   return cc;
 };
 
-////////////////////////////////////////////////////////////////////////////
-/// getUserMedia
-////////////////////////////////////////////////////////////////////////////
 function getUserMedia(constraints) {
   var cc = {};
   cc.audio = constraints.audio ? constraintsToPlugin(constraints.audio) : false;
@@ -104,20 +111,16 @@ function enumerateDevices() {
   });
 }
 
+////////////////////////////////////////////////////////////////////////////
+/// 
+/// exports
+/// 
+////////////////////////////////////////////////////////////////////////////
+
 export function shimGetUserMedia(window, pm) {
   pluginManager = pm;
-
-  // const navigator = window && window.navigator;
-
-  // getUserMedia error shim.
-  // const origGetUserMedia = navigator.mediaDevices.getUserMedia.
-  //     bind(navigator.mediaDevices);
-  // navigator.mediaDevices.getUserMedia = function(c) {
-  //   return origGetUserMedia(c).catch(e => Promise.reject(shimError_(e)));
-  // };
   
   window.navigator.getUserMedia = getUserMedia;
-
   window.navigator.mediaDevices = {
     getUserMedia: getUserMedia,
     enumerateDevices: enumerateDevices,

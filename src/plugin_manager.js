@@ -1,7 +1,9 @@
 'use strict';
 
-import * as utils from 'webrtc-adapter/dist/utils';
-import config from './config';
+import * as webrtcUtils from 'webrtc-adapter/dist/utils';
+import * as utils       from './utils';
+import config           from './config';
+import { PLUGIN_TAGS }  from './plugin_enum';
 
 ////////////////////////////////////////////////////////////////////////////
 /// 
@@ -15,12 +17,6 @@ const PLUGIN_STATES = {
   INJECTING : 2,      // Injecting plugin
   INJECTED: 3,        // Plugin element injected but not usable yet
   READY: 4            // Plugin ready to be used
-};
-
-const PLUGIN_TAGS = {
-  NONE  : 'none',
-  AUDIO : 'audio',
-  VIDEO : 'video'
 };
 
 const TEXT = {
@@ -43,39 +39,32 @@ const TEXT = {
 /// 
 ////////////////////////////////////////////////////////////////////////////
 
-let pluginState = PLUGIN_STATES.NONE;
-let pluginId = config.pluginId;
-let pluginObject = null;
-let pageId = Math.random().toString(36).slice(2);
-var browserDetails = null;
-var options = { // TODO: make this configurable
-  getAllCams: false,
-  hidePluginInstallPrompt: false
-};
-let window_ = null; // TODO: remove me if possible
-
-let onwebrtcreadyDone = false;
-let onwebrtcreadies = []; // TODO rename to onWebRTCReadyCallbacks
+let window_             = null;
+var browserDetails      = null;
+let pageId              = null;
+let pluginObject        = null;
+let pluginId            = config.pluginId;
+let pluginState         = PLUGIN_STATES.NONE;
+var options             = { // TODO: make this configurable
+                            getAllCams: false,
+                            hidePluginInstallPrompt: false
+                          };
+let onwebrtcreadyDone   = false; // TODO can we just use onwebrtcreadies and onwebrtcreadies.length ?
+let onwebrtcreadies     = []; // TODO rename to onWebRTCReadyCallbacks
 
 
 ////////////////////////////////////////////////////////////////////////////
 /// 
-/// Internet functions
+/// Internal functions
 /// 
 ////////////////////////////////////////////////////////////////////////////
-
-function init(window) {
-  window_ = window;
-  browserDetails = detectBrowser(window);
-  pluginState = PLUGIN_STATES.INITIALIZING;
-}
 
 function documentReady() {
   return (document.readyState === 'interactive' && !!document.body) || document.readyState === 'complete';
 }
 
 function detectBrowser(window) {
-  var result = utils.detectBrowser(window);
+  var result = webrtcUtils.detectBrowser(window);
 
   if (/*@cc_on!@*/false || !!document.documentMode) {
     var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
@@ -96,24 +85,6 @@ function detectBrowser(window) {
   }
 
   return result;
-}
-
- 
-function addEvent(elem, evnt, func) {
-  if (elem.addEventListener) { // W3C DOM
-    elem.addEventListener(evnt, func, false);
-  } else if (elem.attachEvent) {// OLD IE DOM
-    elem.attachEvent('on'+evnt, func);
-  } else { // No much to do
-    elem[evnt] = func;
-  }
-};
-
-// Bind arguments starting after however many are passed in.
-function bind_trailing_args(fn, ...bound_args) {
-    return function(...args) {
-        return fn(...args, ...bound_args);
-    };
 }
 
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
@@ -153,6 +124,12 @@ function maybeThroughWebRTCReady() {
 /// 
 ////////////////////////////////////////////////////////////////////////////
 
+export function init(window, pageid) {
+  window_ = window;
+  pageId = pageid;
+  browserDetails = detectBrowser(window);
+  pluginState = PLUGIN_STATES.INITIALIZING;
+}
 
 /* jshint -W035 */
 export function WaitForPluginReady() {
@@ -178,14 +155,17 @@ export function callWhenPluginReady(callback) {
   }
 };
 
-export function injectPlugin(window) {
-  init(window); // TODO: move me
+export function injectPlugin() {
+  if (!window_) {
+    console.error('plugin_manager needs init() to be called before injectPlugin');
+    return;
+  }
 
   // only inject once the page is ready
   if (!documentReady()) {
-    addEvent(document
+    utils.addEvent(document
           , 'readystatechange'
-          , bind_trailing_args(injectPlugin, window));
+          , utils.bind_trailing_args(injectPlugin, window_));
     return;
   }
 
@@ -195,7 +175,7 @@ export function injectPlugin(window) {
   }
   pluginState = PLUGIN_STATES.INJECTING;
 
-  window.__TemWebRTCReady0 = onPluginLoaded;
+  window_.__TemWebRTCReady0 = onPluginLoaded;
 
   var existing = document.getElementById(config.pluginId);
   if (!!existing) {
@@ -205,13 +185,13 @@ export function injectPlugin(window) {
     pluginObject = existing;
     pluginState = PLUGIN_STATES.INJECTED;
     if (pluginObject.valid) {
-      window[config.onload](); // call onload function to unlock AJS
+      window_[config.onload](); // call onload function to unlock AJS
     } else {
       // wait for plugin.valid with an interval
       var pluginValidInterval = setInterval(function () {
         if (pluginObject.valid) {
           clearInterval(pluginValidInterval);
-          window[config.onload](); // call onload function to unlock AJS
+          window_[config.onload](); // call onload function to unlock AJS
         }
       }, 100);
     }
