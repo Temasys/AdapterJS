@@ -1,8 +1,7 @@
 'use strict';
 
-import * as webrtcUtils from 'webrtc-adapter/dist/utils';
-import * as utils       from './utils';
-import config           from './config';
+import * as utils       from './../utils';
+import config           from './../config';
 import { PLUGIN_TAGS }  from './plugin_enum';
 
 ////////////////////////////////////////////////////////////////////////////
@@ -63,30 +62,6 @@ function documentReady() {
   return (document.readyState === 'interactive' && !!document.body) || document.readyState === 'complete';
 }
 
-function detectBrowser(window) {
-  var result = webrtcUtils.detectBrowser(window);
-
-  if (/*@cc_on!@*/false || !!document.documentMode) {
-    var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
-
-    result.browser = 'IE';
-    result.version   = parseInt(hasMatch[1], 10);
-
-    // window.webrtcDetectedBrowser   = 'IE';
-    // window.webrtcDetectedVersion   = parseInt(hasMatch[1], 10);
-    // window.webrtcMinimumVersion    = 9;
-    // window.webrtcDetectedType      = 'plugin';
-    // window.webrtcDetectedDCSupport = 'SCTP';
-
-    if (!result.version) {
-      hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
-      result.version = parseInt(hasMatch[1] || '0', 10);
-    }
-  }
-
-  return result;
-}
-
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
 // details to the plugin.
@@ -127,7 +102,7 @@ function maybeThroughWebRTCReady() {
 export function init(window, pageid) {
   window_ = window;
   pageId = pageid;
-  browserDetails = detectBrowser(window);
+  browserDetails = utils.detectBrowser(window);
   pluginState = PLUGIN_STATES.INITIALIZING;
 }
 

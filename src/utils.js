@@ -1,5 +1,7 @@
 'use strict';
 
+import * as webrtcUtils from 'webrtc-adapter/dist/utils';
+
 ////////////////////////////////////////////////////////////////////////////
 /// 
 /// local variables
@@ -36,4 +38,47 @@ export function addEvent(elem, evnt, func) {
     elem[evnt] = func;
   }
 };
+
+export function detectBrowser(window) {
+  var result = webrtcUtils.detectBrowser(window);
+
+  if (/*@cc_on!@*/false || !!document.documentMode) {
+    var hasMatch = /\brv[ :]+(\d+)/g.exec(navigator.userAgent) || [];
+
+    result.browser = 'IE';
+    result.version = parseInt(hasMatch[1], 10);
+
+    // window.webrtcDetectedBrowser   = 'IE';
+    // window.webrtcDetectedVersion   = parseInt(hasMatch[1], 10);
+    // window.webrtcMinimumVersion    = 9;
+    // window.webrtcDetectedType      = 'plugin';
+    // window.webrtcDetectedDCSupport = 'SCTP';
+
+    if (!result.version) {
+      hasMatch = /\bMSIE[ :]+(\d+)/g.exec(navigator.userAgent) || [];
+      result.version = parseInt(hasMatch[1] || '0', 10);
+    }
+  // Detect Safari
+  } else if (/constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || safari.pushNotification) || navigator.userAgent.match(/AppleWebKit\/(\d+)\./) || navigator.userAgent.match(/Version\/(\d+).(\d+)/)) {
+    hasMatch = navigator.userAgent.match(/version\/(\d+)\.(\d+)/i) || [];
+    var AppleWebKitBuild = navigator.userAgent.match(/AppleWebKit\/(\d+)/i) || [];
+
+    var isMobile      = navigator.userAgent.match(/(iPhone|iPad)/gi);
+    var hasNativeImpl = AppleWebKitBuild.length >= 1 && AppleWebKitBuild[1] >= 604;
+
+    var majorVersion  = parseInt(hasMatch[1] || '0', 10);
+    var minorVersion  = parseInt(hasMatch[2] || '0', 10);
+    var nativeImplIsOverridable = majorVersion == 11 && minorVersion < 2;
+
+    if (!isMobile
+      && (!hasNativeImpl || (AdapterJS.options.forceSafariPlugin && nativeImplIsOverridable))) {
+      result.browser = 'safari-plugin';
+      result.version = parseInt(hasMatch[1], 10);
+    } else {
+      // Managed by webrtc-adapter:detectBrowser
+    }
+  }
+
+  return result;
+}
 
