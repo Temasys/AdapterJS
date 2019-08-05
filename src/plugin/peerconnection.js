@@ -77,6 +77,14 @@ class RTCPeerConnectionAdapter {
   removeStream(stream) {
     return this.pc_.removeStream(stream);
   };
+  getLocalStreams() { // Depreacted
+    console.warn('getLocalStreams is depreacted.');
+    return this.pc_.getLocalStreams();
+  };
+  getRemoteStreams() { // Depreacted
+    console.warn('getRemoteStreams is depreacted.');
+    return this.pc_.getRemoteStreams();
+  };
   getStats(optTrack) {
     optTrack = typeof(optTrack) !== 'undefined' ? optTrack : null;
     var this_ = this;
@@ -105,14 +113,11 @@ class RTCPeerConnectionAdapter {
   // MISSING
   // addTrack() {
   // removeTrack() {
-  // getLocalStreams() {
-  // getRemoteStreams() {
   // readonly attribute RTCSessionDescription? currentLocalDescription;
   // readonly attribute RTCSessionDescription? pendingLocalDescription;
   // readonly attribute boolean?               canTrickleIceCandidates;
   // readonly attribute RTCSessionDescription? currentRemoteDescription;
   // readonly attribute RTCSessionDescription? pendingRemoteDescription;
-
 
   // ==== PRIVATE
   WaitForPluginReady() {
