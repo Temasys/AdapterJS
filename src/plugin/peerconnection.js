@@ -23,17 +23,15 @@ class RTCPeerConnectionAdapter {
     this.pc_ = pluginManager.plugin().PeerConnection(configuration);
 
     // Event forwarding
-    // TODO: can JS do pre-processor-like functions ? If not maybe some string to function tool ?
-    this.pc_.onicecandidate = this._onicecandidate.bind(this);
-    this.pc_.onaddstream = this._onaddstream.bind(this);
-    this.pc_.onsignalingstatechange = this._onsignalingstatechange.bind(this);
-    this.pc_.oniceconnectionstatechange = this._oniceconnectionstatechange.bind(this);
-    this.pc_.ongatheringchange = this._ongatheringchange.bind(this);
-    this.pc_.onnegotiationneeded = this._onnegotiationneeded.bind(this);
-    this.pc_.onicecandidate = this._onicecandidate.bind(this);
-    this.pc_.ondatachannel = this._ondatachannel.bind(this);
-    this.pc_.onremovestream = this._onremovestream.bind(this);
-  }
+    this.forwardEvent(this.pc_, 'onicecandidate');
+    this.forwardEvent(this.pc_, 'onaddstream');
+    this.forwardEvent(this.pc_, 'onsignalingstatechange');
+    this.forwardEvent(this.pc_, 'oniceconnectionstatechange');
+    this.forwardEvent(this.pc_, 'ongatheringchange');
+    this.forwardEvent(this.pc_, 'onnegotiationneeded');
+    this.forwardEvent(this.pc_, 'ondatachannel');
+    this.forwardEvent(this.pc_, 'onremovestream');
+  };
 
   // ==== PUBLIC FUNCTIONS
 
@@ -97,37 +95,6 @@ class RTCPeerConnectionAdapter {
   get iceConnectionState()  { return this.pc_.iceConnectionState; };
   get iceGatheringState()   { return this.pc_.iceGatheringState;  };
 
-  // ==== EVENT CONNECTORS
-  _onicecandidate(e) {
-    if (typeof this.onicecandidate === 'function') this.onicecandidate(e);
-  };
-
-  _onaddstream(e) {
-    if (typeof this.onaddstream === 'function') this.onaddstream(e);
-  };
-  _onsignalingstatechange(e) {
-    if (typeof this.onsignalingstatechange === 'function') this.onsignalingstatechange(e);
-  };
-  _oniceconnectionstatechange(e) {
-    if (typeof this.oniceconnectionstatechange === 'function') this.oniceconnectionstatechange(e);
-  };
-  _ongatheringchange(e) {
-    if (typeof this.ongatheringchange === 'function') this.ongatheringchange(e);
-  };
-  _onnegotiationneeded(e) {
-    if (typeof this.onnegotiationneeded === 'function') this.onnegotiationneeded(e);
-  };
-  _onicecandidate(e) {
-    if (typeof this.onicecandidate === 'function') this.onicecandidate(e);
-  };
-  _ondatachannel(e) {
-    if (typeof this.ondatachannel === 'function') this.ondatachannel(e);
-  };
-  _onremovestream(e) {
-    if (typeof this.onremovestream === 'function') this.onremovestream(e);
-  };
-
-
   // get testStr() {
   //   return this.pc_.testStr;
   // }
@@ -152,6 +119,13 @@ class RTCPeerConnectionAdapter {
     pluginManager.WaitForPluginReady();
   };
 
+  // TODO: move me to utils ??
+  forwardEvent(eventProducer, eventName) {
+    eventProducer[eventName] = function(e) {
+      if (typeof this[eventName] === 'function') 
+        this[eventName](e);
+    }.bind(this);
+  };
 }
 
 
