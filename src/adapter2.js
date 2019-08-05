@@ -11,6 +11,7 @@ import * as native_attachmediastream  from './attachmediastream';
 import * as pluginManager             from './plugin/plugin_manager';
 import * as getusermedia              from './plugin/getusermedia';
 import * as plugin_attachmediastream  from './plugin/attachmediastream';
+import * as plugin_peerConnection     from './plugin/peerconnection.js';
 // import * as pluginShim      from './plugin_shim';
 
 let browserDetails = utils.detectBrowser(window);
@@ -23,6 +24,7 @@ if ( browserDetails.browser == 'IE'
   pluginManager.injectPlugin();
   getusermedia.shimGetUserMedia(window, pluginManager);
   plugin_attachmediastream.shimAttachMediaStream(window, pluginManager, pageId);
+  plugin_peerConnection.shimPeerConnection(window, pluginManager);
 } else {
   native_attachmediastream.shimAttachMediaStream(window);
 }

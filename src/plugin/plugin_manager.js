@@ -4,6 +4,8 @@ import * as utils       from './../utils';
 import config           from './../config';
 import { PLUGIN_TAGS }  from './plugin_enum';
 
+// TODO: test on IE 9 that console.* exists
+
 ////////////////////////////////////////////////////////////////////////////
 /// 
 /// enums
