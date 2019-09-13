@@ -25,6 +25,7 @@ class RTCPeerConnectionAdapter {
     // Event forwarding
     this.forwardEvent(this.pc_, 'onicecandidate');
     this.forwardEvent(this.pc_, 'onaddstream');
+    this.forwardEvent(this.pc_, 'ontrack');
     this.forwardEvent(this.pc_, 'onsignalingstatechange');
     this.forwardEvent(this.pc_, 'oniceconnectionstatechange');
     this.forwardEvent(this.pc_, 'ongatheringchange');
@@ -76,6 +77,9 @@ class RTCPeerConnectionAdapter {
   };
   removeStream(stream) {
     return this.pc_.removeStream(stream);
+  };
+  addTrack(track, stream) {
+    return this.pc_.addTrack(track, stream);
   };
   getLocalStreams() { // Depreacted
     console.warn('getLocalStreams is depreacted.');
