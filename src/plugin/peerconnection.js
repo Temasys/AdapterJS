@@ -89,6 +89,15 @@ class RTCPeerConnectionAdapter {
     console.warn('getRemoteStreams is depreacted.');
     return this.pc_.getRemoteStreams();
   };
+  getSenders() {
+    return this.pc_.getSenders();
+  };
+  getReceivers() {
+    return this.pc_.getReceivers();
+  };
+  getTransceivers() {
+    return this.pc_.getTransceivers();
+  };
   getStats(optTrack) {
     optTrack = typeof(optTrack) !== 'undefined' ? optTrack : null;
     var this_ = this;

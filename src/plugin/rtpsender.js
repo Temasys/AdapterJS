@@ -1,0 +1,47 @@
+'use strict';
+
+////////////////////////////////////////////////////////////////////////////
+/// 
+/// local variables
+/// 
+////////////////////////////////////////////////////////////////////////////
+
+let pluginManager = null;
+
+////////////////////////////////////////////////////////////////////////////
+/// 
+/// Internal functions
+/// 
+////////////////////////////////////////////////////////////////////////////
+
+class RTCRtpSenderAdapter {
+
+  // ==== STATIC FUNCTIONS
+
+  static getCapabilities(kind) {
+    if (kind !== 'audio' 
+      && kind !== 'video') {
+      console.error("RTCRtpSender.getCapabilities arg0 should be 'audio', or 'video'");
+      return;
+    }
+    RTCRtpSenderAdapter.WaitForPluginReady();
+    return pluginManager.plugin().GetRtpSenderCapabilities(kind);
+  };
+
+  // ==== PRIVATE
+  static WaitForPluginReady() {
+    pluginManager.WaitForPluginReady();
+  };
+}
+
+////////////////////////////////////////////////////////////////////////////
+/// 
+/// exports
+/// 
+////////////////////////////////////////////////////////////////////////////
+
+export function shimRTCRtpSender(window, pm) {
+  pluginManager = pm;
+
+  window.RTCRtpSender = RTCRtpSenderAdapter;
+}
