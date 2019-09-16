@@ -14,7 +14,37 @@ let pluginManager = null;
 /// 
 ////////////////////////////////////////////////////////////////////////////
 
-class RTCRtpReceiverAdapter {
+class RTCRtpReceiver {
+  constructor(receiver) {
+    pluginManager.WaitForPluginReady();
+
+    this.receiver_ = receiver;
+  }
+
+  // ==== PUBLIC FUNCTIONS
+  getParameters() {
+    return this.receiver_.getParameters();
+  };
+  getStats() {
+    var this_ = this;
+    return new Promise((resolve, reject) => {
+      var parseAndResolve = (stats) => { resolve(JSON.parse(stats)); };
+      this_.receiver_.getStats(parseAndResolve, reject);
+    });
+  }
+  getContributingSources() {
+    return this.receiver_.getContributingSources();
+  };
+  getSynchronizationSources() {
+    return this.receiver_.getSynchronizationSources();
+  };
+
+  // ==== READ ONLY PROPERTIES
+
+  get track()           { return this.receiver_.track; };
+  get transport()       { console.error('RTCRtpReceiver.transport is not supported'); };
+  get rtcpTransport()   { console.error('RTCRtpReceiver.rtcpTransport is not supported'); };
+
 
   // ==== STATIC FUNCTIONS
 
@@ -43,5 +73,5 @@ class RTCRtpReceiverAdapter {
 export function shimRTCRtpReceiver(window, pm) {
   pluginManager = pm;
 
-  window.RTCRtpReceiver = RTCRtpReceiverAdapter;
+  window.RTCRtpReceiver = RTCRtpReceiver;
 }
