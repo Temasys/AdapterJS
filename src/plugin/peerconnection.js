@@ -14,10 +14,10 @@ let pluginManager = null;
 /// 
 ////////////////////////////////////////////////////////////////////////////
 
-class RTCPeerConnectionAdapter {
+class RTCPeerConnection {
   constructor(configuration) {
     // Note : this line waits for the plugin to be ready
-    // This means that RTCPeerConnectionAdapter's functinos don't need to be protected for plugin ready
+    // This means that RTCPeerConnection's functions don't need to be protected for plugin ready
     pluginManager.WaitForPluginReady();
 
     this.pc_ = pluginManager.plugin().PeerConnection(configuration);
@@ -90,7 +90,12 @@ class RTCPeerConnectionAdapter {
     return this.pc_.getRemoteStreams();
   };
   getSenders() {
-    return this.pc_.getSenders();
+    var senders = this.pc_.getSenders();
+    var wrappedSenders = [];
+    senders.forEach((sender) => {
+      wrappedSenders.push(new RTCRtpSender(sender));
+    })
+    return wrappedSenders;
   };
   getReceivers() {
     return this.pc_.getReceivers();
@@ -157,7 +162,7 @@ class RTCPeerConnectionAdapter {
 export function shimPeerConnection(window, pm) {
   pluginManager = pm;
 
-  window.RTCPeerConnection = RTCPeerConnectionAdapter;
+  window.RTCPeerConnection = RTCPeerConnection;
 
   ////////////////////////////////////////////////////////////////////////////
   /// RTCIceCandidate TODO: give me my own file
