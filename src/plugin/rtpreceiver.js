@@ -28,7 +28,9 @@ class RTCRtpReceiver {
   getStats() {
     var this_ = this;
     return new Promise((resolve, reject) => {
-      var parseAndResolve = (stats) => { resolve(JSON.parse(stats)); };
+      var parseAndResolve = (stats) => {
+        resolve(stats ? JSON.parse(stats) : []);
+      };
       this_.receiver_.getStats(parseAndResolve, reject);
     });
   }

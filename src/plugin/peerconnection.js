@@ -90,15 +90,18 @@ class RTCPeerConnection {
     return this.pc_.getRemoteStreams();
   };
   getSenders() {
-    var senders = this.pc_.getSenders();
     var wrappedSenders = [];
-    senders.forEach((sender) => {
+    this.pc_.getSenders().forEach((sender) => {
       wrappedSenders.push(new RTCRtpSender(sender));
     })
     return wrappedSenders;
   };
   getReceivers() {
-    return this.pc_.getReceivers();
+    var wrappedReceivers = [];
+    this.pc_.getSenders().forEach((receiver) => {
+      wrappedReceivers.push(new RTCRtpReceiver(receiver));
+    })
+    return wrappedReceivers;
   };
   getTransceivers() {
     return this.pc_.getTransceivers();
