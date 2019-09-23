@@ -81,6 +81,16 @@ class RTCPeerConnection {
   addTrack(track, stream) {
     return this.pc_.addTrack(track, stream);
   };
+  addTransceiver(trackOrKind, init) {
+    if (typeof trackOrKind === 'string'
+      && trackOrKind !== 'audio' && trackOrKind !== 'video') {
+      console.error('A string was specified as trackOrKind which is not valid. The string must be either "audio" or "video"');
+      return;
+    }
+    var t = this.pc_.addTransceiver(trackOrKind, init);
+    if (t) return new RTCRtpTransceiver(t);
+    else console.error('addTransceiver failed'); //returns undefined
+  };
   getLocalStreams() { // Depreacted
     console.warn('getLocalStreams is depreacted.');
     return this.pc_.getLocalStreams();
