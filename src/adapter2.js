@@ -14,6 +14,7 @@ import * as plugin_attachmediastream  from './plugin/attachmediastream';
 import * as plugin_peerConnection     from './plugin/peerconnection.js';
 import * as plugin_rtpSender          from './plugin/rtpsender.js';
 import * as plugin_rtpReceiver        from './plugin/rtpreceiver.js';
+import * as plugin_rtpTransceiver     from './plugin/rtptransceiver.js';
 // import * as pluginShim      from './plugin_shim';
 
 let browserDetails = utils.detectBrowser(window);
@@ -29,6 +30,7 @@ if ( browserDetails.browser == 'IE'
   plugin_peerConnection.shimPeerConnection(window, pluginManager);
   plugin_rtpSender.shimRTCRtpSender(window, pluginManager);
   plugin_rtpReceiver.shimRTCRtpReceiver(window, pluginManager);
+  plugin_rtpTransceiver.shimRTCRtpTransceiver(window, pluginManager);
 } else {
   native_attachmediastream.shimAttachMediaStream(window);
 }

@@ -104,7 +104,11 @@ class RTCPeerConnection {
     return wrappedReceivers;
   };
   getTransceivers() {
-    return this.pc_.getTransceivers();
+    var wrappedTransceivers = [];
+    this.pc_.getTransceivers().forEach((transceiver) => {
+      wrappedTransceivers.push(new RTCRtpTransceiver(transceiver));
+    })
+    return wrappedTransceivers;
   };
   getStats(optTrack) {
     optTrack = typeof(optTrack) !== 'undefined' ? optTrack : null;
