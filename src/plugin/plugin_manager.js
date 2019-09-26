@@ -24,7 +24,7 @@ const TEXT = {
   PLUGIN: {
     REQUIRE_INSTALLATION: 'This website requires you to install a WebRTC-enabling plugin ' +
       'to work on this browser.',
-    REQUIRE_RESTART: 'Your plugin is being downloaded. Please run the installer, and restart your browser to begin using it.',
+    REQUIRE_RESTART: 'Your plugin is being downloaded. Please run the installer, and restart your browser to start using it.',
     NOT_SUPPORTED: 'Your browser does not support WebRTC.',
     BUTTON: 'Install Now'
   },
@@ -60,10 +60,6 @@ let onwebrtcreadies     = []; // TODO rename to onWebRTCReadyCallbacks
 /// 
 ////////////////////////////////////////////////////////////////////////////
 
-function documentReady() {
-  return (document.readyState === 'interactive' && !!document.body) || document.readyState === 'complete';
-}
-
 // !!!! WARNING: DO NOT OVERRIDE THIS FUNCTION. !!!
 // This function will be called when plugin is ready. It sends necessary
 // details to the plugin.
@@ -75,7 +71,7 @@ function documentReady() {
 // This function is the only private function that is not encapsulated to
 // allow the plugin method to be called.
 function onPluginLoaded() {
-  if (documentReady()) {
+  if (utils.documentReady()) {
     pluginState = PLUGIN_STATES.READY;
     maybeThroughWebRTCReady();
   } else {
@@ -153,7 +149,33 @@ export function isPluginInstalled() {
     return false;
   } else 
     return false; // other browsers would not support plugins
-}
+};
+
+export function getDownloadLink() {
+  if(!!navigator.platform.match(/^Mac/i))
+    return config.downloadLinks.mac;
+  else if(!!navigator.platform.match(/^Win/i))
+    return config.downloadLinks.win;
+};
+
+export function downloadPlugin(callback) {
+  // Download
+  window.open(getDownloadLink(), '_top');
+
+  if (browserDetails.browser === 'safari-plugin' && browserDetails.version == 11) {
+    // Safari 11 doesn't have a way to reload the list of plugins. Ask user to restart their browser
+    utils.renderNotificationBar(TEXT.PLUGIN.REQUIRE_RESTART);
+  } else {
+    // Reload the list of plugins,
+    var interval = setInterval(()=>{
+      navigator.plugins.refresh(false);
+      if (isPluginInstalled()) {
+        clearInterval(interval);
+        callback();
+      }
+    } , 500);
+  }
+};
 
 export function injectPlugin() {
   if (!window_) {
@@ -162,7 +184,7 @@ export function injectPlugin() {
   }
 
   // only inject once the page is ready
-  if (!documentReady()) {
+  if (!utils.documentReady()) {
     utils.addEvent(document
           , 'readystatechange'
           , utils.bind_trailing_args(injectPlugin, window_));

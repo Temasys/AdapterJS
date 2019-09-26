@@ -39,6 +39,11 @@ export function addEvent(elem, evnt, func) {
   }
 };
 
+
+export function documentReady() {
+  return (document.readyState === 'interactive' && !!document.body) || document.readyState === 'complete';
+};
+
 export function detectBrowser(window) {
   var result = webrtcUtils.detectBrowser(window);
 
@@ -81,4 +86,66 @@ export function detectBrowser(window) {
 
   return result;
 }
+
+export function renderNotificationBar(message, buttonText, buttonCallback) {
+  // only inject once the page is ready
+  if (!documentReady()) {
+    return;
+  }
+
+  var w = window;
+  var i = document.createElement('iframe');
+  i.name = 'adapterjs-alert';
+  i.style.position = 'fixed';
+  i.style.top = '-41px';
+  i.style.left = 0;
+  i.style.right = 0;
+  i.style.width = '100%';
+  i.style.height = '40px';
+  i.style.backgroundColor = '#ffffe1';
+  i.style.border = 'none';
+  i.style.borderBottom = '1px solid #888888';
+  i.style.zIndex = '9999999';
+  if(typeof i.style.webkitTransition === 'string') {
+    i.style.webkitTransition = 'all .5s ease-out';
+  } else if(typeof i.style.transition === 'string') {
+    i.style.transition = 'all .5s ease-out';
+  }
+  document.body.appendChild(i);
+  var c = (i.contentWindow) ? i.contentWindow :
+    (i.contentDocument.document) ? i.contentDocument.document : i.contentDocument;
+  c.document.open();
+  c.document.write('<span style="display: inline-block; font-family: Helvetica, Arial,' +
+    'sans-serif; font-size: .9rem; padding: 4px; vertical-align: ' +
+    'middle; cursor: default;">' + message + '</span>');
+  if(buttonText && typeof buttonCallback === 'function') {
+    c.document.write('<button id="okay">' + buttonText + '</button><button id="cancel">Cancel</button>');
+    c.document.close();
+
+    // On click on okay
+    addEvent(c.document.getElementById('okay'), 'click', function (e) {
+      e.preventDefault();
+      try {
+        e.cancelBubble = true;
+      } catch(error) { }
+      buttonCallback(e);
+    });
+
+    // On click on Cancel - all bars has same logic so keeping it that way for now
+    addEvent(c.document.getElementById('cancel'), 'click', function(e) {
+      w.document.body.removeChild(i);
+    });
+  } else {
+    c.document.close();
+  }
+  setTimeout(function() {
+    if(typeof i.style.webkitTransform === 'string') {
+      i.style.webkitTransform = 'translateY(40px)';
+    } else if(typeof i.style.transform === 'string') {
+      i.style.transform = 'translateY(40px)';
+    } else {
+      i.style.top = '0px';
+    }
+  }, 300);
+};
 
