@@ -180,7 +180,7 @@ export function injectPlugin() {
     pluginObject = document.createElement('div');
     pluginObject.innerHTML = '<object id="' +
       config.pluginId + '" type="' +
-      config.type + '" ' + 'width="1" height="1">' +
+      config.mimetype + '" ' + 'width="1" height="1">' +
       '<param name="pluginId" value="' +
       config.pluginId + '" /> ' +
       '<param name="windowless" value="false" /> ' +
@@ -211,7 +211,7 @@ export function injectPlugin() {
       pluginObject.width = '0px';
       pluginObject.height = '0px';
     }
-    pluginObject.type = config.type;
+    pluginObject.type = config.mimetype;
     pluginObject.innerHTML = '<param name="onload" value="' +
       config.onload + '">' +
       '<param name="pluginId" value="' +

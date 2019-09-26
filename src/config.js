@@ -1,8 +1,8 @@
 export default {
   prefix : 'Tem',
-  plugName : 'TemWebRTCPlugin',
+  pluginName : 'TemWebRTCPlugin',
   pluginId : 'plugin0',
-  type : 'application/x-temwebrtcplugin',
+  mimetype : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0',
   portalLink : 'https://skylink.io/plugin/',
   companyName: 'Temasys',

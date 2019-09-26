@@ -80,7 +80,7 @@ function attachMediaStream(element, stream) {
     }
 
     temp.innerHTML = '<object id="' + elementId + '" ' + classHTML +
-      'type="' + config.type + '">' +
+      'type="' + config.mimetype + '">' +
       '<param name="pluginId" value="' + elementId + '" /> ' +
       '<param name="pageId" value="' + pageId + '" /> ' +
       '<param name="windowless" value="true" /> ' +
