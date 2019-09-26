@@ -132,6 +132,29 @@ export function callWhenPluginReady(callback) {
   }
 };
 
+
+export function isPluginInstalled() {
+  if (browserDetails.browser === 'IE') {
+    try {
+      let axo = new ActiveXObject(config.prefix + '.' + config.pluginName);
+      return true; // will fall into catch if plugin is not installed
+    } catch (e) {
+      return false;
+    }
+  }else if (browserDetails.browser === 'safari-plugin') {
+    let pluginArray = navigator.mimeTypes;
+    if (typeof pluginArray !== 'undefined') {
+      for (var i = 0; i < pluginArray.length; i++) {
+        if (pluginArray[i].type.indexOf(config.mimetype) >= 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  } else 
+    return false; // other browsers would not support plugins
+}
+
 export function injectPlugin() {
   if (!window_) {
     console.error('plugin_manager needs init() to be called before injectPlugin');
