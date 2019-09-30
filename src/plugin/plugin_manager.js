@@ -177,6 +177,25 @@ export function downloadPlugin(callback) {
   }
 };
 
+export function getLatestVersionNumber() {
+  var request = new XMLHttpRequest();
+  request.open('GET', config.versionURL +'?cacheBreaker='+new Date().getTime(), false);
+  request.send(null);
+  return request.responseText;
+  // request.onreadystatechange = function () {
+  //   if (request.readyState === 4 && request.status === 200) {
+  //     return request.responseText;
+  //   }
+  // }
+}
+
+export function isUpdateAvailable() {
+  if (!pluginObject) return;
+  let current = pluginObject.VERSION;
+  let latest  = getLatestVersionNumber();
+  return utils.versionCompare(latest, current) > 0;
+}
+
 export function injectPlugin() {
   if (!window_) {
     console.error('plugin_manager needs init() to be called before injectPlugin');

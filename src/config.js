@@ -6,6 +6,7 @@ export default {
   onload : '__TemWebRTCReady0',
   portalLink : 'https://skylink.io/plugin/',
   companyName: 'Temasys',
+  versionURL: 'https://s3-us-west-2.amazonaws.com/webrtcplugin/CURRENT_STABLE',
   downloadLinks : {
     mac: 'https://bit.ly/webrtcpluginpkg',
     win: 'https://bit.ly/webrtcpluginmsi'
