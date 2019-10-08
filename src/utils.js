@@ -35,7 +35,7 @@ export function addEvent(elem, evnt, func) {
   } else if (elem.attachEvent) {// OLD IE DOM
     elem.attachEvent('on'+evnt, func);
   } else { // No much to do
-    elem[evnt] = func;
+    elem['on'+evnt] = func;
   }
 };
 
