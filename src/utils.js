@@ -88,8 +88,11 @@ export function detectBrowser(window) {
 }
 
 export function renderNotificationBar(message, buttonText, buttonCallback) {
-  // only inject once the page is ready
+  // Render only once document ready
   if (!documentReady()) {
+    addEvent(document
+          , 'DOMContentLoaded'
+          , renderNotificationBar.bind(null, message, buttonText, buttonCallback));
     return;
   }
 

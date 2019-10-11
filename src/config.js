@@ -10,6 +10,29 @@ export default {
   downloadLinks : {
     mac: 'https://bit.ly/webrtcpluginpkg',
     win: 'https://bit.ly/webrtcpluginmsi'
+  },
+  refreshIEAfterInstall: true,
+  TEXT: {
+    PLUGIN: {
+      INSTALLATION: {
+        LABEL: 'This website requires you to install a WebRTC-enabling plugin to work on this browser.',
+        BUTTON: 'Install Now',
+      },
+      UPDATE: {
+        LABEL: 'A new version of your WebRTC plugin is available.',
+        BUTTON: 'Update Now',
+      },
+      RESTART: {
+        LABEL: 'Thank you. After installing the new version of your WebRTC plugin, please restart your browser to start using it.',
+      },
+    },
+    NOT_SUPPORTED: {
+      LABEL: 'Your browser does not support WebRTC.',
+    },
+    // REFRESH: {
+    //   LABEL: 'Please refresh page',
+    //   BUTTON: 'Refresh Page'
+    // }
   }
 };
 // if(typeof AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== "undefined" && AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== null) {

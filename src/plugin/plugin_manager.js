@@ -20,20 +20,6 @@ const PLUGIN_STATES = {
   READY: 4            // Plugin ready to be used
 };
 
-const TEXT = {
-  PLUGIN: {
-    REQUIRE_INSTALLATION: 'This website requires you to install a WebRTC-enabling plugin ' +
-      'to work on this browser.',
-    REQUIRE_RESTART: 'Your plugin is being downloaded. Please run the installer, and restart your browser to start using it.',
-    NOT_SUPPORTED: 'Your browser does not support WebRTC.',
-    BUTTON: 'Install Now'
-  },
-  REFRESH: {
-    REQUIRE_REFRESH: 'Please refresh page',
-    BUTTON: 'Refresh Page'
-  }
-};
-
 ////////////////////////////////////////////////////////////////////////////
 /// 
 /// local variables
@@ -128,7 +114,6 @@ export function callWhenPluginReady(callback) {
   }
 };
 
-
 export function isPluginInstalled() {
   if (browserDetails.browser === 'IE') {
     try {
@@ -164,14 +149,13 @@ export function downloadPlugin(callback) {
 
   if (browserDetails.browser === 'safari-plugin' && browserDetails.version == 11) {
     // Safari 11 doesn't have a way to reload the list of plugins. Ask user to restart their browser
-    utils.renderNotificationBar(TEXT.PLUGIN.REQUIRE_RESTART);
+    utils.renderNotificationBar(config.TEXT.PLUGIN.RESTART.LABEL);
   } else {
     // Reload the list of plugins,
     var interval = setInterval(()=>{
-      navigator.plugins.refresh(false);
       if (isPluginInstalled()) {
         clearInterval(interval);
-        callback();
+        if (typeof callback === 'function') callback();
       }
     } , 500);
   }
@@ -196,6 +180,27 @@ export function isUpdateAvailable() {
   return utils.versionCompare(latest, current) > 0;
 }
 
+export function installPlugin() {
+  let downloadCallback = function() {
+    // IE and Safari don't have the same behaviour after installing a plugin.
+    // IE requires a page refresh, when Safari can just refresh the list via JS
+    // See : http://support.temasys.com.sg/support/solutions/articles/12000020619-do-i-need-to-restart-my-browser-after-installing-the-webrtc-plugin-
+    if (browserDetails.browser !== 'IE') {
+      navigator.plugins.refresh(false);
+      plugin_manager.injectPlugin();
+    } else if (config.refreshIEAfterInstall)
+      location.reload();
+  };
+  utils.renderNotificationBar(config.TEXT.PLUGIN.INSTALLATION.LABEL, config.TEXT.PLUGIN.INSTALLATION.BUTTON, downloadPlugin.bind(null, downloadCallback));
+}
+
+export function updatePlugin() {
+  let updateCallback = function() {
+    utils.renderNotificationBar(config.TEXT.PLUGIN.RESTART.LABEL);
+  };
+  utils.renderNotificationBar(config.TEXT.PLUGIN.UPDATE.LABEL, config.TEXT.PLUGIN.UPDATE.BUTTON, downloadPlugin.bind(null, updateCallback));
+}
+
 export function injectPlugin() {
   if (!window_) {
     console.error('plugin_manager needs init() to be called before injectPlugin');
@@ -204,9 +209,7 @@ export function injectPlugin() {
 
   // only inject once the page is ready
   if (!utils.documentReady()) {
-    utils.addEvent(document
-          , 'readystatechange'
-          , utils.bind_trailing_args(injectPlugin, window_));
+    utils.addEvent(document, 'readystatechange', injectPlugin);
     return;
   }
 
