@@ -11,6 +11,8 @@ export default {
     mac: 'https://bit.ly/webrtcpluginpkg',
     win: 'https://bit.ly/webrtcpluginmsi'
   },
+  autoInstall: true,
+  autoUpdate: true,
   refreshIEAfterInstall: true,
   TEXT: {
     PLUGIN: {

@@ -5,6 +5,7 @@ console.log('AdapterJS');
 import '@babel/polyfill';
 import adapter from 'webrtc-adapter/dist/adapter_core';
 
+import config                         from './config';
 import * as utils                     from './utils';
 import * as native_attachmediastream  from './attachmediastream';
 import * as plugin_manager            from './plugin/plugin_manager';
@@ -33,12 +34,14 @@ if ( browserDetails.browser == 'IE'
   plugin_rtpReceiver.shimRTCRtpReceiver(window, plugin_manager);
   plugin_rtpTransceiver.shimRTCRtpTransceiver(window, plugin_manager);
 
-  if (!plugin_manager.isPluginInstalled()) 
-    plugin_manager.installPlugin();
-  else {
+  if (plugin_manager.isPluginInstalled()) {
     plugin_manager.injectPlugin();
-    if (plugin_manager.isUpdateAvailable())
+    if (plugin_manager.isUpdateAvailable() && config.autoUpdate) {
       plugin_manager.updatePlugin();
+    }
+  } 
+  else if (config.autoInstall) {
+    plugin_manager.installPlugin();
   }
 } 
 else {
