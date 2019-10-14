@@ -13,6 +13,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-string-replace');
 
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.initConfig({
 
@@ -32,7 +33,7 @@ module.exports = function(grunt) {
       browserify: {
         adapter: {
           src: ['./src/adapter2.js'],
-          dest: './out/adapter2.js',
+          dest: './out/adapter.js',
           options: {
             // browserifyOptions: { debug: true },
             transform: [['babelify', {presets: ['@babel/preset-env']}]],
@@ -43,6 +44,13 @@ module.exports = function(grunt) {
             // }
           }
         },
+      },
+
+      watch: {
+        js: {
+          files: ['src/**/*.js'],
+          tasks: ['build']
+        }
       },
 
       clean: {
