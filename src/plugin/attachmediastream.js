@@ -149,8 +149,6 @@ function reattachMediaStream(to, from) {
 export function shimAttachMediaStream(window, pm, pageid) {
   pageId        = pageid;
   pluginManager = pm;
-  // attachMediaStream_    = bind_trailing_args(attachMediaStream,   pageId);
-  // reattachMediaStream_  = bind_trailing_args(reattachMediaStream, pageId);
 
   // Propagate attachMediaStream in window
   window.attachMediaStream    = attachMediaStream;
