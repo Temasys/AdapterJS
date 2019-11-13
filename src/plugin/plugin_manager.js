@@ -165,7 +165,7 @@ export function getLatestVersionNumber() {
   var request = new XMLHttpRequest();
   request.open('GET', config.versionURL +'?cacheBreaker='+new Date().getTime(), false);
   request.send(null);
-  return request.responseText;
+  return request.responseText.replace(/\n/g, '');
   // request.onreadystatechange = function () {
   //   if (request.readyState === 4 && request.status === 200) {
   //     return request.responseText;
@@ -174,10 +174,19 @@ export function getLatestVersionNumber() {
 }
 
 export function isUpdateAvailable() {
-  if (!pluginObject) return;
+  if (!pluginObject) {
+    callWhenPluginReady(checkForUpdate);
+    return;
+  }
   let current = pluginObject.VERSION;
   let latest  = getLatestVersionNumber();
   return utils.versionCompare(latest, current) > 0;
+}
+
+export function checkForUpdate() {
+  if (isUpdateAvailable() && config.autoUpdate) {
+      updatePlugin();
+    }
 }
 
 export function installPlugin() {

@@ -4,16 +4,15 @@ export default {
   pluginId : 'plugin0',
   mimetype : 'application/x-temwebrtcplugin',
   onload : '__TemWebRTCReady0',
-  portalLink : 'https://skylink.io/plugin/',
+  portalLink : 'plugin.temasys.com.sg',
   companyName: 'Temasys',
-  versionURL: 'https://s3-us-west-2.amazonaws.com/webrtcplugin/CURRENT_STABLE',
   downloadLinks : {
-    mac: 'https://bit.ly/webrtcpluginpkg',
-    win: 'https://bit.ly/webrtcpluginmsi'
+    mac: 'https://webrtcplugin.s3.amazonaws.com/LatestVersion/TemWebRTCPlugin.pkg',
+    win: 'https://webrtcplugin.s3.amazonaws.com/LatestVersion/TemWebRTCPlugin.msi',
   },
-  autoInstall: true,
+  autoInstall: false,
   autoUpdate: true,
-  refreshIEAfterInstall: true,
+  refreshIEAfterInstall: false,
   TEXT: {
     PLUGIN: {
       INSTALLATION: {
@@ -31,17 +30,6 @@ export default {
     NOT_SUPPORTED: {
       LABEL: 'Your browser does not support WebRTC.',
     },
-    // REFRESH: {
-    //   LABEL: 'Please refresh page',
-    //   BUTTON: 'Refresh Page'
-    // }
-  }
+  },
+  versionURL : 'https://s3-us-west-2.amazonaws.com/webrtcplugin/CURRENT_STABLE'
 };
-// if(typeof AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== "undefined" && AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks !== null) {
-//   if(!!navigator.platform.match(/^Mac/i)) {
-//     AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.mac;
-//   }
-//   else if(!!navigator.platform.match(/^Win/i)) {
-//     AdapterJS.WebRTCPlugin.pluginInfo.downloadLink = AdapterJS.WebRTCPlugin.pluginInfo.downloadLinks.win;
-//   }
-// }

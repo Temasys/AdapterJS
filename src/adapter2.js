@@ -36,9 +36,8 @@ if ( browserDetails.browser == 'IE'
 
   if (plugin_manager.isPluginInstalled()) {
     plugin_manager.injectPlugin();
-    if (plugin_manager.isUpdateAvailable() && config.autoUpdate) {
-      plugin_manager.updatePlugin();
-    }
+    plugin_manager.checkForUpdate();
+    
   } 
   else if (config.autoInstall) {
     plugin_manager.installPlugin();
@@ -53,6 +52,7 @@ let AdapterJS = {
   webRTCReady: plugin_manager.webRTCReady,
   pluginManager: plugin_manager,
   utils: utils,
+  addEvent: utils.addEvent
 };
 
 window.AdapterJS = AdapterJS
