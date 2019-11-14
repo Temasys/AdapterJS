@@ -77,6 +77,17 @@ function maybeThroughWebRTCReady() {
   });
 };
 
+function checkUpdateAvailable(resolve_callback, reject_callback) {
+  if (pluginObject) {
+    let current = pluginObject.VERSION;
+    let latest  = getLatestVersionNumber();
+    (utils.versionCompare(latest, current) > 0) ? resolve_callback(true) : resolve_callback(false);    
+
+  } else {
+    reject_callback("plugin object is not available");
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////
 /// 
 /// exports
@@ -174,13 +185,15 @@ export function getLatestVersionNumber() {
 }
 
 export function isUpdateAvailable() {
-  if (!pluginObject) {
-    callWhenPluginReady(checkForUpdate);
-    return;
-  }
-  let current = pluginObject.VERSION;
-  let latest  = getLatestVersionNumber();
-  return utils.versionCompare(latest, current) > 0;
+  return new Promise ((resolve, reject) =>{
+    if (!pluginObject) {
+      callWhenPluginReady(() => {
+        checkUpdateAvailable(resolve, reject);
+      });
+      return;
+    }
+    checkUpdateAvailable(resolve, reject);
+  });
 }
 
 export function checkForUpdate() {
