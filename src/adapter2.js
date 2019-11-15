@@ -36,8 +36,15 @@ if ( browserDetails.browser == 'IE'
 
   if (plugin_manager.isPluginInstalled()) {
     plugin_manager.injectPlugin();
-    if (plugin_manager.isUpdateAvailable() && config.autoUpdate) {
-      plugin_manager.updatePlugin();
+    if (config.autoUpdate) {
+      plugin_manager.isUpdateAvailable().
+      then( (update_available) => {
+        if (update_available)
+          plugin_manager.updatePlugin();
+      }).
+      catch( (reason_text) =>{
+        console.warn("check for plugin autoupdate failed. reason: " + reason_text);
+      });
     }
   } 
   else if (config.autoInstall) {
@@ -53,6 +60,7 @@ let AdapterJS = {
   webRTCReady: plugin_manager.webRTCReady,
   pluginManager: plugin_manager,
   utils: utils,
+  addEvent: utils.addEvent
 };
 
 window.AdapterJS = AdapterJS
