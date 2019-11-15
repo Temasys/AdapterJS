@@ -179,18 +179,12 @@ export function isUpdateAvailable() {
       if (pluginObject) {
         var current = pluginObject.VERSION;
         var latest = getLatestVersionNumber();
-        utils.versionCompare(latest, current) > 0 ? resolve(true) : resolve(false);
+        resolve(utils.versionCompare(latest, current) > 0);
       } else {
         reject("plugin object is not available");
       }
     });
   });
-}
-
-export function checkForUpdate() {
-  if (isUpdateAvailable() && config.autoUpdate) {
-      updatePlugin();
-    }
 }
 
 export function installPlugin() {
