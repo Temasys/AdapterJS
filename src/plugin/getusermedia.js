@@ -90,6 +90,33 @@ function getUserMedia(constraints) {
   })
 };
 
+function getDisplayMedia(constraints) {
+  const defaultScreenshareVideo = {mediaSource: 'screensharing'}
+  if(!constraints)
+    constraints = { video: defaultScreenshareVideo };
+  else if(!constraints.video
+    || typeof constraints.video !== 'object' /* {video:true} scenario */
+  )
+    constraints.video = defaultScreenshareVideo;
+
+  if(constraints.video.displaySurface) {
+    switch (constraints.video.displaySurface) {
+      case 'monitor':
+        constraints.video.mediaSource = "screen";
+        break;
+      case 'window':
+        constraints.video.mediaSource = "window";
+        break;
+      default:
+        console.warn(`Plugin doesn't support the provided getDisplayMedia video constraint: ${constraints.video.displaySurface}, So defaulting to screenOrWindow.`);
+        constraints.video.mediaSource = "screensharing"; // screen or window
+        break;
+    }
+  }
+
+  return getUserMedia(constraints);
+};
+
 function enumerateDevices() {
   return new Promise((resolve, reject) => {
     pluginManager.callWhenPluginReady(() => {
