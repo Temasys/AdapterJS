@@ -245,6 +245,9 @@ window.webrtcDetectedType = null;
 //Creates MediaStream object.
 window.MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
 
+//Creates MediaStreamTrack object.
+window.MediaStreamTrack = (typeof MediaStreamTrack === 'function') ? MediaStreamTrack : null;
+
 //The RTCPeerConnection object.
 window.RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
   RTCPeerConnection : null;
@@ -953,7 +956,7 @@ if (['webkit', 'moz', 'ms', 'AppleWebKit'].indexOf(AdapterJS.webrtcDetectedType)
     ////////////////////////////////////////////////////////////////////////////
     /// MediaStreamTrack
     ////////////////////////////////////////////////////////////////////////////
-    var MediaStreamTrack = function(){};
+    MediaStreamTrack = function(){};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.GetSources(callback);
