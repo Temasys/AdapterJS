@@ -1,4 +1,4 @@
-/*! adapterjs - v0.15.4 - 2019-01-07 */
+/*! adapterjs - v0.15.5 - 2020-07-14 */
 
 'use strict'
 
@@ -20,7 +20,7 @@ AdapterJS.options.hidePluginInstallPrompt = !!AdapterJS.options.hidePluginInstal
 AdapterJS.options.forceSafariPlugin = !!AdapterJS.options.forceSafariPlugin;
 
 // AdapterJS version
-AdapterJS.VERSION = '0.15.4';
+AdapterJS.VERSION = '0.15.5';
 
 // This function will be called when the WebRTC API is ready to be used
 // Whether it is the native implementation (Chrome, Firefox, Opera) or
@@ -268,6 +268,9 @@ window.webrtcDetectedType = null;
 
 //Creates MediaStream object.
 window.MediaStream = (typeof MediaStream === 'function') ? MediaStream : null;
+
+//Creates MediaStreamTrack object.
+window.MediaStreamTrack = (typeof MediaStreamTrack === 'function') ? MediaStreamTrack : null;
 
 //The RTCPeerConnection object.
 window.RTCPeerConnection = (typeof RTCPeerConnection === 'function') ?
@@ -6383,7 +6386,7 @@ module.exports = {
     ////////////////////////////////////////////////////////////////////////////
     /// MediaStreamTrack
     ////////////////////////////////////////////////////////////////////////////
-    var MediaStreamTrack = function(){};
+    MediaStreamTrack = function(){};
     MediaStreamTrack.getSources = function (callback) {
       AdapterJS.WebRTCPlugin.callWhenPluginReady(function() {
         AdapterJS.WebRTCPlugin.plugin.GetSources(callback);
